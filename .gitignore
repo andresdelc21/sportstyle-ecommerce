@@ -1,0 +1,15 @@
+# Archivos temporales
+*.log
+
+# Windows
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Configuraciones locales futuras
+config/local.php
+
+# Dependencias futuras
+vendor/
+node_modules/

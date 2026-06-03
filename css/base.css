@@ -1,0 +1,29 @@
+/* ===== RESET ===== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --verde:      #00e676;
+    --verde-dark: #00c853;
+    --naranja:    #ff6d00;
+    --negro:      #111;
+    --gris:       #f5f5f5;
+    --texto:      #222;
+    --sombra:     0 5px 20px rgba(0,0,0,0.10);}
+    /* ===== BASE ===== */
+body {
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: var(--gris);
+    color: var(--texto);
+    overflow-x: hidden;
+}
+
+img { max-width: 100%; }
+/* ===== BTN GENERAL ===== */
+.btn { display: inline-block; background: black; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; border: none; cursor: pointer; font-size: 14px; }
+.btn:hover { background: #333; }

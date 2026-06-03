@@ -1,0 +1,987 @@
+/* =========================
+   ADMIN PANEL
+========================= */
+
+.admin-body{
+    background: #111;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+.admin-container{
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+
+.admin-sidebar{
+    width: 260px;
+    background: #0a0a0a;
+    padding: 30px 20px;
+    border-right: 1px solid #222;
+}
+
+.admin-logo{
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.admin-logo span{
+    color: #00e676;
+}
+
+.admin-user{
+    color: #aaa;
+    margin-bottom: 40px;
+}
+
+.admin-menu{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.admin-menu a{
+    color: white;
+    text-decoration: none;
+    padding: 14px;
+    border-radius: 12px;
+    transition: 0.3s;
+    background: #1a1a1a;
+}
+
+.admin-menu a:hover{
+    background: #00e676;
+    color: black;
+    transform: translateX(5px);
+}
+
+.logout-btn{
+    margin-top: 30px;
+    background: #e53935 !important;
+}
+
+/* CONTENT */
+
+.admin-content{
+    flex: 1;
+    padding: 40px;
+}
+
+.admin-header h1{
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+.admin-header p{
+    color: #aaa;
+    margin-bottom: 40px;
+}
+
+/* CARDS */
+
+.admin-cards{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+    gap: 25px;
+}
+
+.admin-card{
+    background: #1a1a1a;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #222;
+    transition: 0.3s;
+}
+
+.admin-card:hover{
+    transform: translateY(-5px);
+    border-color: #00e676;
+}
+
+.admin-card h3{
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.admin-card p{
+    color: #aaa;
+    margin-bottom: 25px;
+}
+
+.admin-card a{
+    display: inline-block;
+    padding: 12px 20px;
+    background: #00e676;
+    color: black;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+}
+/* =========================
+   ADMIN PRODUCTOS
+========================= */
+
+.admin-top{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.admin-top h1{
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+.admin-top p{
+    color: #aaa;
+}
+
+.btn-admin-agregar{
+    background: #00e676;
+    color: black;
+    padding: 14px 22px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-admin-agregar:hover{
+    transform: scale(1.05);
+}
+
+/* TABLA */
+
+.tabla-admin{
+    background: #1a1a1a;
+    border-radius: 20px;
+    overflow-x: auto;
+    border: 1px solid #222;
+}
+
+.tabla-admin table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-admin thead{
+    background: #111;
+}
+
+.tabla-admin th{
+    padding: 18px;
+    text-align: left;
+    color: #00e676;
+    font-size: 15px;
+}
+
+.tabla-admin td{
+    padding: 18px;
+    border-top: 1px solid #222;
+}
+
+.tabla-admin tr:hover{
+    background: #151515;
+}
+
+.admin-img-producto{
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+/* STOCK */
+
+.stock-ok{
+    background: rgba(0,230,118,0.15);
+    color: #00e676;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.stock-bajo{
+    background: rgba(229,57,53,0.15);
+    color: #ff5252;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* BOTONES TABLA */
+
+.acciones-tabla{
+    display: flex;
+    gap: 10px;
+}
+
+.btn-tabla{
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-tabla.editar{
+    background: #00e676;
+}
+
+.btn-tabla.eliminar{
+    background: #e53935;
+}
+
+.btn-tabla:hover{
+    transform: scale(1.08);
+}
+
+/* LINK ACTIVO */
+
+.activo-admin{
+    background: #00e676 !important;
+    color: black !important;
+}
+/* =========================
+   ESTADOS PEDIDOS
+========================= */
+
+.estado{
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.estado.pendiente{
+    background: rgba(255,152,0,0.15);
+    color: #ff9800;
+}
+
+.estado.pagado{
+    background: rgba(0,230,118,0.15);
+    color: #00e676;
+}
+
+.estado.enviado{
+    background: rgba(33,150,243,0.15);
+    color: #2196f3;
+}
+/* =========================
+   PANEL VENTAS
+========================= */
+
+.ventas-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.venta-card{
+    background: #1a1a1a;
+    border: 1px solid #222;
+    border-radius: 20px;
+    padding: 30px;
+    transition: 0.3s;
+}
+
+.venta-card:hover{
+    transform: translateY(-5px);
+    border-color: #00e676;
+}
+
+.venta-icono{
+    font-size: 40px;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.venta-card h3{
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.venta-card h2{
+    font-size: 30px;
+    color: white;
+}
+/* =========================
+   FORM ADMIN
+========================= */
+
+.form-admin{
+    background: #1a1a1a;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #222;
+}
+
+.admin-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-admin textarea{
+    resize: none;
+}
+.btn-admin-volver{
+    background:#111;
+    color:#fff;
+    padding:10px 16px;
+    border-radius:10px;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.btn-admin-volver:hover{
+    background:#00c853;
+}
+
+/* =========================
+   ADMIN DASHBOARD PREMIUM
+========================= */
+
+.admin-numero{
+    font-size:34px;
+    font-weight:800;
+    color:#111;
+    margin:12px 0;
+}
+
+.admin-card span{
+    color:#777;
+    font-size:14px;
+}
+
+.admin-section{
+    margin-top:40px;
+}
+
+.admin-section h2{
+    margin-bottom:20px;
+    font-size:26px;
+    color:#111;
+}
+
+.admin-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    margin-bottom:35px;
+}
+
+@media(max-width:768px){
+    .admin-top{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+.admin-sidebar{
+    background:#0b1220;
+    border-right:1px solid rgba(255,255,255,.06);
+    backdrop-filter:blur(20px);
+}
+/* =========================
+   ADMIN V2 DASHBOARD UI
+========================= */
+
+.admin-hero{
+    background:
+        radial-gradient(circle at top right, rgba(0,230,118,.22), transparent 35%),
+        linear-gradient(135deg, #162033, #0d1117);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:28px;
+    padding:36px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:25px;
+    box-shadow:0 20px 60px rgba(0,0,0,.28);
+    margin-bottom:34px;
+}
+
+.admin-hero h1{
+    font-size:42px;
+    line-height:1.1;
+    margin:14px 0 12px;
+    color:#fff;
+}
+
+.admin-hero p{
+    color:#aeb7c7;
+    font-size:16px;
+    max-width:620px;
+}
+
+.admin-badge{
+    display:inline-block;
+    padding:7px 14px;
+    border-radius:999px;
+    background:rgba(0,230,118,.14);
+    color:#00e676;
+    font-size:13px;
+    font-weight:800;
+    border:1px solid rgba(0,230,118,.25);
+}
+
+.admin-hero-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.btn-admin-secundario{
+    display:inline-block;
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    padding:14px 22px;
+    border-radius:12px;
+    text-decoration:none;
+    font-weight:800;
+    border:1px solid rgba(255,255,255,.12);
+    transition:.3s;
+}
+
+.btn-admin-secundario:hover{
+    background:rgba(255,255,255,.14);
+    transform:translateY(-2px);
+}
+
+.admin-metricas{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:22px;
+    margin-bottom:34px;
+}
+
+.metrica-card{
+    min-height:145px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    background:
+        linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 14px 35px rgba(0,0,0,.22);
+}
+
+.metrica-card:hover{
+    transform:translateY(-6px);
+    border-color:rgba(0,230,118,.45);
+}
+
+.metrica-icono{
+    width:58px;
+    height:58px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:18px;
+    background:rgba(0,230,118,.12);
+    font-size:28px;
+}
+
+.metrica-card span{
+    color:#99a3b4;
+    font-size:13px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.metrica-card h2{
+    font-size:34px;
+    color:#fff;
+    margin:5px 0;
+}
+
+.metrica-card p{
+    color:#8d97a8;
+    margin:0;
+    font-size:14px;
+}
+
+.metrica-card.alerta .metrica-icono{
+    background:rgba(255,152,0,.14);
+}
+
+.metrica-card.venta .metrica-icono{
+    background:rgba(33,150,243,.14);
+}
+
+.admin-dashboard-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:24px;
+    margin-bottom:36px;
+}
+
+.admin-panel-box{
+    background:
+        linear-gradient(145deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:26px;
+    padding:28px;
+    box-shadow:0 14px 35px rgba(0,0,0,.22);
+}
+
+.admin-section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    margin-bottom:22px;
+}
+
+.admin-section-title h2{
+    color:#fff;
+    font-size:26px;
+    margin-bottom:6px;
+}
+
+.admin-section-title p{
+    color:#8d97a8;
+}
+
+.quick-actions{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+}
+
+.quick-action{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:18px;
+    border-radius:18px;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.07);
+    text-decoration:none;
+    transition:.3s;
+}
+
+.quick-action:hover{
+    background:rgba(0,230,118,.12);
+    border-color:rgba(0,230,118,.32);
+    transform:translateY(-4px);
+}
+
+.quick-action span{
+    width:44px;
+    height:44px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,230,118,.12);
+    font-size:22px;
+}
+
+.quick-action h3{
+    color:#fff;
+    font-size:17px;
+    margin-bottom:4px;
+}
+
+.quick-action p{
+    color:#8d97a8;
+    font-size:13px;
+    margin:0;
+}
+
+.admin-resumen-box{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    min-height:260px;
+    background:
+        radial-gradient(circle at top right, rgba(0,230,118,.20), transparent 35%),
+        linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+}
+
+.admin-resumen-box h2{
+    color:#fff;
+    font-size:30px;
+    margin:18px 0 12px;
+}
+
+.admin-resumen-box p{
+    color:#9aa4b5;
+    line-height:1.6;
+    margin-bottom:24px;
+}
+
+.tabla-premium{
+    box-shadow:0 14px 35px rgba(0,0,0,.22);
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.tabla-premium thead{
+    background:rgba(255,255,255,.04);
+}
+
+.tabla-premium th{
+    color:#9aa4b5;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    font-size:12px;
+}
+
+.tabla-premium td{
+    color:#e8edf6;
+}
+
+@media(max-width:1000px){
+
+    .admin-hero{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .admin-dashboard-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+/* =========================
+   PEDIDOS PREMIUM
+========================= */
+
+.small-hero{
+    margin-bottom:24px;
+    padding:28px 34px;
+}
+
+.mini-metricas{
+    margin-bottom:24px;
+}
+
+.admin-search-box{
+    margin-bottom:24px;
+}
+
+.admin-search-box input{
+    width:100%;
+    padding:16px 20px;
+    border:none;
+    outline:none;
+    border-radius:18px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    color:#fff;
+    font-size:15px;
+}
+
+.admin-search-box input::placeholder{
+    color:#97a2b5;
+}
+
+.tabla-admin tr{
+    transition:.25s;
+}
+
+.tabla-admin tbody tr:hover{
+    background:rgba(255,255,255,.04);
+}
+
+.estado.cancelado{
+    background:rgba(229,57,53,0.15);
+    color:#ff5252;
+}
+/* =========================
+   PRODUCTOS ADMIN PREMIUM
+========================= */
+
+.producto-admin-info{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.producto-admin-info strong{
+    color:#fff;
+    display:block;
+    margin-bottom:5px;
+}
+
+.producto-admin-info small{
+    color:#8d97a8;
+    font-size:13px;
+}
+
+.tabla-premium .admin-img-producto{
+    width:64px;
+    height:64px;
+    border-radius:16px;
+    object-fit:cover;
+    background:#fff;
+    padding:4px;
+}
+/* =========================
+   VER PEDIDO PREMIUM
+========================= */
+
+.pedido-hero{
+    margin-bottom:26px;
+}
+
+.pedido-panel{
+    background:
+        linear-gradient(145deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:26px;
+    padding:28px;
+    margin-bottom:26px;
+    box-shadow:0 14px 35px rgba(0,0,0,.22);
+}
+
+.pedido-panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    margin-bottom:22px;
+}
+
+.pedido-panel-header h2{
+    color:#fff;
+    font-size:26px;
+    margin-bottom:6px;
+}
+
+.pedido-panel-header p{
+    color:#8d97a8;
+}
+
+.estado-form{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:14px;
+    max-width:650px;
+}
+
+.estado-form select{
+    background:#fff;
+    color:#111;
+    font-weight:700;
+}
+
+.pedido-grid{
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    gap:24px;
+    margin-bottom:36px;
+}
+
+.pedido-card{
+    background:
+        linear-gradient(145deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:26px;
+    padding:28px;
+    box-shadow:0 14px 35px rgba(0,0,0,.22);
+}
+
+.pedido-card h2{
+    color:#fff;
+    font-size:25px;
+    margin-bottom:22px;
+}
+
+.pedido-dato{
+    padding:15px 0;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.pedido-dato span{
+    display:block;
+    color:#8d97a8;
+    font-size:13px;
+    margin-bottom:6px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.pedido-dato strong{
+    color:#fff;
+    font-size:17px;
+}
+
+.btn-whatsapp-admin{
+    display:inline-block;
+    margin-top:24px;
+    background:#00e676;
+    color:#06120b;
+    padding:15px 22px;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:900;
+    transition:.3s;
+}
+
+.btn-whatsapp-admin:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 25px rgba(0,230,118,.25);
+}
+
+.pedido-total-linea{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 0;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.pedido-total-linea span{
+    color:#8d97a8;
+    font-weight:700;
+}
+
+.pedido-total-linea strong{
+    color:#fff;
+}
+
+.pedido-total-final{
+    margin-top:22px;
+    padding:20px;
+    border-radius:18px;
+    background:rgba(0,230,118,.12);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.pedido-total-final span{
+    color:#00e676;
+    font-weight:900;
+    font-size:18px;
+}
+
+.pedido-total-final strong{
+    color:#fff;
+    font-size:30px;
+}
+
+.pedido-fecha{
+    color:#8d97a8;
+    margin-top:18px;
+}
+
+@media(max-width:900px){
+
+    .pedido-grid{
+        grid-template-columns:1fr;
+    }
+
+    .estado-form{
+        grid-template-columns:1fr;
+    }
+
+    .pedido-panel-header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+}
+/* =========================
+   AGREGAR PRODUCTO PREMIUM
+========================= */
+
+.form-producto-premium{
+    max-width:1200px;
+}
+
+.form-admin-premium .input-group label{
+    color:#9aa4b5;
+    font-weight:900;
+    text-transform:uppercase;
+    font-size:12px;
+    letter-spacing:.6px;
+}
+
+.form-admin-premium input,
+.form-admin-premium select,
+.form-admin-premium textarea{
+    width:100%;
+    background:#fff;
+    color:#111;
+    border:none;
+    outline:none;
+    border-radius:16px;
+    padding:16px 18px;
+    font-size:15px;
+    font-weight:600;
+}
+
+.form-admin-premium textarea{
+    resize:vertical;
+    min-height:150px;
+}
+
+.form-actions-admin{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-top:24px;
+}
+
+.admin-alert{
+    padding:16px 20px;
+    border-radius:16px;
+    margin-bottom:22px;
+    font-weight:900;
+}
+
+.admin-alert.success-msg{
+    background:rgba(0,230,118,.12);
+    color:#00e676;
+    border:1px solid rgba(0,230,118,.25);
+}
+
+.admin-alert.error-msg{
+    background:rgba(229,57,53,.12);
+    color:#ff5252;
+    border:1px solid rgba(229,57,53,.25);
+}
+/* =========================
+   USUARIOS ADMIN PREMIUM
+========================= */
+
+.usuario-admin-info{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.usuario-admin-info strong{
+    color:#fff;
+}
+
+.usuario-avatar{
+    width:44px;
+    height:44px;
+    border-radius:14px;
+    background:rgba(0,230,118,.14);
+    color:#00e676;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:18px;
+}

@@ -1,0 +1,58 @@
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .header { padding: 12px 20px; }
+    .nav { gap: 2px; }
+    .nav-link { font-size: 12px; padding: 6px 8px; }
+    .hero-nike-contenido { flex-direction: column; text-align: center; }
+    .hero-nike-img img { width: 250px; margin-top: 20px; }
+    .hero-nike-texto h1 { font-size: 36px; }
+    .grid { padding: 20px; }
+    .categorias-section { padding: 20px; }
+    .detalle-wrapper { padding: 20px; flex-direction: column; }
+    .galeria { flex-direction: column-reverse; }
+    .galeria-thumbs { flex-direction: row; }
+    .galeria-principal { min-height: 280px; }
+    .carrito-container { padding: 20px; }
+    .carrito-resumen { width: 100%; }
+    .contacto-container { padding: 20px; }
+    .contacto-lateral { width: 100%; }
+}
+.nav-item {
+    position: relative;
+}
+
+.mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 600px;
+    background: white;
+    display: none;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    z-index: 100;
+    min-width: 500px;
+}
+
+.nav-item:hover .mega-menu {
+    display: flex;
+    gap: 40px;
+}
+
+.mega-col h4 {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.mega-col a {
+    display: block;
+    font-size: 13px;
+    color: #333;
+    text-decoration: none;
+    margin-bottom: 5px;
+}
+
+.mega-col a:hover {
+    color: var(--verde);
+}

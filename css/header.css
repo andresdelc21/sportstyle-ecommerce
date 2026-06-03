@@ -1,0 +1,144 @@
+/* ===== HEADER ===== */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: var(--negro);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    overflow: visible;
+}
+
+.logo { font-size: 26px; font-weight: bold; color: white; }
+.logo span { color: var(--verde); }
+
+.acciones-header { display: flex; align-items: center; gap: 15px; }
+
+.carrito-icono {
+    position: relative;
+    font-size: 22px;
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.carrito-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: var(--naranja);
+    color: white;
+    font-size: 11px;
+    border-radius: 50%;
+    padding: 3px 6px;
+    font-weight: bold;
+}
+
+/* ===== MENÚ ===== */
+.nav { display: flex; gap: 5px; align-items: center; }
+.nav-item { position: relative; }
+
+.nav-link {
+    color: #ccc;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: 0.2s;
+    display: block;
+}
+
+.nav-link:hover { color: white; background: rgba(255,255,255,0.08); }
+.nav-sale { color: var(--naranja) !important; font-weight: 900; }
+.nav-sale:hover { background: rgba(255,109,0,0.15) !important; }
+.nav-contacto { font-size: 13px; color: #888 !important; }
+
+/* ===== MEGA MENU ===== */
+.mega-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    background: white;
+    padding: 25px 30px;
+    display: flex;
+    gap: 40px;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(15px);
+    pointer-events: none;
+    transition: 0.3s;
+    z-index: 2000;
+    min-width: 300px;
+}
+
+.nav-item:hover .mega-menu {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.mega-col { display: flex; flex-direction: column; min-width: 130px; }
+.mega-col h4 { font-size: 11px; color: #999; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.mega-col a { text-decoration: none; color: black; padding: 5px 0; font-size: 14px; font-weight: 500; transition: 0.2s; }
+.mega-col a:hover { color: var(--verde-dark); transform: translateX(5px); }
+
+/* ===== OVERLAY ===== */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1500; }
+.overlay.activo { display: block; }
+.overlay {pointer-events: none;}
+
+/* ===== CARRITO LATERAL ===== */
+.carrito-lateral {
+    position: fixed;
+    top: 0;
+    right: -340px;
+    width: 340px;
+    height: 100%;
+    background: white;
+    padding: 25px 20px;
+    transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+    z-index: 2000;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -5px 0 30px rgba(0,0,0,0.15);
+     pointer-events: auto;
+}
+.carrito-lateral.activo { right: 0; }
+
+.carrito-lateral h2 {
+    font-size: 20px;
+    font-weight: 900;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cerrar-carrito { cursor: pointer; font-size: 20px; color: #999; background: none; border: none; transition: 0.2s; }
+.cerrar-carrito:hover { color: #e53935; }
+
+.item-carrito {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f5f5;
+    gap: 10px;
+}
+
+.item-carrito p { font-size: 14px; font-weight: bold; }
+.item-carrito small { color: #999; font-size: 12px; }
+.item-carrito span { color: var(--verde-dark); font-weight: bold; font-size: 14px; }
+
+.carrito-lateral-footer { margin-top: auto; padding-top: 20px; border-top: 2px solid #f0f0f0; }
+.carrito-lateral-footer h3 { font-size: 20px; font-weight: 900; margin-bottom: 12px; }
+
+.btn-eliminar { text-decoration: none; font-size: 16px; opacity: 0.6; transition: 0.2s; }
+.btn-eliminar:hover { opacity: 1; }
