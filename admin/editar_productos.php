@@ -21,6 +21,64 @@ $id = (int) $_GET['id'];
 $success = "";
 $error = "";
 
+/* ACCIONES IMÁGENES */
+if(isset($_GET['principal'])){
+
+    $img_id = (int) $_GET['principal'];
+
+    mysqli_query($conn, "UPDATE imagenes_productos SET principal = 0 WHERE producto_id = $id");
+    mysqli_query($conn, "UPDATE imagenes_productos SET principal = 1 WHERE id = $img_id AND producto_id = $id");
+
+    $sqlPrincipal = "SELECT imagen FROM imagenes_productos WHERE id = $img_id AND producto_id = $id";
+    $resPrincipal = mysqli_query($conn, $sqlPrincipal);
+    $imgPrincipal = mysqli_fetch_assoc($resPrincipal);
+
+    if($imgPrincipal){
+        $rutaPrincipal = $imgPrincipal['imagen'];
+        mysqli_query($conn, "UPDATE productos SET imagen = '$rutaPrincipal' WHERE id = $id");
+    }
+
+    header("Location: editar_productos.php?id=$id");
+    exit;
+}
+
+if(isset($_GET['eliminar_img'])){
+
+    $img_id = (int) $_GET['eliminar_img'];
+
+    $sqlImg = "SELECT imagen, principal FROM imagenes_productos WHERE id = $img_id AND producto_id = $id";
+    $resImg = mysqli_query($conn, $sqlImg);
+    $imgData = mysqli_fetch_assoc($resImg);
+
+    if($imgData){
+
+        $rutaArchivo = "../" . $imgData['imagen'];
+
+        if(file_exists($rutaArchivo)){
+            unlink($rutaArchivo);
+        }
+
+        mysqli_query($conn, "DELETE FROM imagenes_productos WHERE id = $img_id AND producto_id = $id");
+
+        if($imgData['principal'] == 1){
+
+            $sqlNueva = "SELECT * FROM imagenes_productos WHERE producto_id = $id ORDER BY orden ASC, id ASC LIMIT 1";
+            $resNueva = mysqli_query($conn, $sqlNueva);
+            $nueva = mysqli_fetch_assoc($resNueva);
+
+            if($nueva){
+                mysqli_query($conn, "UPDATE imagenes_productos SET principal = 1 WHERE id = {$nueva['id']}");
+                mysqli_query($conn, "UPDATE productos SET imagen = '{$nueva['imagen']}' WHERE id = $id");
+            }
+
+        }
+
+    }
+
+    header("Location: editar_productos.php?id=$id");
+    exit;
+}
+
 /* TRAER PRODUCTO */
 $sql = "SELECT * FROM productos WHERE id = ?";
 
@@ -44,39 +102,91 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     $nombre = trim($_POST['nombre']);
     $descripcion = trim($_POST['descripcion']);
-    $precio = (int) $_POST['precio'];
-    $precio_original = (int) $_POST['precio_original'];
+    $precio = (float) $_POST['precio'];
+    $precio_original = (float) $_POST['precio_original'];
     $stock = (int) $_POST['stock'];
-    $categoria = trim($_POST['categoria']);
+    $categoria = (int) $_POST['categoria'];
     $genero = trim($_POST['genero']);
 
-    /* IMAGEN ACTUAL */
     $imagen = $producto['imagen'];
 
-    /* SUBIR NUEVA IMAGEN */
-    if(isset($_FILES['imagen']) && $_FILES['imagen']['error'] == 0){
+    /* SUBIR IMÁGENES MÚLTIPLES */
+    if(isset($_FILES['imagenes'])){
 
-        $nombreImagen = time() . "_" . basename($_FILES['imagen']['name']);
+        $totalImagenes = count($_FILES['imagenes']['name']);
 
-        $rutaDestino = "../uploads/" . $nombreImagen;
+        for($i = 0; $i < $totalImagenes; $i++){
 
-        if(move_uploaded_file($_FILES['imagen']['tmp_name'], $rutaDestino)){
+            if($_FILES['imagenes']['error'][$i] === 0){
 
-            $imagen = "uploads/" . $nombreImagen;
+                $nombreOriginal = basename($_FILES['imagenes']['name'][$i]);
+                $nombreImagen = time() . "_" . $i . "_" . $nombreOriginal;
 
-        } else {
+                $rutaTemporal = $_FILES['imagenes']['tmp_name'][$i];
+                $rutaDestino = "../uploads/" . $nombreImagen;
 
-            $error = "Error al subir la imagen";
+                if(move_uploaded_file($rutaTemporal, $rutaDestino)){
+
+                    $rutaBD = "uploads/" . $nombreImagen;
+
+                    $sqlOrden = "SELECT COALESCE(MAX(orden), 0) + 1 AS nuevo_orden
+                                 FROM imagenes_productos
+                                 WHERE producto_id = $id";
+
+                    $resOrden = mysqli_query($conn, $sqlOrden);
+                    $ordenData = mysqli_fetch_assoc($resOrden);
+                    $orden = (int) $ordenData['nuevo_orden'];
+
+                    $sqlTieneImagenes = "SELECT COUNT(*) AS total FROM imagenes_productos WHERE producto_id = $id";
+                    $resTieneImagenes = mysqli_query($conn, $sqlTieneImagenes);
+                    $dataTieneImagenes = mysqli_fetch_assoc($resTieneImagenes);
+
+                    $principal = ($dataTieneImagenes['total'] == 0) ? 1 : 0;
+
+                    $sqlInsertImg = "INSERT INTO imagenes_productos
+                    (
+                        producto_id,
+                        imagen,
+                        orden,
+                        principal
+                    )
+                    VALUES
+                    (
+                        ?, ?, ?, ?
+                    )";
+
+                    $stmtImg = mysqli_prepare($conn, $sqlInsertImg);
+
+                    mysqli_stmt_bind_param(
+                        $stmtImg,
+                        "isii",
+                        $id,
+                        $rutaBD,
+                        $orden,
+                        $principal
+                    );
+
+                    mysqli_stmt_execute($stmtImg);
+
+                    if($principal == 1){
+                        $imagen = $rutaBD;
+                    }
+
+                } else {
+
+                    $error = "Error al subir una imagen";
+
+                }
+
+            }
 
         }
 
     }
 
-    /* UPDATE */
     if(empty($error)){
 
         $update = "UPDATE productos SET
-
             nombre = ?,
             descripcion = ?,
             precio = ?,
@@ -85,14 +195,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             categoria_id = ?,
             genero = ?,
             imagen = ?
-
             WHERE id = ?";
 
         $stmtUpdate = mysqli_prepare($conn, $update);
 
         mysqli_stmt_bind_param(
             $stmtUpdate,
-            "ssiiisssi",
+            "ssddiissi",
             $nombre,
             $descripcion,
             $precio,
@@ -108,7 +217,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             $success = "Producto actualizado correctamente";
 
-            /* RECARGAR DATOS */
             $producto['nombre'] = $nombre;
             $producto['descripcion'] = $descripcion;
             $producto['precio'] = $precio;
@@ -127,6 +235,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
 
 }
+
+/* TRAER IMÁGENES */
+$sqlImagenes = "SELECT *
+                FROM imagenes_productos
+                WHERE producto_id = ?
+                ORDER BY principal DESC, orden ASC, id ASC";
+
+$stmtImagenes = mysqli_prepare($conn, $sqlImagenes);
+mysqli_stmt_bind_param($stmtImagenes, "i", $id);
+mysqli_stmt_execute($stmtImagenes);
+$imagenesProducto = mysqli_stmt_get_result($stmtImagenes);
 
 ?>
 
@@ -151,7 +270,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 <div class="admin-container">
 
-    <!-- SIDEBAR -->
     <aside class="admin-sidebar">
 
         <h2 class="admin-logo">
@@ -160,61 +278,53 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
         <nav class="admin-menu">
 
-            <a href="index.php">
-                🏠 Dashboard
-            </a>
+            <a href="index.php">🏠 Dashboard</a>
 
-            <a href="productos.php"
-               class="activo-admin">
-                📦 Productos
-            </a>
+            <a href="productos.php" class="activo-admin">📦 Productos</a>
 
-            <a href="pedidos.php">
-                🧾 Pedidos
-            </a>
+            <a href="pedidos.php">🧾 Pedidos</a>
 
-            <a href="usuarios.php">
-                👥 Usuarios
-            </a>
+            <a href="usuarios.php">👥 Usuarios</a>
 
-            <a href="ventas.php">
-                📊 Ventas
-            </a>
+            <a href="ventas.php">📊 Ventas</a>
+
+            <a href="../index.php">🏪 Ver tienda</a>
+
+            <a href="../logout.php" class="logout-btn">🚪 Cerrar sesión</a>
 
         </nav>
 
     </aside>
 
-    <!-- CONTENIDO -->
     <main class="admin-content">
 
         <div class="admin-top">
 
             <div>
 
-                <h1>
-                    Editar Producto
-                </h1>
+                <h1>Editar Producto</h1>
 
-                <p>
-                    Modifica la información del producto
-                </p>
+                <p>Modifica la información del producto y administra sus imágenes.</p>
 
             </div>
+
+            <a href="productos.php" class="btn-admin-volver">
+                ← Volver
+            </a>
 
         </div>
 
         <?php if($success): ?>
-            <p class="success-msg"><?= $success ?></p>
+            <div class="admin-alert success-msg">✅ <?= $success ?></div>
         <?php endif; ?>
 
         <?php if($error): ?>
-            <p class="error-msg"><?= $error ?></p>
+            <div class="admin-alert error-msg">❌ <?= $error ?></div>
         <?php endif; ?>
 
         <form method="POST"
               enctype="multipart/form-data"
-              class="form-admin">
+              class="form-admin form-admin-premium">
 
             <div class="admin-grid">
 
@@ -224,7 +334,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                     <input type="text"
                            name="nombre"
-                           value="<?= $producto['nombre'] ?>"
+                           value="<?= htmlspecialchars($producto['nombre']) ?>"
                            required>
 
                 </div>
@@ -234,6 +344,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <label>Precio</label>
 
                     <input type="number"
+                           step="0.01"
                            name="precio"
                            value="<?= $producto['precio'] ?>"
                            required>
@@ -245,6 +356,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <label>Precio Original</label>
 
                     <input type="number"
+                           step="0.01"
                            name="precio_original"
                            value="<?= $producto['precio_original'] ?>">
 
@@ -261,30 +373,25 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                 </div>
 
-                <!-- CATEGORÍA -->
                 <div class="input-group">
 
                     <label>Categoría</label>
 
                     <select name="categoria" required>
 
-                        <option value="1"
-                            <?= $producto['categoria_id'] == '1' ? 'selected' : '' ?>>
+                        <option value="1" <?= $producto['categoria_id'] == 1 ? 'selected' : '' ?>>
                             Calzado
                         </option>
 
-                        <option value="2"
-                            <?= $producto['categoria_id'] == '2' ? 'selected' : '' ?>>
+                        <option value="2" <?= $producto['categoria_id'] == 2 ? 'selected' : '' ?>>
                             Remeras
                         </option>
 
-                        <option value="3"
-                            <?= $producto['categoria_id'] == '3' ? 'selected' : '' ?>>
+                        <option value="3" <?= $producto['categoria_id'] == 3 ? 'selected' : '' ?>>
                             Pantalones / Shorts
                         </option>
 
-                        <option value="4"
-                            <?= $producto['categoria_id'] == '4' ? 'selected' : '' ?>>
+                        <option value="4" <?= $producto['categoria_id'] == 4 ? 'selected' : '' ?>>
                             Accesorios
                         </option>
 
@@ -292,25 +399,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                 </div>
 
-                <!-- GÉNERO -->
                 <div class="input-group">
 
                     <label>Género</label>
 
                     <select name="genero" required>
 
-                        <option value="Hombre"
-                            <?= $producto['genero'] == 'Hombre' ? 'selected' : '' ?>>
+                        <option value="Hombre" <?= $producto['genero'] == 'Hombre' ? 'selected' : '' ?>>
                             Hombre
                         </option>
 
-                        <option value="Mujer"
-                            <?= $producto['genero'] == 'Mujer' ? 'selected' : '' ?>>
+                        <option value="Mujer" <?= $producto['genero'] == 'Mujer' ? 'selected' : '' ?>>
                             Mujer
                         </option>
 
-                        <option value="Niños"
-                            <?= $producto['genero'] == 'Niños' ? 'selected' : '' ?>>
+                        <option value="Niños" <?= $producto['genero'] == 'Niños' ? 'selected' : '' ?>>
                             Niños
                         </option>
 
@@ -320,27 +423,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             </div>
 
-            <!-- IMAGEN ACTUAL -->
             <div class="input-group">
 
-                <label>Imagen Actual</label>
-
-                <br>
-
-                <img src="../<?= $producto['imagen'] ?>"
-                     width="120"
-                     style="border-radius:10px; margin-top:10px;">
-
-            </div>
-
-            <!-- NUEVA IMAGEN -->
-            <div class="input-group">
-
-                <label>Nueva Imagen</label>
+                <label>Agregar nuevas imágenes</label>
 
                 <input type="file"
-                       name="imagen"
-                       accept="image/*">
+                       name="imagenes[]"
+                       accept="image/*"
+                       multiple>
 
             </div>
 
@@ -349,18 +439,77 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <label>Descripción</label>
 
                 <textarea name="descripcion"
-                          rows="5"><?= $producto['descripcion'] ?></textarea>
+                          rows="5"><?= htmlspecialchars($producto['descripcion']) ?></textarea>
 
             </div>
 
             <button type="submit"
                     class="btn-admin-agregar">
-
                 Guardar Cambios
-
             </button>
 
         </form>
+
+        <section class="pedido-panel" style="margin-top:30px;">
+
+            <div class="admin-section-title">
+
+                <div>
+
+                    <h2>Galería del producto</h2>
+
+                    <p>Administra las imágenes visibles en el detalle del producto.</p>
+
+                </div>
+
+            </div>
+
+            <div class="admin-galeria-producto">
+
+                <?php if(mysqli_num_rows($imagenesProducto) > 0): ?>
+
+                    <?php while($img = mysqli_fetch_assoc($imagenesProducto)): ?>
+
+                        <div class="admin-img-card">
+
+                            <img src="../<?= $img['imagen'] ?>" alt="Imagen producto">
+
+                            <?php if($img['principal'] == 1): ?>
+
+                                <span class="badge-principal">
+                                    Principal
+                                </span>
+
+                            <?php endif; ?>
+
+                            <div class="admin-img-actions">
+
+                                <a href="editar_productos.php?id=<?= $id ?>&principal=<?= $img['id'] ?>">
+                                    ⭐ Principal
+                                </a>
+
+                                <a href="editar_productos.php?id=<?= $id ?>&eliminar_img=<?= $img['id'] ?>"
+                                   onclick="return confirm('¿Eliminar esta imagen?')">
+                                    🗑 Eliminar
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    <?php endwhile; ?>
+
+                <?php else: ?>
+
+                    <p style="color:#aaa;">
+                        Este producto todavía no tiene imágenes en la galería.
+                    </p>
+
+                <?php endif; ?>
+
+            </div>
+
+        </section>
 
     </main>
 
