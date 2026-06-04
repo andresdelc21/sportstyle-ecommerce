@@ -88,6 +88,7 @@ if($resStockCritico){
         $productosStockCritico[] = $p;
     }
 }
+
 /* DATOS DEL GRÁFICO */
 $resVentasGrafico = mysqli_query($conn, "
     SELECT
@@ -100,14 +101,10 @@ $resVentasGrafico = mysqli_query($conn, "
 ");
 
 if($resVentasGrafico){
-
     while($fila = mysqli_fetch_assoc($resVentasGrafico)){
-
         $ventasPorMesLabels[] = $fila['mes'];
         $ventasPorMesData[] = (float)$fila['total'];
-
     }
-
 }
 
 /* ÚLTIMOS PEDIDOS */
@@ -432,6 +429,31 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
 
         </section>
 
+        <!-- GRÁFICO DE VENTAS -->
+        <section class="admin-section">
+
+            <div class="admin-section-title">
+
+                <div>
+
+                    <h2>Resumen mensual</h2>
+
+                    <p>
+                        Evolución de ventas confirmadas.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="admin-panel-box chart-box">
+
+                <canvas id="ventasMesChart"></canvas>
+
+            </div>
+
+        </section>
+
         <!-- ÚLTIMOS PEDIDOS -->
         <section class="admin-section">
 
@@ -533,13 +555,8 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-
-const ventasLabels =
-<?= json_encode($ventasPorMesLabels) ?>;
-
-const ventasData =
-<?= json_encode($ventasPorMesData) ?>;
-
+const ventasLabels = <?= json_encode($ventasPorMesLabels) ?>;
+const ventasData = <?= json_encode($ventasPorMesData) ?>;
 </script>
 
 <script src="../java/admin.js"></script>
