@@ -27,3 +27,119 @@ img { max-width: 100%; }
 /* ===== BTN GENERAL ===== */
 .btn { display: inline-block; background: black; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; border: none; cursor: pointer; font-size: 14px; }
 .btn:hover { background: #333; }
+/* =========================
+   WHATSAPP FLOTANTE
+========================= */
+
+.whatsapp-float{
+    position:fixed;
+    right:25px;
+    bottom:25px;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    background:#25d366;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    text-decoration:none;
+    box-shadow:0 8px 25px rgba(0,0,0,.25);
+    z-index:3000;
+    transition:.3s;
+}
+
+.whatsapp-float:hover{
+    transform:scale(1.1) translateY(-4px);
+    box-shadow:0 12px 35px rgba(0,0,0,.35);
+}
+/* =========================
+   ASISTENTE VIRTUAL
+========================= */
+
+.asistente-float{
+    position:fixed;
+    right:25px;
+    bottom:95px;
+    z-index:3000;
+}
+
+.asistente-btn{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    border:none;
+    background:#111;
+    color:white;
+    font-size:28px;
+    cursor:pointer;
+    box-shadow:0 8px 25px rgba(0,0,0,.25);
+    transition:.3s;
+}
+
+.asistente-btn:hover{
+    transform:scale(1.08) translateY(-4px);
+    background:var(--verde);
+    color:#111;
+}
+
+.asistente-box{
+    position:absolute;
+    right:0;
+    bottom:75px;
+    width:300px;
+    background:white;
+    border-radius:20px;
+    box-shadow:0 15px 45px rgba(0,0,0,.25);
+    overflow:hidden;
+    display:none;
+}
+
+.asistente-box.activo{
+    display:block;
+}
+
+.asistente-header{
+    background:#111;
+    color:white;
+    padding:16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.asistente-header button{
+    background:none;
+    border:none;
+    color:white;
+    font-size:22px;
+    cursor:pointer;
+}
+
+.asistente-body{
+    padding:18px;
+}
+
+.asistente-body p{
+    font-size:14px;
+    color:#555;
+    margin-bottom:10px;
+}
+
+.asistente-body a{
+    display:block;
+    
+    padding:12px;
+    margin-top:8px;
+    background:#f5f5f5;
+    color:#111;
+    text-decoration:none;
+    border-radius:12px;
+    font-weight:700;
+    transition:.3s;
+}
+
+.asistente-body a:hover{
+    background:var(--verde);
+}

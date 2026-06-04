@@ -151,9 +151,21 @@ function descuento(
 
 <?php include("includes/header.php"); ?>
 
-<h1 class="titulo">
-    Productos
-</h1>
+<div class="productos-header">
+
+    <span class="productos-badge">
+        SportStyle
+    </span>
+
+    <h1>
+        Explorá nuestra colección
+    </h1>
+
+    <p>
+        Encontrá indumentaria, calzado y accesorios deportivos.
+    </p>
+
+</div>
 
 <!-- ===== FILTROS ===== -->
 <div class="filtros">

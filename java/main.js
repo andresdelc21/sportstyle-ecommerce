@@ -68,3 +68,26 @@ function toggleCarrito() {
         cargarCarrito();
     }
 }
+document.addEventListener("DOMContentLoaded", function(){
+
+    const btn = document.getElementById("asistenteBtn");
+    const box = document.getElementById("asistenteBox");
+    const cerrar = document.getElementById("cerrarAsistente");
+
+    if(btn && box){
+
+        btn.addEventListener("click", function(){
+            box.classList.toggle("activo");
+        });
+
+    }
+
+    if(cerrar && box){
+
+        cerrar.addEventListener("click", function(){
+            box.classList.remove("activo");
+        });
+
+    }
+
+});

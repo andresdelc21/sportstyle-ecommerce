@@ -3,7 +3,7 @@
 include("config/conexion.php");
 include("includes/header.php");
 
-/* TRAER PRODUCTOS DESTACADOS DESDE MYSQL */
+/* PRODUCTOS DESTACADOS */
 $sqlDestacados = "SELECT
                     productos.*,
                     categorias.nombre AS categoria_nombre,
@@ -26,29 +26,44 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
 
     <div class="hero-contenido">
 
-        <h1>NUEVA COLECCIÓN</h1>
+        <span class="hero-badge">SportStyle 2026</span>
+
+        <h1>Nueva colección deportiva</h1>
 
         <p>
-            Rendimiento, estilo y comodidad en cada paso.
+            Indumentaria, calzado y accesorios para entrenar con estilo,
+            comodidad y rendimiento.
         </p>
 
-        <a href="productos.php"
-           class="btn-hero">
+        <div class="hero-actions">
 
-            Ver productos
+            <a href="productos.php" class="btn-hero">
+                Ver productos
+            </a>
 
-        </a>
+            <a href="productos.php?genero=Hombre" class="btn-hero-secundario">
+                Explorar colección
+            </a>
+
+        </div>
 
     </div>
 
 </section>
 
-<!-- PRODUCTOS DESTACADOS -->
-<section>
+<section class="home-intro">
 
-    <h2 class="titulo">
-        Productos Destacados
-    </h2>
+    <span>🔥 Nuevos ingresos</span>
+
+    <h2>Productos destacados</h2>
+
+    <p>
+        Selección de productos recientes disponibles en SportStyle.
+    </p>
+
+</section>
+
+<section class="productos-destacados">
 
     <div class="grid">
 
@@ -59,7 +74,6 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
                 <div class="card-v2"
                      onclick="window.location='detalle.php?id=<?= $p['id'] ?>'">
 
-                    <!-- IMAGEN -->
                     <div class="card-v2-img">
 
                         <img src="<?= $p['imagen'] ?>"
@@ -67,7 +81,6 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
 
                     </div>
 
-                    <!-- INFO -->
                     <div class="card-v2-info">
 
                         <div class="card-v2-tags">
@@ -82,7 +95,7 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
 
                             <?php if(!empty($p['marca_nombre'])): ?>
 
-                                <span class="badge-marca">
+                                <span class="badge-genero">
                                     <?= $p['marca_nombre'] ?>
                                 </span>
 
@@ -109,9 +122,7 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
                                 <a href="carrito.php?agregar=<?= $p['id'] ?>"
                                    class="btn-card"
                                    onclick="event.stopPropagation()">
-
-                                   🛒
-
+                                    🛒
                                 </a>
 
                             <?php endif; ?>
@@ -119,9 +130,7 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
                             <a href="detalle.php?id=<?= $p['id'] ?>"
                                class="btn-card btn-detalle"
                                onclick="event.stopPropagation()">
-
-                               👁️
-
+                                👁️
                             </a>
 
                         </div>
@@ -134,7 +143,7 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
 
         <?php else: ?>
 
-            <p style="text-align:center; width:100%; padding:40px; color:#888;">
+            <p class="home-empty">
                 Todavía no hay productos destacados cargados.
             </p>
 
@@ -144,7 +153,30 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
 
 </section>
 
-<!-- BANNER -->
+<section class="home-beneficios-pro">
+
+    <div class="beneficio-pro">
+        <strong>🚚 Envíos</strong>
+        <span>Consultá disponibilidad y tiempos según tu zona.</span>
+    </div>
+
+    <div class="beneficio-pro">
+        <strong>💳 Pagos</strong>
+        <span>Opciones simples para comprar con seguridad.</span>
+    </div>
+
+    <div class="beneficio-pro">
+        <strong>🔒 Compra segura</strong>
+        <span>Tu pedido queda registrado y protegido.</span>
+    </div>
+
+    <div class="beneficio-pro">
+        <strong>↩️ Cambios</strong>
+        <span>Consultá cambios por talle, producto o disponibilidad.</span>
+    </div>
+
+</section>
+
 <section class="banner-promo">
 
     <div class="banner-contenido">
@@ -158,18 +190,16 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
         </h2>
 
         <p>
-            En indumentaria deportiva seleccionada
+            En indumentaria deportiva seleccionada.
         </p>
 
         <span class="fecha">
-            Del 10 al 30 de este mes
+            Promociones disponibles por tiempo limitado.
         </span>
 
-        <a href="productos.php?sale=1"
+        <a href="productos.php"
            class="btn-banner">
-
            Ver ofertas
-
         </a>
 
     </div>
