@@ -1139,3 +1139,16 @@
     background:#f1f3f5;
     color:#111;
 }
+/* =========================
+   CHART DASHBOARD
+========================= */
+
+.chart-box{
+    height:400px;
+    padding:25px;
+}
+
+.chart-box canvas{
+    width:100% !important;
+    height:100% !important;
+}
