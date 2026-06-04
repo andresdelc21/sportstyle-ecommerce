@@ -107,52 +107,8 @@ $ultimasVentas = mysqli_query($conn, $sqlUltimas);
 
 <div class="admin-container">
 
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
+    <?php include("includes/sidebar.php"); ?>
 
-        <h2 class="admin-logo">
-            Sport<span>Style</span>
-        </h2>
-
-        <p class="admin-user">
-            👋 <?= $_SESSION['usuario_nombre'] ?>
-        </p>
-
-        <nav class="admin-menu">
-
-            <a href="index.php">
-                🏠 Dashboard
-            </a>
-
-            <a href="productos.php">
-                📦 Productos
-            </a>
-
-            <a href="pedidos.php">
-                🧾 Pedidos
-            </a>
-
-            <a href="usuarios.php">
-                👥 Usuarios
-            </a>
-
-            <a href="ventas.php"
-               class="activo-admin">
-                📊 Ventas
-            </a>
-
-            <a href="../index.php">
-                🏪 Ver tienda
-            </a>
-
-            <a href="../logout.php"
-               class="logout-btn">
-               🚪 Cerrar sesión
-            </a>
-
-        </nav>
-
-    </aside>
 
     <!-- CONTENIDO -->
     <main class="admin-content">
@@ -420,6 +376,6 @@ $ultimasVentas = mysqli_query($conn, $sqlUltimas);
     </main>
 
 </div>
-
+<script src="../java/admin.js"></script>
 </body>
 </html>

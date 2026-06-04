@@ -70,52 +70,7 @@ foreach($productos as $p){
 
 <div class="admin-container">
 
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
-
-        <h2 class="admin-logo">
-            Sport<span>Style</span>
-        </h2>
-
-        <p class="admin-user">
-            👋 <?= $_SESSION['usuario_nombre'] ?>
-        </p>
-
-        <nav class="admin-menu">
-
-            <a href="index.php">
-                🏠 Dashboard
-            </a>
-
-            <a href="productos.php"
-               class="activo-admin">
-                📦 Productos
-            </a>
-
-            <a href="pedidos.php">
-                🧾 Pedidos
-            </a>
-
-            <a href="usuarios.php">
-                👥 Usuarios
-            </a>
-
-            <a href="ventas.php">
-                📊 Ventas
-            </a>
-
-            <a href="../index.php">
-                🏪 Ver tienda
-            </a>
-
-            <a href="../logout.php"
-               class="logout-btn">
-               🚪 Cerrar sesión
-            </a>
-
-        </nav>
-
-    </aside>
+    <?php include("includes/sidebar.php"); ?>
 
     <!-- CONTENIDO -->
     <main class="admin-content">
@@ -386,6 +341,6 @@ buscadorProducto.addEventListener("keyup", function(){
 });
 
 </script>
-
+<script src="../java/admin.js"></script>
 </body>
 </html>

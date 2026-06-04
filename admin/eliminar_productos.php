@@ -40,4 +40,5 @@ if(mysqli_stmt_execute($stmt)){
     echo "Error al eliminar producto";
 
 }
+
 ?>

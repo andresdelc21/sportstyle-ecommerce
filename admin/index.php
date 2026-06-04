@@ -16,30 +16,75 @@ $totalPedidos = 0;
 $totalUsuarios = 0;
 $totalVentas = 0;
 $pedidosPendientes = 0;
+$ventasMes = 0;
+$productosStockCritico = [];
 
+/* TOTAL PRODUCTOS */
 $resProductos = mysqli_query($conn, "SELECT COUNT(*) AS total FROM productos");
 if($resProductos){
     $totalProductos = mysqli_fetch_assoc($resProductos)['total'];
 }
 
+/* TOTAL PEDIDOS */
 $resPedidos = mysqli_query($conn, "SELECT COUNT(*) AS total FROM pedidos");
 if($resPedidos){
     $totalPedidos = mysqli_fetch_assoc($resPedidos)['total'];
 }
 
+/* TOTAL USUARIOS */
 $resUsuarios = mysqli_query($conn, "SELECT COUNT(*) AS total FROM usuarios");
 if($resUsuarios){
     $totalUsuarios = mysqli_fetch_assoc($resUsuarios)['total'];
 }
 
-$resVentas = mysqli_query($conn, "SELECT SUM(total) AS total FROM pedidos WHERE estado IN ('Pagado','Enviado','Entregado')");
+/* VENTAS TOTALES */
+$resVentas = mysqli_query($conn, "
+    SELECT SUM(total) AS total 
+    FROM pedidos 
+    WHERE estado IN ('Pagado','Enviado','Entregado')
+");
+
 if($resVentas){
     $totalVentas = mysqli_fetch_assoc($resVentas)['total'] ?? 0;
 }
 
-$resPendientes = mysqli_query($conn, "SELECT COUNT(*) AS total FROM pedidos WHERE estado = 'Pendiente'");
+/* PEDIDOS PENDIENTES */
+$resPendientes = mysqli_query($conn, "
+    SELECT COUNT(*) AS total 
+    FROM pedidos 
+    WHERE estado = 'Pendiente'
+");
+
 if($resPendientes){
     $pedidosPendientes = mysqli_fetch_assoc($resPendientes)['total'];
+}
+
+/* VENTAS DEL MES */
+$resVentasMes = mysqli_query($conn, "
+    SELECT SUM(total) AS total
+    FROM pedidos
+    WHERE estado IN ('Pagado','Enviado','Entregado')
+    AND MONTH(fecha) = MONTH(CURRENT_DATE())
+    AND YEAR(fecha) = YEAR(CURRENT_DATE())
+");
+
+if($resVentasMes){
+    $ventasMes = mysqli_fetch_assoc($resVentasMes)['total'] ?? 0;
+}
+
+/* PRODUCTOS CON STOCK CRÍTICO */
+$resStockCritico = mysqli_query($conn, "
+    SELECT id, nombre, stock, imagen
+    FROM productos
+    WHERE stock > 0 AND stock <= 5
+    ORDER BY stock ASC
+    LIMIT 5
+");
+
+if($resStockCritico){
+    while($p = mysqli_fetch_assoc($resStockCritico)){
+        $productosStockCritico[] = $p;
+    }
 }
 
 /* ÚLTIMOS PEDIDOS */
@@ -62,8 +107,11 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
@@ -71,60 +119,15 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
 
     <link rel="stylesheet"
           href="../css/estilos.css">
+
 </head>
 
 <body class="admin-body">
 
 <div class="admin-container">
 
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
+    <?php include("includes/sidebar.php"); ?>
 
-        <h2 class="admin-logo">
-            Sport<span>Style</span>
-        </h2>
-
-        <p class="admin-user">
-            👋 <?= $_SESSION['usuario_nombre'] ?>
-        </p>
-
-        <nav class="admin-menu">
-
-            <a href="index.php"
-               class="activo-admin">
-                🏠 Dashboard
-            </a>
-
-            <a href="productos.php">
-                📦 Productos
-            </a>
-
-            <a href="pedidos.php">
-                🧾 Pedidos
-            </a>
-
-            <a href="usuarios.php">
-                👥 Usuarios
-            </a>
-
-            <a href="ventas.php">
-                📊 Ventas
-            </a>
-
-            <a href="../index.php">
-                🏪 Ver tienda
-            </a>
-
-            <a href="../logout.php"
-               class="logout-btn">
-               🚪 Cerrar sesión
-            </a>
-
-        </nav>
-
-    </aside>
-
-    <!-- CONTENIDO -->
     <main class="admin-content">
 
         <!-- HERO DASHBOARD -->
@@ -206,9 +209,21 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
                 <div class="metrica-icono">💰</div>
 
                 <div>
-                    <span>Ventas</span>
+                    <span>Ventas totales</span>
                     <h2>$<?= number_format($totalVentas, 0, ',', '.') ?></h2>
                     <p>Ventas confirmadas</p>
+                </div>
+
+            </div>
+
+            <div class="admin-card metrica-card venta">
+
+                <div class="metrica-icono">📅</div>
+
+                <div>
+                    <span>Ventas del mes</span>
+                    <h2>$<?= number_format($ventasMes, 0, ',', '.') ?></h2>
+                    <p>Ingresos confirmados este mes</p>
                 </div>
 
             </div>
@@ -299,6 +314,96 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
                    class="btn-admin-agregar">
                     Revisar pedidos
                 </a>
+
+            </div>
+
+        </section>
+
+        <!-- STOCK CRÍTICO -->
+        <section class="admin-section">
+
+            <div class="admin-section-title">
+
+                <div>
+                    <h2>Stock crítico</h2>
+                    <p>Productos que necesitan reposición pronto.</p>
+                </div>
+
+                <a href="productos.php"
+                   class="btn-admin-secundario">
+                    Ver productos
+                </a>
+
+            </div>
+
+            <div class="tabla-admin tabla-premium">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Stock</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    <?php if(count($productosStockCritico) > 0): ?>
+
+                        <?php foreach($productosStockCritico as $p): ?>
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="producto-admin-info">
+
+                                        <img src="../<?= $p['imagen'] ?>"
+                                             class="admin-img-producto">
+
+                                        <strong>
+                                            <?= $p['nombre'] ?>
+                                        </strong>
+
+                                    </div>
+
+                                </td>
+
+                                <td>
+                                    <span class="stock-bajo">
+                                        <?= $p['stock'] ?> unidades
+                                    </span>
+                                </td>
+
+                                <td class="acciones-tabla">
+
+                                    <a href="editar_productos.php?id=<?= $p['id'] ?>"
+                                       class="btn-tabla editar">
+                                       ✏️
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        <?php endforeach; ?>
+
+                    <?php else: ?>
+
+                        <tr>
+                            <td colspan="3"
+                                style="text-align:center; padding:30px;">
+                                No hay productos con stock crítico
+                            </td>
+                        </tr>
+
+                    <?php endif; ?>
+
+                    </tbody>
+
+                </table>
 
             </div>
 
@@ -401,6 +506,8 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
     </main>
 
 </div>
+
+<script src="../java/admin.js"></script>
 
 </body>
 </html>

@@ -116,48 +116,9 @@ if(!empty($pedido['telefono_cliente'])){
 
 <div class="admin-container">
 
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
+    <?php include("includes/sidebar.php"); ?>
 
-        <h2 class="admin-logo">
-            Sport<span>Style</span>
-        </h2>
-
-        <nav class="admin-menu">
-
-            <a href="index.php">
-                🏠 Dashboard
-            </a>
-
-            <a href="productos.php">
-                📦 Productos
-            </a>
-
-            <a href="pedidos.php"
-               class="activo-admin">
-                🧾 Pedidos
-            </a>
-
-            <a href="usuarios.php">
-                👥 Usuarios
-            </a>
-
-            <a href="ventas.php">
-                📊 Ventas
-            </a>
-
-            <a href="../index.php">
-                🏪 Ver tienda
-            </a>
-
-            <a href="../logout.php"
-               class="logout-btn">
-               🚪 Cerrar sesión
-            </a>
-
-        </nav>
-
-    </aside>
+    <main class="admin-content">
 
     <!-- CONTENIDO -->
     <main class="admin-content">
@@ -419,6 +380,6 @@ if(!empty($pedido['telefono_cliente'])){
     </main>
 
 </div>
-
+<script src="../java/admin.js"></script>
 </body>
 </html>

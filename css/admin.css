@@ -1048,3 +1048,94 @@
     background:#00e676;
     color:#111;
 }
+/* =========================
+   ADMIN THEME TOGGLE
+========================= */
+
+.admin-theme-toggle{
+    width:100%;
+    border:none;
+    background:#1a1a1a;
+    color:#fff;
+    padding:14px;
+    border-radius:14px;
+    margin:15px 0 25px;
+    cursor:pointer;
+    font-size:18px;
+    font-weight:900;
+    transition:.3s;
+}
+
+.admin-theme-toggle:hover{
+    background:#00e676;
+    color:#111;
+}
+
+/* MODO CLARO */
+
+.admin-light{
+    background:#f4f6f8;
+    color:#111;
+}
+
+.admin-light .admin-sidebar{
+    background:#ffffff;
+    border-right:1px solid #e5e7eb;
+}
+
+.admin-light .admin-logo,
+.admin-light .admin-content,
+.admin-light .admin-top h1,
+.admin-light .admin-hero h1,
+.admin-light .admin-section-title h2{
+    color:#111;
+}
+
+.admin-light .admin-user,
+.admin-light .admin-top p,
+.admin-light .admin-hero p,
+.admin-light .admin-section-title p{
+    color:#666;
+}
+
+.admin-light .admin-menu a{
+    background:#f1f3f5;
+    color:#111;
+}
+
+.admin-light .admin-menu a:hover,
+.admin-light .activo-admin{
+    background:#00e676 !important;
+    color:#111 !important;
+}
+
+.admin-light .admin-card,
+.admin-light .venta-card,
+.admin-light .tabla-admin,
+.admin-light .pedido-panel,
+.admin-light .pedido-card,
+.admin-light .admin-panel-box,
+.admin-light .metrica-card{
+    background:#ffffff;
+    color:#111;
+    border-color:#e5e7eb;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.admin-light .tabla-admin thead{
+    background:#f1f3f5;
+}
+
+.admin-light .tabla-admin td{
+    border-top:1px solid #e5e7eb;
+    color:#222;
+}
+
+.admin-light .tabla-premium td{
+    color:#222;
+}
+
+.admin-light .admin-theme-toggle{
+    background:#f1f3f5;
+    color:#111;
+}

@@ -131,48 +131,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 <div class="admin-container">
 
-    <aside class="admin-sidebar">
+    <?php include("includes/sidebar.php"); ?>
 
-        <h2 class="admin-logo">
-            Sport<span>Style</span>
-        </h2>
-
-        <nav class="admin-menu">
-
-            <a href="index.php">
-                🏠 Dashboard
-            </a>
-
-            <a href="productos.php"
-               class="activo-admin">
-                📦 Productos
-            </a>
-
-            <a href="pedidos.php">
-                🧾 Pedidos
-            </a>
-
-            <a href="usuarios.php">
-                👥 Usuarios
-            </a>
-
-            <a href="ventas.php">
-                📊 Ventas
-            </a>
-
-            <a href="../index.php">
-                🏪 Ver tienda
-            </a>
-
-            <a href="../logout.php"
-               class="logout-btn">
-               🚪 Cerrar sesión
-            </a>
-
-        </nav>
-
-    </aside>
-
+    <main class="admin-content">
     <main class="admin-content">
 
         <section class="admin-hero small-hero">
@@ -394,6 +355,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </main>
 
 </div>
-
+<script src="../java/admin.js"></script>
 </body>
 </html>
