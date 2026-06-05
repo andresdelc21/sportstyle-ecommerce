@@ -3,6 +3,7 @@
 session_start();
 
 require_once __DIR__ . "/includes/auth_admin.php";
+require_once __DIR__ . "/includes/csrf.php";
 
 require_once __DIR__ . "/../config/conexion.php";
 
@@ -23,7 +24,24 @@ $id = (int) $_GET['id'];
 /* ACTUALIZAR ESTADO */
 if(isset($_POST['actualizar_estado'])){
 
+    if(!validarCsrf()){
+        header("Location: ver_pedido.php?id=" . $id);
+        exit;
+    }
+
     $nuevoEstado = trim($_POST['estado']);
+    $estadosPermitidos = [
+        'Pendiente',
+        'Pagado',
+        'Enviado',
+        'Entregado',
+        'Cancelado'
+    ];
+
+    if(!in_array($nuevoEstado, $estadosPermitidos, true)){
+        header("Location: ver_pedido.php?id=" . $id);
+        exit;
+    }
 
     $sqlEstado = "UPDATE pedidos
                   SET estado = ?
@@ -122,9 +140,6 @@ if(!empty($pedido['telefono_cliente'])){
 
     <main class="admin-content">
 
-    <!-- CONTENIDO -->
-    <main class="admin-content">
-
         <!-- HERO -->
         <section class="admin-hero small-hero pedido-hero">
 
@@ -174,6 +189,8 @@ if(!empty($pedido['telefono_cliente'])){
 
             <form method="POST"
                   class="estado-form">
+
+                <?= csrfInput() ?>
 
                 <select name="estado"
                         class="input-cupon">
@@ -242,6 +259,33 @@ if(!empty($pedido['telefono_cliente'])){
                     <span>💳 Método de pago</span>
                     <strong><?= ucfirst($pedido['metodo_pago'] ?? '-') ?></strong>
                 </div>
+
+                <?php if(($pedido['metodo_pago'] ?? '') === 'mp'): ?>
+
+                    <div class="pedido-dato">
+                        <span>Mercado Pago</span>
+                        <strong><?= htmlspecialchars($pedido['mp_status'] ?? 'Sin confirmar') ?></strong>
+                    </div>
+
+                    <?php if(!empty($pedido['mp_payment_id'])): ?>
+
+                        <div class="pedido-dato">
+                            <span>ID de pago</span>
+                            <strong><?= htmlspecialchars($pedido['mp_payment_id']) ?></strong>
+                        </div>
+
+                    <?php endif; ?>
+
+                    <?php if(!empty($pedido['mp_preference_id'])): ?>
+
+                        <div class="pedido-dato">
+                            <span>Preferencia</span>
+                            <strong><?= htmlspecialchars($pedido['mp_preference_id']) ?></strong>
+                        </div>
+
+                    <?php endif; ?>
+
+                <?php endif; ?>
 
                 <?php if(!empty($telefonoWhatsApp)): ?>
 

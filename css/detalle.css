@@ -46,7 +46,7 @@
 .detalle-rating { display: flex; align-items: center; gap: 8px; margin: 10px 0; font-size: 18px; color: #ffc107; }
 .detalle-precios { display: flex; align-items: center; gap: 12px; margin: 15px 0; flex-wrap: wrap; }
 .detalle-precio-actual { font-size: 32px; font-weight: 900; color: var(--negro); }
-.detalle-ahorro { background: #e8f5e9; color: var(--verde-dark); font-size: 13px; font-weight: bold; padding: 4px 10px; border-radius: 20px; }
+.detalle-ahorro { background: #e0f2fe; color: var(--verde-dark); font-size: 13px; font-weight: bold; padding: 4px 10px; border-radius: 20px; }
 .detalle-stock { margin: 15px 0; font-size: 14px; font-weight: bold; }
 
 .btn-detalle-comprar {
@@ -79,10 +79,15 @@
 /* ===== DETALLE PRODUCTO PRO ===== */
 .detalle {
     display: flex;
-    gap: 50px;
-    padding: 50px;
+    gap: 42px;
+    width:min(1180px, calc(100% - 48px));
+    margin:26px auto 0;
+    padding: 34px;
     flex-wrap: wrap;
     background: white;
+    border:1px solid #e8eef5;
+    border-radius:20px;
+    box-shadow:0 12px 34px rgba(15,23,42,.08);
 }
 /* =========================
    BUSCADOR
@@ -116,34 +121,62 @@
 }
 
 .btn-buscador:hover{
-    background:#00c853;
+    background:var(--verde-dark);
 }
 /* IMAGEN */
 .detalle-img {
+    position: relative;
     flex: 1;
     min-width: 300px;
     text-align: center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:430px;
+    background:#f8fafc;
+    border:1px solid #edf2f7;
+    border-radius:18px;
+    padding:24px;
 }
 
 .detalle-img img {
-    max-width: 450px;
+    max-width: min(450px, 100%);
+    max-height:360px;
+    object-fit:contain;
+}
+
+.detalle-stock-overlay {
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
 }
 
 /* INFO */
 .detalle-info {
     flex: 1;
     min-width: 300px;
+    max-width:520px;
+    padding:6px 0;
 }
 
 .detalle-categoria {
+    display:inline-flex;
+    width:max-content;
     font-size: 12px;
-    color: #999;
+    color: var(--verde-dark);
+    background:#e0f2fe;
+    padding:7px 12px;
+    border-radius:999px;
+    font-weight:900;
     text-transform: uppercase;
 }
 
 .detalle-info h1 {
-    font-size: 28px;
-    margin: 10px 0;
+    font-size: 34px;
+    line-height:1.1;
+    color:var(--negro);
+    margin: 14px 0 10px;
 }
 
 /* PRECIO */
@@ -151,7 +184,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 15px 0;
+    margin: 18px 0;
+    flex-wrap:wrap;
 }
 
 .precio-original {
@@ -160,11 +194,12 @@
 }
 
 .descuento {
-    background: red;
+    background: var(--naranja);
     color: white;
-    padding: 3px 8px;
-    border-radius: 6px;
+    padding: 5px 9px;
+    border-radius: 999px;
     font-size: 12px;
+    font-weight:900;
 }
 
 .precio-actual {
@@ -175,8 +210,14 @@
 
 /* STOCK */
 .detalle-stock {
-    margin: 10px 0;
+    display:inline-flex;
+    margin: 6px 0 14px;
+    padding:8px 12px;
+    border-radius:999px;
+    background:#f1f5f9;
+    color:#334155;
     font-weight: bold;
+    font-size:14px;
 }
 
 /* CANTIDAD */
@@ -195,22 +236,27 @@
     gap: 12px;
     align-items: center;
     flex-wrap: wrap;
+    margin-top:18px;
 }
 
 .btn-comprar {
-    display: inline-block;
-    background: black;
+    display: inline-flex;
+    align-items:center;
+    justify-content:center;
+    background: var(--negro);
     color: white;
-    padding: 14px 25px;
-    border-radius: 8px;
+    min-height:50px;
+    padding: 14px 22px;
+    border-radius: 12px;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 900;
     transition: 0.3s;
+    flex:1 1 210px;
 }
 
 .btn-comprar:hover {
     background: var(--verde);
-    color: black;
+    color: #0f172a;
 }
 
 .btn-favorito-detalle {
@@ -221,7 +267,7 @@
     min-height: 48px;
     padding: 12px 18px;
     border: 2px solid #111;
-    border-radius: 8px;
+    border-radius: 12px;
     color: #111;
     background: #fff;
     text-decoration: none;
@@ -247,33 +293,61 @@
 
 /* DESCRIPCIÓN */
 .detalle-desc {
-    margin-top: 30px;
+    margin-top: 26px;
+    padding-top:22px;
+    border-top:1px solid #edf2f7;
 }
 
 .detalle-desc h3 {
     margin-bottom: 10px;
+    color:var(--negro);
+}
+
+.detalle-desc p {
+    color:#64748b;
+    line-height:1.65;
 }
 
 /* EXTRA */
 .detalle-extra {
     margin-top: 20px;
-    color: #555;
-    line-height: 1.8;
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:10px;
+    color: #475569;
+    line-height: 1.35;
+}
+
+.detalle-extra p{
+    margin:0;
+    padding:12px;
+    background:#f8fafc;
+    border:1px solid #edf2f7;
+    border-radius:12px;
+    font-size:13px;
+    font-weight:800;
 }
 .miniaturas {
     display: flex;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 18px;
+    justify-content:center;
+    flex-wrap:wrap;
 }
 
 .miniaturas img {
-    width: 60px;
+    width: 62px;
+    height:62px;
+    object-fit:contain;
     cursor: pointer;
-    border: 2px solid transparent;
+    border: 2px solid #e2e8f0;
+    border-radius:12px;
+    background:white;
+    padding:5px;
 }
 
 .miniaturas img:hover {
-    border: 2px solid black;
+    border-color: var(--verde-dark);
 }
 
 .talle {
@@ -303,7 +377,7 @@
 }
 .btn-volver-detalle{
     display:inline-block;
-    margin:25px 50px 0;
+    margin:24px 0 0 max(24px, calc((100% - 1180px) / 2));
     color:#111;
     text-decoration:none;
     font-weight:800;
@@ -315,8 +389,8 @@
 }
 
 .btn-volver-detalle:hover{
-    background:#00e676;
-    color:#000;
+    background:var(--verde);
+    color:#0f172a;
     transform:translateX(-4px);
 }
 .zoom-overlay{

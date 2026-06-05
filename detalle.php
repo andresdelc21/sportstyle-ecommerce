@@ -137,6 +137,14 @@ $desc = descuento(
          src="<?= $producto['imagenes'][0] ?>"
          alt="<?= $producto['nombre'] ?>">
 
+    <?php if($producto['stock'] <= 0): ?>
+
+        <span class="stock-overlay detalle-stock-overlay">
+            Sin stock
+        </span>
+
+    <?php endif; ?>
+
     <?php if(count($producto['imagenes']) > 1): ?>
 
         <div class="miniaturas">
@@ -275,9 +283,23 @@ $desc = descuento(
 <!-- REVIEWS -->
 <section class="reviews-section">
 
-    <h2 class="titulo">
-        Opiniones del producto
-    </h2>
+    <div class="reviews-header">
+
+        <span class="productos-badge">
+            Opiniones
+        </span>
+
+        <h2>
+            Experiencias de clientes
+        </h2>
+
+        <p>
+            Leé reseñas del producto o compartí tu experiencia para ayudar a otros compradores.
+        </p>
+
+    </div>
+
+    <div class="reviews-grid">
 
     <?php if(isset($_SESSION['usuario_id'])): ?>
 
@@ -401,13 +423,34 @@ $desc = descuento(
 
     <?php else: ?>
 
-        <p class="carrito-vacio">
-            Inicia sesión para dejar una opinión.
-        </p>
+        <div class="review-login-box">
+
+            <h3>
+                ¿Ya compraste o probaste este producto?
+            </h3>
+
+            <p>
+                Iniciá sesión para dejar una opinión y ayudar a otros clientes.
+            </p>
+
+            <a href="login.php"
+               class="btn-review-premium">
+                Iniciar sesión
+            </a>
+
+        </div>
 
     <?php endif; ?>
 
     <div class="reviews-lista">
+
+        <div class="reviews-lista-header">
+
+            <h3>
+                Reseñas publicadas
+            </h3>
+
+        </div>
 
         <?php if(mysqli_num_rows($reviews) > 0): ?>
 
@@ -437,13 +480,24 @@ $desc = descuento(
 
         <?php else: ?>
 
-            <p class="carrito-vacio">
-                Este producto todavía no tiene opiniones.
-            </p>
+            <div class="reviews-empty">
+
+                <strong>
+                    Todavía no hay opiniones
+                </strong>
+
+                <p>
+                    Sé el primero en contar cómo te resultó este producto.
+                </p>
+
+            </div>
 
         <?php endif; ?>
 
     </div>
+
+    </div>
+
 <div class="zoom-overlay" id="zoomOverlay">
     <img id="zoomImage" src="">
 </div>

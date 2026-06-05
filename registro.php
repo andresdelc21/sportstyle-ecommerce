@@ -13,26 +13,71 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    // VALIDAR EMAIL EXISTENTE
-    $check = mysqli_query($conn,
-    "SELECT * FROM usuarios WHERE email='$email'");
+    if(strlen($nombre) < 2){
 
-    if(mysqli_num_rows($check) > 0){
+        $error = "Ingresá un nombre válido";
+
+    } elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+
+        $error = "Ingresá un email válido";
+
+    } elseif(strlen($password) < 6){
+
+        $error = "La contraseña debe tener al menos 6 caracteres";
+
+    } else {
+
+        // VALIDAR EMAIL EXISTENTE
+        $sqlCheck = "SELECT id FROM usuarios WHERE email = ? LIMIT 1";
+
+        $stmtCheck = mysqli_prepare($conn, $sqlCheck);
+
+        mysqli_stmt_bind_param(
+            $stmtCheck,
+            "s",
+            $email
+        );
+
+        mysqli_stmt_execute($stmtCheck);
+
+        $check = mysqli_stmt_get_result($stmtCheck);
+
+        if(mysqli_num_rows($check) > 0){
 
         $error = "El correo ya está registrado";
 
-    } else {
+        } else {
 
         // ENCRIPTAR PASSWORD
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
         // INSERTAR
         $sql = "INSERT INTO usuarios
-        (nombre,email,password)
+        (
+            nombre,
+            email,
+            password,
+            rol
+        )
         VALUES
-        ('$nombre','$email','$passwordHash')";
+        (
+            ?,
+            ?,
+            ?,
+            'cliente'
+        )";
 
-        if(mysqli_query($conn,$sql)){
+        $stmtInsert = mysqli_prepare($conn, $sql);
+
+        mysqli_stmt_bind_param(
+            $stmtInsert,
+            "sss",
+            $nombre,
+            $email,
+            $passwordHash
+        );
+
+        if(mysqli_stmt_execute($stmtInsert)){
 
             $success = "Cuenta creada correctamente";
 
@@ -40,6 +85,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             $error = "Error al registrar";
 
+        }
         }
     }
 }

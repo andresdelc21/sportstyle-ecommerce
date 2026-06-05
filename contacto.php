@@ -12,13 +12,36 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
 <?php include("includes/header.php"); ?>
 
-<h1 class="titulo">Contacto</h1>
+<section class="contacto-header">
+
+    <span class="productos-badge">
+        Atención al cliente
+    </span>
+
+    <h1>
+        Contacto
+    </h1>
+
+    <p>
+        Escribinos por consultas de productos, envíos, pagos o cambios. Te respondemos lo antes posible.
+    </p>
+
+</section>
 
 <div class="contacto-container">
 
     <!-- FORMULARIO -->
     <div class="contacto-form">
-        <h2>Envianos un mensaje</h2>
+
+        <div class="contacto-form-title">
+
+            <h2>Envianos un mensaje</h2>
+
+            <p>
+                Completá el formulario y te contactamos por email.
+            </p>
+
+        </div>
 
         <?php if($enviado): ?>
             <div class="alerta-ok" style="display:block;">
@@ -43,7 +66,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 <label>Mensaje</label>
                 <textarea name="mensaje" placeholder="Escribí tu mensaje acá..." required></textarea>
             </div>
-            <button type="submit" class="btn" style="width:100%; padding:14px;">
+            <button type="submit" class="btn contacto-submit">
                 Enviar mensaje ✉️
             </button>
         </form>
@@ -55,26 +78,34 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         <a href="https://wa.me/<?= htmlspecialchars(preg_replace('/[^0-9]/', '', $WHATSAPP_TIENDA ?? '')) ?>?text=Hola!%20Quiero%20más%20información"
            target="_blank" class="contacto-card">
             <span class="icono">💬</span>
-            <h3>WhatsApp</h3>
-            <p>Respondemos al instante en horario comercial</p>
+            <div>
+                <h3>WhatsApp</h3>
+                <p>Respuesta rápida en horario comercial</p>
+            </div>
         </a>
 
         <a href="<?= htmlspecialchars($INSTAGRAM_TIENDA ?? '#') ?>" target="_blank" class="contacto-card">
             <span class="icono">📸</span>
-            <h3>Instagram</h3>
-            <p>Seguinos para ver novedades</p>
+            <div>
+                <h3>Instagram</h3>
+                <p>Novedades, ingresos y promociones</p>
+            </div>
         </a>
 
         <a href="mailto:<?= htmlspecialchars($EMAIL_TIENDA ?? 'contacto@sportstyle.com') ?>" class="contacto-card">
             <span class="icono">✉️</span>
-            <h3>Email</h3>
-            <p><?= htmlspecialchars($EMAIL_TIENDA ?? 'contacto@sportstyle.com') ?></p>
+            <div>
+                <h3>Email</h3>
+                <p><?= htmlspecialchars($EMAIL_TIENDA ?? 'contacto@sportstyle.com') ?></p>
+            </div>
         </a>
 
         <div class="contacto-card" style="cursor:default;">
             <span class="icono">🕐</span>
-            <h3>Horarios</h3>
-            <p>Lunes a Viernes: 9hs - 18hs<br>Sábados: 9hs - 13hs</p>
+            <div>
+                <h3>Horarios</h3>
+                <p>Lunes a Viernes: 9hs - 18hs<br>Sábados: 9hs - 13hs</p>
+            </div>
         </div>
 
     </div>

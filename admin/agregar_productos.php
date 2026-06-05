@@ -3,8 +3,10 @@
 session_start();
 
 require_once __DIR__ . "/includes/auth_admin.php";
+require_once __DIR__ . "/includes/csrf.php";
 
 require_once(__DIR__ . "/../config/conexion.php");
+require_once(__DIR__ . "/includes/upload_helper.php");
 
 /* PROTEGER */
 if(!isset($_SESSION['usuario_nombre'])){
@@ -32,6 +34,10 @@ $error = "";
 /* GUARDAR PRODUCTO */
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 
+    if(!validarCsrf()){
+        $error = "Solicitud inválida.";
+    }
+
     $nombre = trim($_POST['nombre']);
     $descripcion = trim($_POST['descripcion']);
     $precio = (int) $_POST['precio'];
@@ -43,16 +49,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     $imagen = "";
 
-    if(isset($_FILES['imagen']) && $_FILES['imagen']['error'] === 0){
+    if(!$error && isset($_FILES['imagen']) && $_FILES['imagen']['error'] === 0){
 
-        $imagenNombre = time() . "_" . $_FILES['imagen']['name'];
-        $rutaTemporal = $_FILES['imagen']['tmp_name'];
-        $rutaDestino = "../uploads/" . $imagenNombre;
+        $rutaImagen = guardarImagenSubida($_FILES['imagen'], $error);
 
-        if(move_uploaded_file($rutaTemporal, $rutaDestino)){
-            $imagen = "uploads/" . $imagenNombre;
-        } else {
-            $error = "Error al subir la imagen";
+        if($rutaImagen){
+            $imagen = $rutaImagen;
         }
 
     }
@@ -136,7 +138,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <?php include("includes/sidebar.php"); ?>
 
     <main class="admin-content">
-    <main class="admin-content">
 
         <section class="admin-hero small-hero">
 
@@ -197,6 +198,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <form method="POST"
                   enctype="multipart/form-data"
                   class="form-admin-premium">
+
+                <?= csrfInput() ?>
 
                 <div class="admin-grid">
 

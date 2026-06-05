@@ -3,6 +3,7 @@
 session_start();
 
 require_once __DIR__ . "/includes/auth_admin.php";
+require_once __DIR__ . "/includes/csrf.php";
 
 require_once __DIR__ . "/../config/conexion.php";
 
@@ -280,13 +281,25 @@ foreach($productos as $p){
 
                                 </a>
 
-                                <a href="eliminar_productos.php?id=<?= $p['id'] ?>"
-                                   class="btn-tabla eliminar"
-                                   onclick="return confirm('¿Eliminar producto?')">
+                                <form method="POST"
+                                      action="eliminar_productos.php"
+                                      class="form-inline-admin"
+                                      onsubmit="return confirm('¿Eliminar producto?')">
 
-                                   ❌
+                                    <?= csrfInput() ?>
 
-                                </a>
+                                    <input type="hidden"
+                                           name="id"
+                                           value="<?= $p['id'] ?>">
+
+                                    <button type="submit"
+                                            class="btn-tabla eliminar">
+
+                                       ❌
+
+                                    </button>
+
+                                </form>
 
                             </td>
 

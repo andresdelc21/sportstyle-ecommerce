@@ -1999,6 +1999,16 @@
     font-weight:700;
 }
 
+.form-inline-admin{
+    display:inline-flex;
+    margin:0;
+}
+
+.form-inline-admin button{
+    border:0;
+    cursor:pointer;
+}
+
 /* Sidebar siempre oscuro: anula restos del modo claro anterior */
 .admin-body.admin-light .admin-sidebar,
 .admin-body .admin-sidebar{

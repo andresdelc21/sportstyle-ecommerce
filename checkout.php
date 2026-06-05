@@ -117,6 +117,10 @@ if(isset($_POST['confirmar'])){
         $erroresCheckout[] = 'Seleccioná un método de pago.';
     }
 
+    if($pago === 'mp' && empty($MP_ACCESS_TOKEN)){
+        $erroresCheckout[] = 'Mercado Pago todavía no está configurado. Elegí otro método de pago o cargá las credenciales desde el admin.';
+    }
+
     $_SESSION['cliente'] = [
         "nombre" => $nombre,
         "telefono" => $telefono,
@@ -233,9 +237,9 @@ if(isset($_POST['confirmar'])){
     /* MERCADOPAGO */
     if($pago == "mp"){
 
-        unset($_SESSION['carrito']);
+        $_SESSION['mp_pedido_id'] = $pedido_id;
 
-        header("Location: checkout.php?success=1");
+        header("Location: pago.php?pedido=" . $pedido_id);
         exit;
 
     }
@@ -250,9 +254,21 @@ $subtotalVista = 0;
 
 <?php include("includes/header.php"); ?>
 
-<h1 class="titulo">
-    Finalizar Compra
-</h1>
+<section class="checkout-header">
+
+    <span class="productos-badge">
+        Checkout
+    </span>
+
+    <h1>
+        Finalizar compra
+    </h1>
+
+    <p>
+        Completá tus datos, revisá el pedido y elegí cómo querés pagar.
+    </p>
+
+</section>
 
 <?php if(isset($_GET['success'])): ?>
 
@@ -367,15 +383,30 @@ $subtotalVista = 0;
 
 <?php endif; ?>
 
-<div class="carrito-container">
+<div class="carrito-container checkout-container">
 
     <!-- FORMULARIO -->
     <form method="POST"
-          action="checkout.php">
+          action="checkout.php"
+          class="checkout-form">
 
-        <h2>
-            Datos del cliente
-        </h2>
+        <div class="checkout-panel-title">
+
+            <span>1</span>
+
+            <div>
+
+                <h2>
+                    Datos del cliente
+                </h2>
+
+                <p>
+                    Usamos estos datos para preparar y enviar tu pedido.
+                </p>
+
+            </div>
+
+        </div>
 
         <input type="text"
                name="nombre"
@@ -410,9 +441,23 @@ $subtotalVista = 0;
                readonly
                class="input-cupon">
 
-        <h3>
-            Método de pago
-        </h3>
+        <div class="checkout-panel-title mini">
+
+            <span>2</span>
+
+            <div>
+
+                <h3>
+                    Método de pago
+                </h3>
+
+                <p>
+                    Podés pagar online, por transferencia o coordinar por WhatsApp.
+                </p>
+
+            </div>
+
+        </div>
 
         <select name="pago"
                 class="input-cupon"
@@ -451,7 +496,25 @@ $subtotalVista = 0;
     </form>
 
     <!-- PRODUCTOS -->
-    <div class="carrito-items">
+    <div class="carrito-items checkout-productos">
+
+        <div class="checkout-panel-title">
+
+            <span>3</span>
+
+            <div>
+
+                <h2>
+                    Productos
+                </h2>
+
+                <p>
+                    Confirmá cantidades y subtotal antes de pagar.
+                </p>
+
+            </div>
+
+        </div>
 
         <?php foreach($_SESSION['carrito'] as $id => $cantidad): ?>
 
@@ -470,7 +533,7 @@ $subtotalVista = 0;
 
             ?>
 
-            <div class="carrito-card">
+            <div class="carrito-card checkout-producto-card">
 
                 <h3>
                     <?= $producto['nombre'] ?>
@@ -494,7 +557,7 @@ $subtotalVista = 0;
     </div>
 
     <!-- RESUMEN -->
-    <div class="carrito-resumen">
+    <div class="carrito-resumen checkout-summary">
 
         <h2>
             Resumen

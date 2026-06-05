@@ -330,20 +330,36 @@ $envioListo = (
 
 <?php include("includes/header.php"); ?>
 
-<h1 class="titulo">
-    Carrito
-</h1>
+<section class="productos-header carrito-header">
 
-<div class="carrito-topbar">
+    <div class="carrito-header-inner">
 
-    <a href="productos.php"
-       class="seguir-comprando">
+        <div>
 
-       ← Seguir comprando
+            <span class="productos-badge">
+                Tu compra
+            </span>
 
-    </a>
+            <h1>
+                Carrito
+            </h1>
 
-</div>
+            <p>
+                Revisá tus productos, calculá el envío y finalizá la compra.
+            </p>
+
+        </div>
+
+        <a href="productos.php"
+           class="seguir-comprando carrito-header-link">
+
+           ← Seguir comprando
+
+        </a>
+
+    </div>
+
+</section>
 
 <?php if(!empty($carritoMsg)): ?>
 
@@ -353,7 +369,7 @@ $envioListo = (
 
 <?php endif; ?>
 
-<div class="carrito-container">
+<div class="carrito-container <?= count($carrito) === 0 ? 'carrito-container-vacio' : '' ?>">
 
     <!-- ===== PRODUCTOS ===== -->
     <div class="carrito-items">
@@ -470,12 +486,23 @@ $envioListo = (
                     Explorá la colección y agregá productos para continuar con tu compra.
                 </p>
 
-                <a href="productos.php"
-                   class="btn-pagar">
+                <div class="carrito-vacio-acciones">
 
-                    Ver productos
+                    <a href="productos.php"
+                       class="btn-pagar">
 
-                </a>
+                        Ver productos
+
+                    </a>
+
+                    <a href="index.php"
+                       class="btn-secundario-checkout">
+
+                        Volver al inicio
+
+                    </a>
+
+                </div>
 
             </div>
 

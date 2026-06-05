@@ -3,8 +3,10 @@
 session_start();
 
 require_once __DIR__ . "/includes/auth_admin.php";
+require_once __DIR__ . "/includes/csrf.php";
 
 require_once(dirname(__FILE__) . "/../config/conexion.php");
+require_once(__DIR__ . "/includes/upload_helper.php");
 
 /* PROTEGER */
 if(!isset($_SESSION['usuario_nombre'])){
@@ -26,6 +28,11 @@ $error = "";
 /* ACCIONES IMÁGENES */
 if(isset($_GET['principal'])){
 
+    if(($_GET['csrf_token'] ?? '') !== csrfToken()){
+        header("Location: editar_productos.php?id=$id");
+        exit;
+    }
+
     $img_id = (int) $_GET['principal'];
 
     mysqli_query($conn, "UPDATE imagenes_productos SET principal = 0 WHERE producto_id = $id");
@@ -45,6 +52,11 @@ if(isset($_GET['principal'])){
 }
 
 if(isset($_GET['eliminar_img'])){
+
+    if(($_GET['csrf_token'] ?? '') !== csrfToken()){
+        header("Location: editar_productos.php?id=$id");
+        exit;
+    }
 
     $img_id = (int) $_GET['eliminar_img'];
 
@@ -102,6 +114,10 @@ if(!$producto){
 /* ACTUALIZAR */
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 
+    if(!validarCsrf()){
+        $error = "Solicitud inválida.";
+    }
+
     $nombre = trim($_POST['nombre']);
     $descripcion = trim($_POST['descripcion']);
     $precio = (float) $_POST['precio'];
@@ -113,7 +129,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $imagen = $producto['imagen'];
 
     /* SUBIR IMÁGENES MÚLTIPLES */
-    if(isset($_FILES['imagenes'])){
+    if(empty($error) && isset($_FILES['imagenes'])){
 
         $totalImagenes = count($_FILES['imagenes']['name']);
 
@@ -121,15 +137,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             if($_FILES['imagenes']['error'][$i] === 0){
 
-                $nombreOriginal = basename($_FILES['imagenes']['name'][$i]);
-                $nombreImagen = time() . "_" . $i . "_" . $nombreOriginal;
+                $archivo = [
+                    'name' => $_FILES['imagenes']['name'][$i],
+                    'type' => $_FILES['imagenes']['type'][$i],
+                    'tmp_name' => $_FILES['imagenes']['tmp_name'][$i],
+                    'error' => $_FILES['imagenes']['error'][$i],
+                    'size' => $_FILES['imagenes']['size'][$i]
+                ];
 
-                $rutaTemporal = $_FILES['imagenes']['tmp_name'][$i];
-                $rutaDestino = "../uploads/" . $nombreImagen;
+                $rutaBD = guardarImagenSubida($archivo, $error);
 
-                if(move_uploaded_file($rutaTemporal, $rutaDestino)){
-
-                    $rutaBD = "uploads/" . $nombreImagen;
+                if($rutaBD){
 
                     $sqlOrden = "SELECT COALESCE(MAX(orden), 0) + 1 AS nuevo_orden
                                  FROM imagenes_productos
@@ -173,10 +191,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     if($principal == 1){
                         $imagen = $rutaBD;
                     }
-
-                } else {
-
-                    $error = "Error al subir una imagen";
 
                 }
 
@@ -276,8 +290,6 @@ $imagenesProducto = mysqli_stmt_get_result($stmtImagenes);
 
     <main class="admin-content">
 
-    <main class="admin-content">
-
         <div class="admin-top">
 
             <div>
@@ -305,6 +317,8 @@ $imagenesProducto = mysqli_stmt_get_result($stmtImagenes);
         <form method="POST"
               enctype="multipart/form-data"
               class="form-admin form-admin-premium">
+
+            <?= csrfInput() ?>
 
             <div class="admin-grid">
 
@@ -464,11 +478,11 @@ $imagenesProducto = mysqli_stmt_get_result($stmtImagenes);
 
                             <div class="admin-img-actions">
 
-                                <a href="editar_productos.php?id=<?= $id ?>&principal=<?= $img['id'] ?>">
+                                <a href="editar_productos.php?id=<?= $id ?>&principal=<?= $img['id'] ?>&csrf_token=<?= csrfToken() ?>">
                                     ⭐ Principal
                                 </a>
 
-                                <a href="editar_productos.php?id=<?= $id ?>&eliminar_img=<?= $img['id'] ?>"
+                                <a href="editar_productos.php?id=<?= $id ?>&eliminar_img=<?= $img['id'] ?>&csrf_token=<?= csrfToken() ?>"
                                    onclick="return confirm('¿Eliminar esta imagen?')">
                                     🗑 Eliminar
                                 </a>

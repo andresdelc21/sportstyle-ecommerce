@@ -133,13 +133,21 @@ $heroEnlace = !empty($bannerPrincipal['enlace'])
 
             <?php while($p = mysqli_fetch_assoc($resultadoDestacados)): ?>
 
-                <div class="card-v2"
+                <div class="card-v2 <?= $p['stock'] <= 0 ? 'card-sin-stock' : '' ?>"
                      onclick="window.location='detalle.php?id=<?= $p['id'] ?>'">
 
                     <div class="card-v2-img">
 
                         <img src="<?= $p['imagen'] ?>"
                              alt="<?= $p['nombre'] ?>">
+
+                        <?php if($p['stock'] <= 0): ?>
+
+                            <span class="stock-overlay">
+                                Sin stock
+                            </span>
+
+                        <?php endif; ?>
 
                     </div>
                     <div class="card-v2-acciones">
@@ -201,6 +209,12 @@ $heroEnlace = !empty($bannerPrincipal['enlace'])
                                    onclick="event.stopPropagation()">
                                     🛒
                                 </a>
+
+                            <?php else: ?>
+
+                                <span class="sin-stock">
+                                    Sin stock
+                                </span>
 
                             <?php endif; ?>
 

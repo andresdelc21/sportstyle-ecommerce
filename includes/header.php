@@ -35,6 +35,43 @@ $sqlMarcas = "SELECT * FROM marcas ORDER BY nombre ASC";
 
 $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
+/* ===== CATEGORÍAS PARA MENÚ ===== */
+$sqlCategoriasHeader = "SELECT id, nombre FROM categorias ORDER BY nombre ASC";
+
+$resultadoCategoriasHeader = mysqli_query($conn, $sqlCategoriasHeader);
+
+$categoriasHeader = [];
+
+if($resultadoCategoriasHeader){
+
+    while($categoriaHeader = mysqli_fetch_assoc($resultadoCategoriasHeader)){
+
+        $categoriasHeader[strtolower($categoriaHeader['nombre'])] = $categoriaHeader;
+
+    }
+
+}
+
+function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $genero = ''): string {
+
+    $categoria = $categoriasHeader[strtolower($nombre)] ?? null;
+    $url = "/sportstyle/productos.php";
+    $params = [];
+
+    if($genero !== ''){
+        $params['genero'] = $genero;
+    }
+
+    if($categoria){
+        $params['categoria_id'] = $categoria['id'];
+    } else {
+        $params['buscar'] = $nombre;
+    }
+
+    return $url . '?' . http_build_query($params);
+
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -72,8 +109,19 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
         <?= htmlspecialchars($NOMBRE_TIENDA ?? 'SportStyle') ?>
     </div>
 
+    <button type="button"
+            class="menu-toggle"
+            id="menuToggle"
+            aria-label="Abrir menú"
+            aria-expanded="false">
+
+        ☰
+
+    </button>
+
     <!-- ===== NAV ===== -->
-    <nav class="nav">
+    <nav class="nav"
+         id="menuPrincipal">
 
         <!-- INICIO -->
         <a href="/sportstyle/index.php"
@@ -99,26 +147,26 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
                     <h4>Calzado</h4>
 
-                    <a href="/sportstyle/productos.php?genero=Hombre&categoria_id=1">
-                        Running
-                    </a>
-
-                    <a href="/sportstyle/productos.php?genero=Hombre&categoria_id=1">
-                        Training
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Zapatillas', 'Hombre') ?>">
+                        Zapatillas
                     </a>
 
                 </div>
 
                 <div class="mega-col">
 
-                    <h4>Ropa</h4>
+                    <h4>Indumentaria</h4>
 
-                    <a href="/sportstyle/productos.php?genero=Hombre&categoria_id=2">
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Remeras', 'Hombre') ?>">
                         Remeras
                     </a>
 
-                    <a href="/sportstyle/productos.php?genero=Hombre&categoria_id=3">
-                        Shorts
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Pantalones', 'Hombre') ?>">
+                        Pantalones
+                    </a>
+
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Buzos', 'Hombre') ?>">
+                        Buzos
                     </a>
 
                 </div>
@@ -127,8 +175,8 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
                     <h4>Accesorios</h4>
 
-                    <a href="/sportstyle/productos.php?genero=Hombre&categoria_id=4">
-                        Mochilas
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Accesorios', 'Hombre') ?>">
+                        Ver accesorios
                     </a>
 
                 </div>
@@ -153,26 +201,26 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
                     <h4>Calzado</h4>
 
-                    <a href="/sportstyle/productos.php?genero=Mujer&categoria_id=1">
-                        Running
-                    </a>
-
-                    <a href="/sportstyle/productos.php?genero=Mujer&categoria_id=1">
-                        Training
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Zapatillas', 'Mujer') ?>">
+                        Zapatillas
                     </a>
 
                 </div>
 
                 <div class="mega-col">
 
-                    <h4>Ropa</h4>
+                    <h4>Indumentaria</h4>
 
-                    <a href="/sportstyle/productos.php?genero=Mujer&categoria_id=2">
-                        Tops
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Remeras', 'Mujer') ?>">
+                        Remeras
                     </a>
 
-                    <a href="/sportstyle/productos.php?genero=Mujer&categoria_id=3">
-                        Leggings
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Pantalones', 'Mujer') ?>">
+                        Pantalones
+                    </a>
+
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Buzos', 'Mujer') ?>">
+                        Buzos
                     </a>
 
                 </div>
@@ -181,8 +229,8 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
                     <h4>Accesorios</h4>
 
-                    <a href="/sportstyle/productos.php?genero=Mujer&categoria_id=4">
-                        Bolsos
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Accesorios', 'Mujer') ?>">
+                        Ver accesorios
                     </a>
 
                 </div>
@@ -207,7 +255,7 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
                     <h4>Calzado</h4>
 
-                    <a href="/sportstyle/productos.php?genero=Niños&categoria_id=1">
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Zapatillas', 'Niños') ?>">
                         Zapatillas
                     </a>
 
@@ -215,14 +263,18 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
                 <div class="mega-col">
 
-                    <h4>Ropa</h4>
+                    <h4>Indumentaria</h4>
 
-                    <a href="/sportstyle/productos.php?genero=Niños&categoria_id=2">
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Remeras', 'Niños') ?>">
                         Remeras
                     </a>
 
-                    <a href="/sportstyle/productos.php?genero=Niños&categoria_id=3">
-                        Shorts
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Pantalones', 'Niños') ?>">
+                        Pantalones
+                    </a>
+
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Buzos', 'Niños') ?>">
+                        Buzos
                     </a>
 
                 </div>
@@ -231,8 +283,8 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
                     <h4>Accesorios</h4>
 
-                    <a href="/sportstyle/productos.php?genero=Niños&categoria_id=4">
-                        Accesorios
+                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Accesorios', 'Niños') ?>">
+                        Ver accesorios
                     </a>
 
                 </div>

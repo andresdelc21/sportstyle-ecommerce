@@ -5,6 +5,29 @@ console.log("JS cargado");
 ========================= */
 document.addEventListener("DOMContentLoaded", () => {
 
+    /* ===== MENÚ MOBILE ===== */
+    const menuToggle = document.getElementById("menuToggle");
+    const menuPrincipal = document.getElementById("menuPrincipal");
+
+    if (menuToggle && menuPrincipal) {
+        menuToggle.addEventListener("click", () => {
+            const abierto = menuPrincipal.classList.toggle("activo");
+
+            menuToggle.setAttribute("aria-expanded", abierto ? "true" : "false");
+            menuToggle.textContent = abierto ? "×" : "☰";
+        });
+
+        menuPrincipal.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                if (link.getAttribute("href") === "#") return;
+
+                menuPrincipal.classList.remove("activo");
+                menuToggle.setAttribute("aria-expanded", "false");
+                menuToggle.textContent = "☰";
+            });
+        });
+    }
+
     /* ===== CAMBIO DE IMAGEN EN DETALLE ===== */
     window.cambiarImagen = function(img) {
         const principal = document.getElementById("img-principal");
@@ -102,12 +125,19 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(res => res.json())
             .then(data => {
-                mostrarMensajeCarrito(data.mensaje, data.ok);
-
-                if (!data.ok) return;
+                if (!data.ok) {
+                    mostrarMensajeCarrito(data.mensaje, false);
+                    return;
+                }
 
                 actualizarBadgeCarrito(data.cantidad_items);
-                abrirCarrito();
+                mostrarBotonAgregado(btn);
+
+                const carrito = document.getElementById("carrito-lateral");
+
+                if (carrito && carrito.classList.contains("activo")) {
+                    cargarCarrito();
+                }
             })
             .catch(err => console.error("Error agregando al carrito:", err));
         });
@@ -115,6 +145,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+function mostrarBotonAgregado(btn) {
+    if (!btn) return;
+
+    const textoOriginal = btn.dataset.textoOriginal || btn.innerHTML;
+
+    btn.dataset.textoOriginal = textoOriginal;
+    btn.innerHTML = "✓ Agregado";
+    btn.classList.add("agregado-carrito");
+
+    clearTimeout(btn._agregadoTimer);
+
+    btn._agregadoTimer = setTimeout(() => {
+        btn.innerHTML = textoOriginal;
+        btn.classList.remove("agregado-carrito");
+    }, 1400);
+}
 
 /* =========================
    CARRITO

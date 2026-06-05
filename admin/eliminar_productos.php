@@ -3,6 +3,7 @@
 session_start();
 
 require_once __DIR__ . "/includes/auth_admin.php";
+require_once __DIR__ . "/includes/csrf.php";
 
 include("../config/conexion.php");
 
@@ -12,13 +13,18 @@ if(!isset($_SESSION['usuario_nombre'])){
     exit;
 }
 
-/* VALIDAR ID */
-if(!isset($_GET['id'])){
+if($_SERVER['REQUEST_METHOD'] !== 'POST' || !validarCsrf()){
     header("Location: productos.php");
     exit;
 }
 
-$id = (int) $_GET['id'];
+/* VALIDAR ID */
+if(!isset($_POST['id'])){
+    header("Location: productos.php");
+    exit;
+}
+
+$id = (int) $_POST['id'];
 
 /* ELIMINAR PRODUCTO */
 if(!isset($conn) || !$conn){

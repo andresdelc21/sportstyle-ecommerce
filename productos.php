@@ -251,7 +251,7 @@ function descuento(
 
 ?>
 
-<div class="card-v2"
+<div class="card-v2 <?= $p['stock'] <= 0 ? 'card-sin-stock' : '' ?>"
      onclick="window.location='<?= $BASE ?>detalle.php?id=<?= $p['id'] ?>'">
 
     <!-- ===== IMAGEN ===== -->
@@ -261,6 +261,14 @@ function descuento(
         <img class="img-principal"
              src="<?= $BASE . $p['imagenes'][0] ?>"
              data-imgs='<?= json_encode($p['imagenes']) ?>'>
+
+        <?php if($p['stock'] <= 0): ?>
+
+            <span class="stock-overlay">
+                Sin stock
+            </span>
+
+        <?php endif; ?>
 
     </div>
 
