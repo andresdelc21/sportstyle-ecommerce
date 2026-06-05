@@ -5,6 +5,7 @@ if(session_status() === PHP_SESSION_NONE){
 }
 
 include_once(__DIR__ . "/../config/conexion.php");
+include_once(__DIR__ . "/../config/config.php");
 include_once(__DIR__ . "/../data/carrito_helpers.php");
 
 /* ===== PRODUCTOS MYSQL PARA CARRITO ===== */
@@ -46,7 +47,7 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>SportStyle</title>
+    <title><?= htmlspecialchars($NOMBRE_TIENDA ?? 'SportStyle') ?></title>
 
     <link rel="stylesheet"
           href="/sportstyle/css/estilos.css">
@@ -68,7 +69,7 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
     <!-- LOGO -->
     <div class="logo">
-        Sport<span>Style</span>
+        <?= htmlspecialchars($NOMBRE_TIENDA ?? 'SportStyle') ?>
     </div>
 
     <!-- ===== NAV ===== -->
@@ -311,6 +312,10 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
             </span>
 
+            <span class="rol-badge-header">
+                <?= ($_SESSION['usuario_rol'] ?? 'cliente') === 'admin' ? 'Administrador' : 'Cliente' ?>
+            </span>
+
             <!-- PANEL ADMIN SOLO ADMIN -->
             <?php if(
                 isset($_SESSION['usuario_rol'])
@@ -362,15 +367,12 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
            🛒
 
-           <?php if($cantidadItems > 0): ?>
+                <span class="carrito-badge <?= $cantidadItems > 0 ? '' : 'oculto' ?>"
+                      id="carrito-badge">
 
-                <span class="carrito-badge">
-
-                    <?= $cantidadItems ?>
+                    <?= $cantidadItems > 0 ? $cantidadItems : '' ?>
 
                 </span>
-
-           <?php endif; ?>
 
         </a>
 
@@ -477,6 +479,8 @@ $resultadoMarcas = mysqli_query($conn, $sqlMarcas);
 
 <!-- ===== SCRIPT ===== -->
 <script>
+
+const BASE_URL = "/sportstyle/";
 
 function toggleCarrito(){
 

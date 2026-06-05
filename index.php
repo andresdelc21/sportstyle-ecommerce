@@ -1,7 +1,10 @@
 <?php
 
+if(session_status() === PHP_SESSION_NONE){
+    session_start();
+}
+
 include("config/conexion.php");
-include("includes/header.php");
 
 /* PRODUCTOS DESTACADOS */
 $sqlDestacados = "SELECT
@@ -18,9 +21,69 @@ $sqlDestacados = "SELECT
 
 $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
 
+/* BANNER PRINCIPAL */
+$bannerPrincipal = null;
+
+$sqlBanner = "SELECT *
+              FROM banners
+              WHERE activo = 1
+              ORDER BY id DESC
+              LIMIT 1";
+
+$resultadoBanner = mysqli_query($conn, $sqlBanner);
+
+if($resultadoBanner && mysqli_num_rows($resultadoBanner) > 0){
+    $bannerPrincipal = mysqli_fetch_assoc($resultadoBanner);
+}
+
+/* FAVORITOS DEL USUARIO */
+$favoritosUsuario = [];
+
+if(isset($_SESSION['usuario_id'])){
+
+    $usuario_id = (int) $_SESSION['usuario_id'];
+
+    $sqlFavoritos = "SELECT producto_id
+                     FROM favoritos
+                     WHERE usuario_id = ?";
+
+    $stmtFavoritos = mysqli_prepare($conn, $sqlFavoritos);
+
+    mysqli_stmt_bind_param(
+        $stmtFavoritos,
+        "i",
+        $usuario_id
+    );
+
+    mysqli_stmt_execute($stmtFavoritos);
+
+    $resultadoFavoritos = mysqli_stmt_get_result($stmtFavoritos);
+
+    while($favorito = mysqli_fetch_assoc($resultadoFavoritos)){
+
+        $favoritosUsuario[] = (int) $favorito['producto_id'];
+
+    }
+
+}
+
+include("includes/header.php");
+
 ?>
 
-<section class="hero">
+<?php
+
+$heroTitulo = $bannerPrincipal['titulo'] ?? 'Nueva colección deportiva';
+$heroSubtitulo = $bannerPrincipal['subtitulo'] ?? 'Indumentaria, calzado y accesorios para entrenar con estilo, comodidad y rendimiento.';
+$heroImagen = $bannerPrincipal['imagen'] ?? 'img/pro.jpg';
+$heroEnlace = !empty($bannerPrincipal['enlace'])
+    ? $bannerPrincipal['enlace']
+    : 'productos.php';
+
+?>
+
+<section class="hero"
+         style="background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.7)), url('<?= htmlspecialchars($heroImagen) ?>') center/cover no-repeat;">
 
     <div class="hero-overlay"></div>
 
@@ -28,16 +91,15 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
 
         <span class="hero-badge">SportStyle 2026</span>
 
-        <h1>Nueva colección deportiva</h1>
+        <h1><?= htmlspecialchars($heroTitulo) ?></h1>
 
         <p>
-            Indumentaria, calzado y accesorios para entrenar con estilo,
-            comodidad y rendimiento.
+            <?= htmlspecialchars($heroSubtitulo) ?>
         </p>
 
         <div class="hero-actions">
 
-            <a href="productos.php" class="btn-hero">
+            <a href="<?= htmlspecialchars($heroEnlace) ?>" class="btn-hero">
                 Ver productos
             </a>
 
@@ -80,6 +142,20 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
                              alt="<?= $p['nombre'] ?>">
 
                     </div>
+                    <div class="card-v2-acciones">
+
+                        <a href="#"
+                           class="accion-btn btn-favorito-js <?= in_array((int) $p['id'], $favoritosUsuario, true) ? 'favorito-activo' : '' ?>"
+                           data-producto="<?= $p['id'] ?>"
+                           onclick="event.stopPropagation()"
+                           title="Favoritos"
+                           aria-label="Agregar o quitar favorito">
+
+                            ❤️
+
+                        </a>
+
+                    </div>
 
                     <div class="card-v2-info">
 
@@ -120,7 +196,8 @@ $resultadoDestacados = mysqli_query($conn, $sqlDestacados);
                             <?php if($p['stock'] > 0): ?>
 
                                 <a href="carrito.php?agregar=<?= $p['id'] ?>"
-                                   class="btn-card"
+                                   class="btn-card btn-agregar-carrito-js"
+                                   data-producto="<?= $p['id'] ?>"
                                    onclick="event.stopPropagation()">
                                     🛒
                                 </a>

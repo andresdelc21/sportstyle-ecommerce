@@ -1,58 +1,117 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) 
-    session_start();
-include(__DIR__ . "/../data/productos.php");
 
-$carrito = $_SESSION['carrito'] ?? [];
-$total = 0;
+if(session_status() === PHP_SESSION_NONE){
+    session_start();
+}
+
+include(__DIR__ . "/../config/conexion.php");
+include_once(__DIR__ . "/../data/carrito_helpers.php");
+
 $BASE = "/sportstyle/";
+$carrito = $_SESSION['carrito'] ?? [];
+
+$sqlProductos = "SELECT * FROM productos";
+$resultadoProductos = mysqli_query($conn, $sqlProductos);
+
+$productos = [];
+
+while($fila = mysqli_fetch_assoc($resultadoProductos)){
+    $productos[(int) $fila['id']] = $fila;
+}
+
+$total = 0;
+
 ?>
 
-<div class="carrito-lateral" id="carritoLateral">   <!-- ✅ Contenedor agregado -->
-    <h2>
-        Tu carrito  
-        <button onclick="toggleCarrito()" class="cerrar-carrito">✖</button>
-    </h2>
+<h2>
 
-    <?php if (!empty($carrito)): ?>
-        <?php foreach ($carrito as $id => $cantidad): ?>
-            <?php foreach ($productos as $p): ?>
-                <?php if ($p['id'] == $id): ?>
-                    <?php
-                        $subtotal = $p['precio'] * $cantidad;
-                        $total += $subtotal;
-                    ?>
-                    <!-- INFO -->
-                    <div>
-                        <p><?= htmlspecialchars($p['nombre']) ?></p>
-                        <small>Cant: <?= (int)$cantidad ?></small>
-                    </div>
+    Tu carrito
 
-                    <!-- PRECIO + ACCIONES -->
-                    <div>
-                        <span>$<?= number_format($subtotal, 0, ',', '.') ?></span>
-                        <a href="<?= $BASE ?>carrito.php?eliminar=<?= (int)$id ?>"
-                           class="btn-eliminar"
-                           title="Eliminar">
-                           ❌
-                        </a>
-                    </div>
-                    <!-- ✅ Se eliminó el </div> de más -->
+    <button onclick="toggleCarrito()"
+            class="cerrar-carrito">
 
-                <?php endif; ?>
-            <?php endforeach; ?>
-        <?php endforeach; ?>
+        x
 
-        <!-- FOOTER -->
-        <div class="carrito-lateral-footer">
-            <h3>Total: $<?= number_format($total, 0, ',', '.') ?></h3>
-            <a href="<?= $BASE ?>carrito.php"
-   class="btn-card"
-   onclick="window.location.href='<?= $BASE ?>carrito.php'">
-   Ver carrito completo
-</a>
+    </button>
 
-    <?php else: ?>
-        <p style="text-align:center; margin-top:40px;">Tu carrito está vacío 🛒</p>
-    <?php endif; ?>
-</div>   <!-- ✅ Cierre del contenedor -->
+</h2>
+
+<?php if(!empty($carrito)): ?>
+
+    <?php foreach($carrito as $id => $cantidad): ?>
+
+        <?php
+
+        $id = (int) $id;
+        $cantidad = (int) $cantidad;
+
+        if(!isset($productos[$id]) || $cantidad <= 0){
+            continue;
+        }
+
+        $p = $productos[$id];
+        $subtotal = $p['precio'] * $cantidad;
+        $total += $subtotal;
+
+        ?>
+
+        <div class="item-carrito">
+
+            <div>
+
+                <p>
+                    <?= htmlspecialchars($p['nombre']) ?>
+                </p>
+
+                <small>
+                    Cantidad: <?= $cantidad ?>
+                </small>
+
+            </div>
+
+            <div style="text-align:right">
+
+                <span>
+                    $<?= number_format($subtotal, 0, ',', '.') ?>
+                </span>
+
+                <br>
+
+                <a href="<?= $BASE ?>carrito.php?eliminar=<?= $id ?>"
+                   class="btn-eliminar"
+                   title="Eliminar">
+
+                    x
+
+                </a>
+
+            </div>
+
+        </div>
+
+    <?php endforeach; ?>
+
+    <div class="carrito-lateral-footer">
+
+        <h3>
+            Total:
+            $<?= number_format($total, 0, ',', '.') ?>
+        </h3>
+
+        <a href="<?= $BASE ?>carrito.php"
+           class="btn"
+           style="display:block; text-align:center; margin-top:10px;">
+
+            Ver carrito completo
+
+        </a>
+
+    </div>
+
+<?php else: ?>
+
+    <p style="color:#aaa; text-align:center; margin-top:40px;">
+        Tu carrito está vacío
+    </p>
+
+<?php endif; ?>

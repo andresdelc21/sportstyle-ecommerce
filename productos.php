@@ -31,6 +31,37 @@ while($fila = mysqli_fetch_assoc($resultado)){
 
 }
 
+/* ===== FAVORITOS DEL USUARIO ===== */
+$favoritosUsuario = [];
+
+if(isset($_SESSION['usuario_id'])){
+
+    $usuario_id = (int) $_SESSION['usuario_id'];
+
+    $sqlFavoritos = "SELECT producto_id
+                     FROM favoritos
+                     WHERE usuario_id = ?";
+
+    $stmtFavoritos = mysqli_prepare($conn, $sqlFavoritos);
+
+    mysqli_stmt_bind_param(
+        $stmtFavoritos,
+        "i",
+        $usuario_id
+    );
+
+    mysqli_stmt_execute($stmtFavoritos);
+
+    $resultadoFavoritos = mysqli_stmt_get_result($stmtFavoritos);
+
+    while($favorito = mysqli_fetch_assoc($resultadoFavoritos)){
+
+        $favoritosUsuario[] = (int) $favorito['producto_id'];
+
+    }
+
+}
+
 /* ===== TRAER CATEGORÍAS ===== */
 $sqlCategorias = "SELECT * FROM categorias ORDER BY nombre ASC";
 
@@ -224,6 +255,7 @@ function descuento(
      onclick="window.location='<?= $BASE ?>detalle.php?id=<?= $p['id'] ?>'">
 
     <!-- ===== IMAGEN ===== -->
+
     <div class="card-v2-img">
 
         <img class="img-principal"
@@ -232,36 +264,18 @@ function descuento(
 
     </div>
 
-    <!-- ===== ACCIONES ===== -->
     <div class="card-v2-acciones">
 
-        <a href="favoritos.php?toggle=<?= $p['id'] ?>"
-           class="accion-btn"
-           onclick="event.stopPropagation()">
+        <a href="#"
+           class="accion-btn btn-favorito-js <?= in_array((int) $p['id'], $favoritosUsuario, true) ? 'favorito-activo' : '' ?>"
+           data-producto="<?= $p['id'] ?>"
+           onclick="event.stopPropagation()"
+           title="Favoritos"
+           aria-label="Agregar o quitar favorito">
 
-           ❤️
-
-        </a>
-
-        <a href="detalle.php?id=<?= $p['id'] ?>"
-           class="accion-btn"
-           onclick="event.stopPropagation()">
-
-           👁️
+            ❤️
 
         </a>
-
-        <?php if($p['stock'] > 0): ?>
-
-            <a href="carrito.php?agregar=<?= $p['id'] ?>"
-               class="accion-btn"
-               onclick="event.stopPropagation()">
-
-               🛒
-
-            </a>
-
-        <?php endif; ?>
 
     </div>
 
@@ -361,7 +375,8 @@ function descuento(
             <?php if($p['stock'] > 0): ?>
 
                 <a href="<?= $BASE ?>carrito.php?agregar=<?= $p['id'] ?>"
-                   class="btn-card"
+                   class="btn-card btn-agregar-carrito-js"
+                   data-producto="<?= $p['id'] ?>"
                    onclick="event.stopPropagation()">
 
                    🛒 Agregar

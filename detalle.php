@@ -61,6 +61,36 @@ if(empty($imagenes)){
 
 $producto['imagenes'] = $imagenes;
 
+/* FAVORITO DEL USUARIO */
+$esFavorito = false;
+
+if(isset($_SESSION['usuario_id'])){
+
+    $usuario_id = (int) $_SESSION['usuario_id'];
+
+    $sqlFavorito = "SELECT id
+                    FROM favoritos
+                    WHERE usuario_id = ?
+                    AND producto_id = ?
+                    LIMIT 1";
+
+    $stmtFavorito = mysqli_prepare($conn, $sqlFavorito);
+
+    mysqli_stmt_bind_param(
+        $stmtFavorito,
+        "ii",
+        $usuario_id,
+        $id
+    );
+
+    mysqli_stmt_execute($stmtFavorito);
+
+    $resultadoFavorito = mysqli_stmt_get_result($stmtFavorito);
+
+    $esFavorito = mysqli_num_rows($resultadoFavorito) > 0;
+
+}
+
 /* REVIEWS */
 $sqlReviews = "SELECT *
                FROM reviews
@@ -189,7 +219,8 @@ $desc = descuento(
             <?php if($producto['stock'] > 0): ?>
 
                 <a href="carrito.php?agregar=<?= $producto['id'] ?>"
-                   class="btn-comprar">
+                   class="btn-comprar btn-agregar-carrito-js"
+                   data-producto="<?= $producto['id'] ?>">
                     🛒 Agregar al carrito
                 </a>
 
@@ -200,6 +231,22 @@ $desc = descuento(
                 </span>
 
             <?php endif; ?>
+
+            <a href="#"
+               class="btn-favorito-detalle btn-favorito-js <?= $esFavorito ? 'favorito-activo' : '' ?>"
+               data-producto="<?= $producto['id'] ?>"
+               title="<?= $esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos' ?>"
+               aria-label="Agregar o quitar favorito">
+
+                <span class="favorito-icono">
+                    ❤️
+                </span>
+
+                <span class="favorito-texto">
+                    <?= $esFavorito ? 'En favoritos' : 'Guardar favorito' ?>
+                </span>
+
+            </a>
 
         </div>
 

@@ -1152,3 +1152,875 @@
     width:100% !important;
     height:100% !important;
 }
+
+/* =========================
+   ADMIN BACKOFFICE REFINADO
+========================= */
+
+.admin-body{
+    background:#f4f6f8;
+    color:#1f2937;
+    font-family:Arial, sans-serif;
+}
+
+.admin-container{
+    display:flex;
+    min-height:100vh;
+}
+
+.admin-sidebar{
+    width:248px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    background:#111827;
+    border-right:1px solid #1f2937;
+    padding:24px 16px;
+    box-shadow:none;
+}
+
+.admin-logo{
+    font-size:24px;
+    line-height:1;
+    margin:0 0 28px;
+    color:#fff;
+    letter-spacing:0;
+}
+
+.admin-logo span{
+    color:#22c55e;
+}
+
+.admin-menu{
+    gap:4px;
+}
+
+.admin-menu hr{
+    width:100%;
+    border:0;
+    border-top:1px solid rgba(255,255,255,.08);
+    margin:18px 0;
+}
+
+.admin-menu a{
+    display:flex;
+    align-items:center;
+    min-height:42px;
+    padding:10px 12px;
+    border-radius:8px;
+    background:transparent;
+    color:#cbd5e1;
+    font-size:14px;
+    font-weight:700;
+    text-decoration:none;
+    transition:.18s ease;
+}
+
+.admin-menu a:hover,
+.activo-admin{
+    background:#1f2937 !important;
+    color:#fff !important;
+    transform:none;
+}
+
+.logout-btn{
+    color:#fecaca !important;
+    background:transparent !important;
+}
+
+.logout-btn:hover{
+    background:#7f1d1d !important;
+    color:#fff !important;
+}
+
+.admin-content{
+    flex:1;
+    padding:28px 32px 48px;
+    color:#1f2937;
+    max-width:1500px;
+}
+
+.admin-hero,
+.small-hero{
+    background:transparent;
+    border:0;
+    border-radius:0;
+    padding:0 0 22px;
+    margin-bottom:22px;
+    box-shadow:none;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.admin-hero h1,
+.small-hero h1{
+    color:#111827;
+    font-size:30px;
+    line-height:1.2;
+    margin:4px 0 6px;
+}
+
+.admin-hero p,
+.small-hero p{
+    color:#64748b;
+    font-size:14px;
+    margin:0;
+    max-width:720px;
+}
+
+.admin-badge{
+    padding:0;
+    background:transparent;
+    color:#64748b;
+    border:0;
+    border-radius:0;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+}
+
+.admin-hero-actions{
+    gap:10px;
+}
+
+.btn-admin-agregar,
+.btn-admin-secundario,
+.btn-admin-volver,
+.btn-whatsapp-admin{
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:14px;
+    font-weight:800;
+    box-shadow:none;
+    transform:none;
+}
+
+.btn-admin-agregar{
+    background:#111827;
+    color:#fff;
+}
+
+.btn-admin-agregar:hover{
+    background:#0f172a;
+    transform:none;
+}
+
+.btn-admin-secundario,
+.btn-admin-volver{
+    background:#fff;
+    color:#111827;
+    border:1px solid #d7dce3;
+}
+
+.btn-admin-secundario:hover,
+.btn-admin-volver:hover{
+    background:#f8fafc;
+    color:#111827;
+    transform:none;
+}
+
+.admin-metricas{
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:14px;
+    margin-bottom:24px;
+}
+
+.admin-card,
+.metrica-card,
+.venta-card,
+.admin-panel-box,
+.pedido-panel,
+.pedido-card,
+.tabla-admin,
+.form-admin{
+    background:#fff;
+    color:#111827;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+
+.admin-card:hover,
+.metrica-card:hover,
+.venta-card:hover,
+.quick-action:hover{
+    transform:none;
+    border-color:#cbd5e1;
+}
+
+.metrica-card{
+    min-height:104px;
+    padding:18px;
+    gap:14px;
+}
+
+.metrica-icono{
+    width:38px;
+    height:38px;
+    border-radius:8px;
+    background:#f1f5f9 !important;
+    color:#111827;
+    font-size:18px;
+}
+
+.metrica-card span,
+.admin-card span{
+    color:#64748b;
+    font-size:12px;
+    letter-spacing:.04em;
+}
+
+.metrica-card h2{
+    color:#111827;
+    font-size:26px;
+    margin:2px 0;
+}
+
+.metrica-card p,
+.admin-card p,
+.venta-card h3,
+.quick-action p,
+.admin-section-title p,
+.admin-resumen-box p{
+    color:#64748b;
+}
+
+.admin-dashboard-grid{
+    grid-template-columns:1.6fr 1fr;
+    gap:18px;
+    margin-bottom:28px;
+}
+
+.admin-panel-box,
+.pedido-panel,
+.pedido-card{
+    padding:20px;
+}
+
+.admin-section{
+    margin-top:28px;
+}
+
+.admin-section-title{
+    margin-bottom:12px;
+}
+
+.admin-section-title h2,
+.pedido-panel-header h2,
+.pedido-card h2{
+    color:#111827;
+    font-size:20px;
+    margin:0 0 4px;
+}
+
+.quick-actions{
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:10px;
+}
+
+.quick-action{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:14px;
+}
+
+.quick-action span{
+    width:34px;
+    height:34px;
+    border-radius:8px;
+    background:#f1f5f9;
+    font-size:16px;
+}
+
+.quick-action h3{
+    color:#111827;
+    font-size:15px;
+}
+
+.admin-resumen-box{
+    min-height:auto;
+    background:#fff;
+}
+
+.admin-resumen-box h2{
+    color:#111827;
+    font-size:24px;
+    margin:10px 0;
+}
+
+.tabla-admin{
+    overflow:hidden;
+}
+
+.tabla-admin table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.tabla-admin thead,
+.tabla-premium thead{
+    background:#f8fafc;
+}
+
+.tabla-admin th,
+.tabla-premium th{
+    color:#64748b;
+    padding:12px 14px;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.tabla-admin td,
+.tabla-premium td{
+    color:#1f2937;
+    padding:12px 14px;
+    border-top:1px solid #eef2f7;
+    vertical-align:middle;
+}
+
+.tabla-admin tbody tr:hover{
+    background:#f8fafc;
+}
+
+.producto-admin-info strong,
+.usuario-admin-info strong,
+.pedido-dato strong,
+.pedido-total-linea strong{
+    color:#111827;
+}
+
+.producto-admin-info small,
+.pedido-dato span,
+.pedido-total-linea span{
+    color:#64748b;
+}
+
+.tabla-premium .admin-img-producto,
+.admin-img-producto{
+    width:52px;
+    height:52px;
+    border-radius:8px;
+    background:#f8fafc;
+    padding:2px;
+}
+
+.stock-ok,
+.stock-bajo,
+.estado{
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:12px;
+}
+
+.estado.pendiente{
+    background:#fff7ed;
+    color:#c2410c;
+}
+
+.estado.pagado{
+    background:#ecfdf5;
+    color:#047857;
+}
+
+.estado.enviado{
+    background:#eff6ff;
+    color:#1d4ed8;
+}
+
+.estado.cancelado{
+    background:#fef2f2;
+    color:#b91c1c;
+}
+
+.acciones-tabla{
+    gap:6px;
+}
+
+.btn-tabla{
+    width:34px;
+    height:34px;
+    border-radius:8px;
+    background:#f1f5f9 !important;
+    color:#111827;
+}
+
+.btn-tabla:hover{
+    transform:none;
+    background:#e2e8f0 !important;
+}
+
+.admin-search-box{
+    margin-bottom:14px;
+}
+
+.admin-search-box input,
+.form-admin-premium input,
+.form-admin-premium select,
+.form-admin-premium textarea,
+.estado-form select{
+    background:#fff;
+    color:#111827;
+    border:1px solid #d7dce3;
+    border-radius:8px;
+    padding:11px 12px;
+    font-weight:600;
+}
+
+.admin-search-box input{
+    border-color:#d7dce3;
+    font-size:14px;
+}
+
+.pedido-grid{
+    gap:18px;
+}
+
+.pedido-total-final{
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+}
+
+.pedido-total-final span,
+.pedido-total-final strong{
+    color:#111827;
+}
+
+.chart-box{
+    height:320px;
+}
+
+@media(max-width:900px){
+    .admin-container{
+        flex-direction:column;
+    }
+
+    .admin-sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+
+    .admin-content{
+        padding:20px;
+    }
+
+    .admin-hero,
+    .small-hero{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+}
+
+/* =========================
+   ADMIN ESTILO BACKOFFICE TIENDA
+========================= */
+
+.admin-body{
+    background:#eef2f5;
+    color:#263238;
+}
+
+.admin-sidebar{
+    width:220px;
+    background:#26313b;
+    border-right:0;
+    padding:14px 0;
+}
+
+.admin-logo{
+    padding:0 18px 14px;
+    margin:0 0 8px;
+    font-size:19px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.admin-logo span{
+    color:#28c7d9;
+}
+
+.admin-menu{
+    gap:0;
+}
+
+.admin-sidebar-user{
+    margin:0 14px 12px;
+    padding:10px 12px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:4px;
+    background:rgba(255,255,255,.04);
+}
+
+.admin-sidebar-user strong{
+    display:block;
+    color:#fff;
+    font-size:13px;
+    margin-bottom:3px;
+}
+
+.admin-sidebar-user span{
+    color:#9fb0bf;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+}
+
+.admin-menu a{
+    min-height:36px;
+    padding:9px 18px;
+    border-radius:0;
+    color:#c8d1da;
+    font-size:13px;
+    font-weight:600;
+    border-left:3px solid transparent;
+}
+
+.admin-menu a:hover,
+.activo-admin{
+    background:#1f2933 !important;
+    border-left-color:#28c7d9;
+    color:#fff !important;
+}
+
+.admin-menu hr{
+    margin:10px 18px;
+}
+
+.logout-btn:hover{
+    border-left-color:#ef4444;
+}
+
+.admin-content{
+    padding:18px 22px 36px;
+    max-width:none;
+}
+
+.admin-hero,
+.small-hero{
+    background:#fff;
+    border:1px solid #dce4ea;
+    border-radius:4px;
+    padding:14px 16px;
+    margin-bottom:14px;
+    align-items:center;
+}
+
+.admin-hero h1,
+.small-hero h1{
+    font-size:22px;
+    font-weight:600;
+    color:#263238;
+    margin:2px 0 3px;
+}
+
+.admin-hero p,
+.small-hero p{
+    font-size:13px;
+    color:#6b7c8a;
+}
+
+.admin-badge{
+    color:#7b8a96;
+    font-size:11px;
+    letter-spacing:.04em;
+}
+
+.btn-admin-agregar,
+.btn-admin-secundario,
+.btn-admin-volver{
+    border-radius:3px;
+    padding:8px 11px;
+    font-size:12px;
+}
+
+.btn-admin-agregar{
+    background:#24b9d7;
+    color:#fff;
+}
+
+.btn-admin-agregar:hover{
+    background:#1aa5c0;
+}
+
+.btn-admin-secundario,
+.btn-admin-volver{
+    background:#fff;
+    border:1px solid #ccd6dd;
+    color:#425466;
+}
+
+.admin-metricas{
+    grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+    gap:10px;
+    margin-bottom:14px;
+}
+
+.admin-card,
+.metrica-card,
+.venta-card,
+.admin-panel-box,
+.pedido-panel,
+.pedido-card,
+.tabla-admin,
+.form-admin{
+    border-radius:4px;
+    border-color:#dce4ea;
+    box-shadow:none;
+}
+
+.metrica-card{
+    min-height:78px;
+    padding:12px;
+    gap:10px;
+}
+
+.metrica-icono{
+    width:30px;
+    height:30px;
+    border-radius:3px;
+    background:#e9f7fb !important;
+    color:#24b9d7;
+    font-size:15px;
+}
+
+.metrica-card span,
+.admin-card span{
+    font-size:11px;
+    color:#7b8a96;
+}
+
+.metrica-card h2{
+    font-size:20px;
+    font-weight:600;
+}
+
+.metrica-card p{
+    display:none;
+}
+
+.admin-dashboard-grid{
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.admin-panel-box,
+.pedido-panel,
+.pedido-card{
+    padding:14px;
+}
+
+.admin-section{
+    margin-top:18px;
+}
+
+.admin-section-title{
+    background:#fff;
+    border:1px solid #dce4ea;
+    border-bottom:0;
+    border-radius:4px 4px 0 0;
+    padding:12px 14px;
+    margin-bottom:0;
+}
+
+.admin-section-title h2,
+.pedido-panel-header h2,
+.pedido-card h2{
+    font-size:16px;
+    font-weight:600;
+}
+
+.admin-section-title p{
+    font-size:12px;
+}
+
+.quick-actions{
+    gap:8px;
+}
+
+.quick-action{
+    border-radius:3px;
+    padding:10px;
+}
+
+.quick-action span{
+    width:28px;
+    height:28px;
+    border-radius:3px;
+}
+
+.quick-action h3{
+    font-size:13px;
+}
+
+.quick-action p{
+    font-size:12px;
+}
+
+.admin-resumen-box h2{
+    font-size:18px;
+}
+
+.admin-search-box{
+    background:#fff;
+    border:1px solid #dce4ea;
+    border-radius:4px;
+    padding:10px;
+    margin-bottom:0;
+    border-bottom:0;
+}
+
+.admin-search-box input{
+    border-radius:3px;
+    padding:8px 10px;
+    font-size:13px;
+    background:#f8fafc;
+}
+
+.tabla-admin{
+    border-radius:0 0 4px 4px;
+    overflow:auto;
+}
+
+.tabla-admin thead,
+.tabla-premium thead{
+    background:#dff6fb;
+}
+
+.tabla-admin th,
+.tabla-premium th{
+    color:#51606d;
+    padding:9px 10px;
+    font-size:11px;
+    font-weight:700;
+    border-bottom:1px solid #c9e9f0;
+}
+
+.tabla-admin td,
+.tabla-premium td{
+    padding:8px 10px;
+    font-size:13px;
+    border-top:1px solid #edf2f5;
+}
+
+.tabla-admin tbody tr:nth-child(even){
+    background:#fbfdfe;
+}
+
+.tabla-admin tbody tr:hover{
+    background:#eefaff;
+}
+
+.tabla-premium .admin-img-producto,
+.admin-img-producto{
+    width:38px;
+    height:38px;
+    border-radius:3px;
+}
+
+.producto-admin-info{
+    gap:9px;
+}
+
+.producto-admin-info strong{
+    font-size:13px;
+}
+
+.producto-admin-info small{
+    font-size:11px;
+}
+
+.stock-ok,
+.stock-bajo,
+.estado{
+    border-radius:3px;
+    padding:4px 7px;
+    font-size:11px;
+    font-weight:700;
+}
+
+.acciones-tabla{
+    gap:4px;
+}
+
+.btn-tabla{
+    width:28px;
+    height:28px;
+    border-radius:3px;
+    font-size:12px;
+    background:#eef3f7 !important;
+}
+
+.btn-tabla:hover{
+    background:#dce9f0 !important;
+}
+
+.form-admin-premium input,
+.form-admin-premium select,
+.form-admin-premium textarea,
+.estado-form select{
+    border-radius:3px;
+    padding:9px 10px;
+    font-size:13px;
+}
+
+.chart-box{
+    height:280px;
+}
+
+.admin-toolbar{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+}
+
+.stock-input-admin{
+    width:90px;
+    padding:7px 8px;
+    border:1px solid #d7dce3;
+    border-radius:3px;
+    font-weight:700;
+}
+
+.admin-check{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-height:34px;
+    color:#425466;
+    font-weight:700;
+}
+
+/* Sidebar siempre oscuro: anula restos del modo claro anterior */
+.admin-body.admin-light .admin-sidebar,
+.admin-body .admin-sidebar{
+    background:#26313b !important;
+}
+
+.admin-body.admin-light .admin-menu a,
+.admin-body .admin-menu a{
+    background:transparent !important;
+    color:#c8d1da !important;
+}
+
+.admin-body.admin-light .admin-menu a:hover,
+.admin-body.admin-light .admin-menu a.activo-admin,
+.admin-body .admin-menu a:hover,
+.admin-body .admin-menu a.activo-admin{
+    background:#1f2933 !important;
+    border-left-color:#28c7d9 !important;
+    color:#fff !important;
+}
+
+.admin-body.admin-light .admin-menu a.logout-btn,
+.admin-body .admin-menu a.logout-btn{
+    color:#fecaca !important;
+}

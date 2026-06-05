@@ -33,3 +33,26 @@ $FACEBOOK_TIENDA = "https://www.facebook.com/sportstyle";
 $MP_PUBLIC_KEY = "";
 
 $MP_ACCESS_TOKEN = "";
+
+/* =========================
+   CONFIGURACIÓN DESDE ADMIN
+========================= */
+
+if(isset($conn)){
+
+    $resultadoConfig = mysqli_query(
+        $conn,
+        "SELECT clave, valor FROM configuracion_tienda"
+    );
+
+    if($resultadoConfig){
+
+        while($config = mysqli_fetch_assoc($resultadoConfig)){
+
+            ${$config['clave']} = $config['valor'];
+
+        }
+
+    }
+
+}

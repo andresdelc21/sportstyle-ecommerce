@@ -1,50 +1,68 @@
+<?php
+
+$paginaActual = basename($_SERVER['PHP_SELF']);
+
+$menuPrincipal = [
+    'index.php' => ['label' => 'Dashboard', 'match' => ['index.php']],
+    'productos.php' => ['label' => 'Productos', 'match' => ['productos.php', 'agregar_productos.php', 'editar_productos.php']],
+    'pedidos.php' => ['label' => 'Pedidos', 'match' => ['pedidos.php', 'ver_pedido.php']],
+    'usuarios.php' => ['label' => 'Usuarios', 'match' => ['usuarios.php']],
+    'ventas.php' => ['label' => 'Ventas', 'match' => ['ventas.php']],
+];
+
+$menuGestion = [
+    'zonas_envio.php' => ['label' => 'Zonas de envío', 'match' => ['zonas_envio.php']],
+    'cupones.php' => ['label' => 'Cupones', 'match' => ['cupones.php']],
+    'banners.php' => ['label' => 'Banners', 'match' => ['banners.php']],
+    'categorias.php' => ['label' => 'Categorías', 'match' => ['categorias.php']],
+    'marcas.php' => ['label' => 'Marcas', 'match' => ['marcas.php']],
+    'stock.php' => ['label' => 'Stock', 'match' => ['stock.php']],
+    'configuracion.php' => ['label' => 'Configuración', 'match' => ['configuracion.php']],
+];
+
+function adminMenuLink(string $href, array $item, string $paginaActual): string {
+    $activo = in_array($paginaActual, $item['match'], true)
+        ? ' activo-admin'
+        : '';
+
+    return '<a href="' . htmlspecialchars($href) . '" class="' . $activo . '"><span>' . htmlspecialchars($item['label']) . '</span></a>';
+}
+
+?>
+
 <aside class="admin-sidebar">
 
     <h2 class="admin-logo">
         Sport<span>Style</span>
     </h2>
 
-    <!-- BOTON MODO OSCURO / CLARO -->
-    <button type="button"
-            id="adminThemeToggle"
-            class="admin-theme-toggle">
-
-        ☀️ / 🌙
-
-    </button>
+    <div class="admin-sidebar-user">
+        <strong><?= htmlspecialchars($_SESSION['usuario_nombre'] ?? 'Admin') ?></strong>
+        <span>Administrador</span>
+    </div>
 
     <nav class="admin-menu">
 
-        <a href="index.php">
-            🏠 Dashboard
-        </a>
+        <?php foreach($menuPrincipal as $href => $item): ?>
+            <?= adminMenuLink($href, $item, $paginaActual) ?>
+        <?php endforeach; ?>
 
-        <a href="productos.php">
-            📦 Productos
-        </a>
+        <hr>
 
-        <a href="pedidos.php">
-            🧾 Pedidos
-        </a>
+        <?php foreach($menuGestion as $href => $item): ?>
+            <?= adminMenuLink($href, $item, $paginaActual) ?>
+        <?php endforeach; ?>
 
-        <a href="usuarios.php">
-            👥 Usuarios
-        </a>
-
-        <a href="ventas.php">
-            📊 Ventas
-        </a>
-
-        <hr style="margin:20px 0; opacity:.15;">
+        <hr>
 
         <a href="../index.php">
-            🛍 Ver tienda
+            <span>Ver tienda</span>
         </a>
 
         <a href="../logout.php"
            class="logout-btn">
 
-            🚪 Cerrar sesión
+            <span>Cerrar sesión</span>
 
         </a>
 

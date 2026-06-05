@@ -31,4 +31,37 @@ function validarCupon(string $codigo) {
     $codigo = strtoupper(trim($codigo));
     return isset($cupones[$codigo]) ? $cupones[$codigo] : false;
 }
+
+function validarCuponDb(mysqli $conn, string $codigo) {
+    $codigo = strtoupper(trim($codigo));
+
+    if($codigo === ''){
+        return false;
+    }
+
+    $sql = "SELECT codigo, tipo, valor
+            FROM cupones
+            WHERE codigo = ?
+            AND activo = 1
+            LIMIT 1";
+
+    $stmt = mysqli_prepare($conn, $sql);
+
+    if(!$stmt){
+        return validarCupon($codigo);
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $codigo);
+    mysqli_stmt_execute($stmt);
+
+    $resultado = mysqli_stmt_get_result($stmt);
+
+    if(mysqli_num_rows($resultado) === 0){
+        return false;
+    }
+
+    $cupon = mysqli_fetch_assoc($resultado);
+
+    return $cupon;
+}
 ?>

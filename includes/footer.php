@@ -1,9 +1,21 @@
+<?php
+
+include_once(__DIR__ . "/../config/config.php");
+
+$nombreTiendaFooter = $NOMBRE_TIENDA ?? 'SportStyle';
+$whatsappTiendaFooter = preg_replace('/[^0-9]/', '', $WHATSAPP_TIENDA ?? '');
+$emailTiendaFooter = $EMAIL_TIENDA ?? 'contacto@sportstyle.com';
+$instagramTiendaFooter = $INSTAGRAM_TIENDA ?? '';
+$facebookTiendaFooter = $FACEBOOK_TIENDA ?? '';
+
+?>
+
 <footer>
 
     <div class="footer-grid">
 
         <div class="footer-col">
-            <h4>SportStyle</h4>
+            <h4><?= htmlspecialchars($nombreTiendaFooter) ?></h4>
             <p>Tienda online de ropa deportiva.</p>
             <p>Calidad, estilo y rendimiento.</p>
         </div>
@@ -24,22 +36,30 @@
 
         <div class="footer-col">
             <h4>Contacto</h4>
-            <p>Email: contacto@sportstyle.com</p>
-            <p>WhatsApp: +54 9 387 330 4414</p>
+            <p>Email: <?= htmlspecialchars($emailTiendaFooter) ?></p>
+            <p>WhatsApp: <?= htmlspecialchars($whatsappTiendaFooter) ?></p>
+            <?php if(!empty($instagramTiendaFooter)): ?>
+                <a href="<?= htmlspecialchars($instagramTiendaFooter) ?>" target="_blank">Instagram</a>
+            <?php endif; ?>
+            <?php if(!empty($facebookTiendaFooter)): ?>
+                <a href="<?= htmlspecialchars($facebookTiendaFooter) ?>" target="_blank">Facebook</a>
+            <?php endif; ?>
         </div>
 
     </div>
 
     <div class="footer-bottom">
-        <p>© <?= date("Y") ?> SportStyle - Todos los derechos reservados</p>
+        <p>© <?= date("Y") ?> <?= htmlspecialchars($nombreTiendaFooter) ?> - Todos los derechos reservados</p>
     </div>
     <!-- BOTÓN WHATSAPP FLOTANTE -->
-<a href="https://wa.me/+5493873304414"
+<?php if(!empty($whatsappTiendaFooter)): ?>
+<a href="https://wa.me/<?= htmlspecialchars($whatsappTiendaFooter) ?>"
    class="whatsapp-float"
    target="_blank"
    title="Escribinos por WhatsApp">
     <i class="fab fa-whatsapp"></i>
 </a>
+<?php endif; ?>
 <!-- ASISTENTE VIRTUAL SPORTSTYLE -->
 <div class="asistente-float" id="asistenteFloat">
 
@@ -50,14 +70,14 @@
     <div class="asistente-box" id="asistenteBox">
 
         <div class="asistente-header">
-            <strong>Asistente SportStyle</strong>
+            <strong>Asistente <?= htmlspecialchars($nombreTiendaFooter) ?></strong>
             <button id="cerrarAsistente">×</button>
         </div>
 
        <div class="asistente-body">
 
     <p>
-        👋 Hola, soy el asistente de SportStyle.
+        👋 Hola, soy el asistente de <?= htmlspecialchars($nombreTiendaFooter) ?>.
     </p>
 
     <p>
@@ -80,9 +100,11 @@
 
     <a href="#">↩️ Cambios y devoluciones</a>
 
-    <a href="https://wa.me/5493873304414" target="_blank">
+    <?php if(!empty($whatsappTiendaFooter)): ?>
+    <a href="https://wa.me/<?= htmlspecialchars($whatsappTiendaFooter) ?>" target="_blank">
         <i class="fab fa-whatsapp"></i> Hablar por WhatsApp
     </a>
+    <?php endif; ?>
 
 </div>
 

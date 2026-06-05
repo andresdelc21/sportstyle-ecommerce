@@ -14,9 +14,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    $sql = "SELECT * FROM usuarios WHERE email='$email'";
+    $sql = "SELECT * FROM usuarios WHERE email = ? LIMIT 1";
 
-    $resultado = mysqli_query($conn, $sql);
+    $stmt = mysqli_prepare($conn, $sql);
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "s",
+        $email
+    );
+
+    mysqli_stmt_execute($stmt);
+
+    $resultado = mysqli_stmt_get_result($stmt);
 
     if(mysqli_num_rows($resultado) > 0){
 
@@ -30,7 +40,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $_SESSION['usuario_rol'] = $usuario['rol'];
             $_SESSION['usuario_email'] = $usuario['email'];
 
-            header("Location: admin/index.php");
+            if(($usuario['rol'] ?? 'cliente') === 'admin'){
+                header("Location: admin/index.php");
+            } else {
+                header("Location: index.php");
+            }
+
             exit;
 
         } else {

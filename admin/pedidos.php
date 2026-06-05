@@ -2,6 +2,8 @@
 
 session_start();
 
+require_once __DIR__ . "/includes/auth_admin.php";
+
 require_once __DIR__ . '/../config/conexion.php';
 
 /* PROTEGER PANEL */
@@ -89,8 +91,6 @@ if($resultado){
 <div class="admin-container">
 
     <?php include("includes/sidebar.php"); ?>
-
-    <main class="admin-content">
 
     <!-- CONTENIDO -->
     <main class="admin-content">

@@ -108,7 +108,22 @@ include("includes/header.php");
 
 ?>
 
-<h1 class="titulo">Mis Favoritos ❤️</h1>
+<div class="favoritos-header">
+
+    <span class="favoritos-badge">
+        ❤️ SportStyle
+    </span>
+
+    <h1>
+        Tu colección favorita
+    </h1>
+
+    <p>
+        Guardá aquí los productos que más te interesan
+        para encontrarlos rápidamente.
+    </p>
+
+</div>
 
 <div class="grid">
 

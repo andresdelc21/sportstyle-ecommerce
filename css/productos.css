@@ -8,6 +8,7 @@
 
 /* ===== CARD V2 ===== */
 .card-v2 {
+    position: relative;
     background: white;
     border-radius: 15px;
     overflow: hidden;
@@ -185,4 +186,40 @@
 .productos-header p{
     color:#777;
     margin-top:10px;
+}
+.favoritos-header{
+    text-align:center;
+    padding:60px 20px 30px;
+}
+
+.favoritos-badge{
+    display:inline-block;
+    padding:8px 16px;
+    border-radius:999px;
+    background:#ffe6ee;
+    color:#ff3d6d;
+    font-size:13px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.favoritos-header h1{
+    margin-top:18px;
+    font-size:48px;
+    font-weight:900;
+}
+
+.favoritos-header p{
+    margin-top:12px;
+    color:#777;
+    font-size:16px;
+    max-width:600px;
+    margin-left:auto;
+    margin-right:auto;
+    line-height:1.6;
+}
+.favorito-activo{
+    background:#ff3d6d !important;
+    color:white !important;
+    transform:scale(1.08);
 }

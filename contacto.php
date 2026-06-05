@@ -1,5 +1,7 @@
 <?php
 session_start();
+include("config/conexion.php");
+include("config/config.php");
 
 $enviado = false;
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -50,23 +52,23 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     <!-- LATERAL -->
     <div class="contacto-lateral">
 
-        <a href="https://wa.me/549XXXXXXXXXX?text=Hola!%20Quiero%20más%20información"
+        <a href="https://wa.me/<?= htmlspecialchars(preg_replace('/[^0-9]/', '', $WHATSAPP_TIENDA ?? '')) ?>?text=Hola!%20Quiero%20más%20información"
            target="_blank" class="contacto-card">
             <span class="icono">💬</span>
             <h3>WhatsApp</h3>
             <p>Respondemos al instante en horario comercial</p>
         </a>
 
-        <a href="https://instagram.com/sportstyle" target="_blank" class="contacto-card">
+        <a href="<?= htmlspecialchars($INSTAGRAM_TIENDA ?? '#') ?>" target="_blank" class="contacto-card">
             <span class="icono">📸</span>
             <h3>Instagram</h3>
-            <p>@sportstyle — Seguinos para ver novedades</p>
+            <p>Seguinos para ver novedades</p>
         </a>
 
-        <a href="mailto:sportstyle@gmail.com" class="contacto-card">
+        <a href="mailto:<?= htmlspecialchars($EMAIL_TIENDA ?? 'contacto@sportstyle.com') ?>" class="contacto-card">
             <span class="icono">✉️</span>
             <h3>Email</h3>
-            <p>sportstyle@gmail.com</p>
+            <p><?= htmlspecialchars($EMAIL_TIENDA ?? 'contacto@sportstyle.com') ?></p>
         </a>
 
         <div class="contacto-card" style="cursor:default;">

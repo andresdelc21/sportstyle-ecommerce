@@ -2,6 +2,8 @@
 
 session_start();
 
+require_once __DIR__ . "/includes/auth_admin.php";
+
 include("../config/conexion.php");
 
 /* PROTEGER */
