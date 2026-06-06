@@ -3,6 +3,7 @@ session_start();
 
 require_once __DIR__ . "/includes/auth_admin.php";
 require_once __DIR__ . "/../config/conexion.php";
+require_once __DIR__ . "/includes/csrf.php";
 
 if(!isset($_SESSION['usuario_nombre'])){
     header("Location: ../login.php");
@@ -11,15 +12,6 @@ if(!isset($_SESSION['usuario_nombre'])){
 
 $mensaje = '';
 $editando = null;
-
-if(isset($_GET['eliminar'])){
-    $id = (int) $_GET['eliminar'];
-    $stmt = mysqli_prepare($conn, "DELETE FROM zonas_envio WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    mysqli_stmt_execute($stmt);
-    header("Location: zonas_envio.php");
-    exit;
-}
 
 if(isset($_GET['editar'])){
     $id = (int) $_GET['editar'];
@@ -30,29 +22,46 @@ if(isset($_GET['editar'])){
 }
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $id = (int) ($_POST['id'] ?? 0);
-    $nombre = trim($_POST['nombre'] ?? '');
-    $cp_desde = (int) ($_POST['cp_desde'] ?? 0);
-    $cp_hasta = (int) ($_POST['cp_hasta'] ?? 0);
-    $costo = (float) ($_POST['costo'] ?? 0);
-    $envio_gratis_desde = (float) ($_POST['envio_gratis_desde'] ?? 0);
+    if(!validarCsrf()){
+        $mensaje = 'La sesión expiró. Volvé a intentar.';
+    } else {
+        $accion = $_POST['accion'] ?? 'guardar';
+        $id = (int) ($_POST['id'] ?? 0);
 
-    if($nombre && $cp_desde > 0 && $cp_hasta >= $cp_desde){
-        if($id > 0){
-            $sql = "UPDATE zonas_envio SET nombre=?, cp_desde=?, cp_hasta=?, costo=?, envio_gratis_desde=? WHERE id=?";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "siiddi", $nombre, $cp_desde, $cp_hasta, $costo, $envio_gratis_desde, $id);
-        } else {
-            $sql = "INSERT INTO zonas_envio (nombre, cp_desde, cp_hasta, costo, envio_gratis_desde) VALUES (?, ?, ?, ?, ?)";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "siidd", $nombre, $cp_desde, $cp_hasta, $costo, $envio_gratis_desde);
+        if($accion === 'eliminar'){
+            if($id > 0){
+                $stmt = mysqli_prepare($conn, "DELETE FROM zonas_envio WHERE id = ?");
+                mysqli_stmt_bind_param($stmt, "i", $id);
+                mysqli_stmt_execute($stmt);
+            }
+
+            header("Location: zonas_envio.php");
+            exit;
         }
-        mysqli_stmt_execute($stmt);
-        header("Location: zonas_envio.php");
-        exit;
-    }
 
-    $mensaje = 'Completá nombre y rangos de CP válidos.';
+        $nombre = trim($_POST['nombre'] ?? '');
+        $cp_desde = (int) ($_POST['cp_desde'] ?? 0);
+        $cp_hasta = (int) ($_POST['cp_hasta'] ?? 0);
+        $costo = (float) ($_POST['costo'] ?? 0);
+        $envio_gratis_desde = (float) ($_POST['envio_gratis_desde'] ?? 0);
+
+        if($nombre && $cp_desde > 0 && $cp_hasta >= $cp_desde){
+            if($id > 0){
+                $sql = "UPDATE zonas_envio SET nombre=?, cp_desde=?, cp_hasta=?, costo=?, envio_gratis_desde=? WHERE id=?";
+                $stmt = mysqli_prepare($conn, $sql);
+                mysqli_stmt_bind_param($stmt, "siiddi", $nombre, $cp_desde, $cp_hasta, $costo, $envio_gratis_desde, $id);
+            } else {
+                $sql = "INSERT INTO zonas_envio (nombre, cp_desde, cp_hasta, costo, envio_gratis_desde) VALUES (?, ?, ?, ?, ?)";
+                $stmt = mysqli_prepare($conn, $sql);
+                mysqli_stmt_bind_param($stmt, "siidd", $nombre, $cp_desde, $cp_hasta, $costo, $envio_gratis_desde);
+            }
+            mysqli_stmt_execute($stmt);
+            header("Location: zonas_envio.php");
+            exit;
+        }
+
+        $mensaje = 'Completá nombre y rangos de CP válidos.';
+    }
 }
 
 $zonas = mysqli_query($conn, "SELECT * FROM zonas_envio ORDER BY cp_desde ASC");
@@ -81,6 +90,8 @@ $zonas = mysqli_query($conn, "SELECT * FROM zonas_envio ORDER BY cp_desde ASC");
 
     <section class="pedido-panel">
         <form method="POST" class="form-admin-premium">
+            <?= csrfInput() ?>
+            <input type="hidden" name="accion" value="guardar">
             <input type="hidden" name="id" value="<?= (int)($editando['id'] ?? 0) ?>">
             <div class="admin-grid">
                 <div class="input-group">
@@ -120,8 +131,13 @@ $zonas = mysqli_query($conn, "SELECT * FROM zonas_envio ORDER BY cp_desde ASC");
                     <td>$<?= number_format($z['costo'], 0, ',', '.') ?></td>
                     <td>$<?= number_format($z['envio_gratis_desde'], 0, ',', '.') ?></td>
                     <td class="acciones-tabla">
-                        <a class="btn-tabla editar" href="zonas_envio.php?editar=<?= $z['id'] ?>">✎</a>
-                        <a class="btn-tabla eliminar" href="zonas_envio.php?eliminar=<?= $z['id'] ?>" onclick="return confirm('¿Eliminar zona?')">x</a>
+                        <a class="btn-tabla editar" href="zonas_envio.php?editar=<?= $z['id'] ?>">Editar</a>
+                        <form method="POST" class="form-accion-tabla" onsubmit="return confirm('¿Eliminar zona?')">
+                            <?= csrfInput() ?>
+                            <input type="hidden" name="accion" value="eliminar">
+                            <input type="hidden" name="id" value="<?= (int)$z['id'] ?>">
+                            <button class="btn-tabla eliminar" type="submit">x</button>
+                        </form>
                     </td>
                 </tr>
             <?php endwhile; ?>

@@ -88,7 +88,7 @@ foreach($productos as $p){
                 </span>
 
                 <h1>
-                    Productos 📦
+                    Productos
                 </h1>
 
                 <p>
@@ -115,10 +115,6 @@ foreach($productos as $p){
 
             <div class="admin-card metrica-card">
 
-                <div class="metrica-icono">
-                    📦
-                </div>
-
                 <div>
 
                     <span>Total productos</span>
@@ -133,10 +129,6 @@ foreach($productos as $p){
 
             <div class="admin-card metrica-card alerta">
 
-                <div class="metrica-icono">
-                    ⚠️
-                </div>
-
                 <div>
 
                     <span>Stock bajo</span>
@@ -150,10 +142,6 @@ foreach($productos as $p){
             </div>
 
             <div class="admin-card metrica-card">
-
-                <div class="metrica-icono">
-                    ❌
-                </div>
 
                 <div>
 
@@ -277,7 +265,7 @@ foreach($productos as $p){
                                 <a href="editar_productos.php?id=<?= $p['id'] ?>"
                                    class="btn-tabla editar">
 
-                                   ✏️
+                                   Editar
 
                                 </a>
 
@@ -295,7 +283,7 @@ foreach($productos as $p){
                                     <button type="submit"
                                             class="btn-tabla eliminar">
 
-                                       ❌
+                                       Eliminar
 
                                     </button>
 

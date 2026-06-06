@@ -72,3 +72,50 @@
         width: 100%;
     }
 }
+
+/* ===== AJUSTE RESPONSIVE COMERCIAL ===== */
+@media (max-width: 768px) {
+    .hero {
+        min-height: 340px;
+        padding: 34px 20px;
+    }
+
+    .hero h1 {
+        font-size: 29px;
+    }
+
+    .hero p {
+        font-size: 14px;
+    }
+
+    .productos-header,
+    .favoritos-header,
+    .contacto-header {
+        padding-top: 24px;
+    }
+
+    .productos-header h1,
+    .favoritos-header h1,
+    .contacto-header h1,
+    .carrito-header h1,
+    .checkout-header h1,
+    .reviews-header h2 {
+        font-size: 24px;
+    }
+
+    .grid {
+        padding: 18px 14px 28px;
+    }
+
+    .banner-promo,
+    .home-beneficios-pro,
+    .reviews-section,
+    .contacto-header,
+    .contacto-container {
+        width: calc(100% - 28px);
+    }
+
+    .contacto-container {
+        padding: 0;
+    }
+}

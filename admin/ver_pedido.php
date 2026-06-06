@@ -241,22 +241,22 @@ if(!empty($pedido['telefono_cliente'])){
                 <h2>Datos del cliente</h2>
 
                 <div class="pedido-dato">
-                    <span>👤 Nombre</span>
+                    <span>Nombre</span>
                     <strong><?= $pedido['nombre_cliente'] ?? '-' ?></strong>
                 </div>
 
                 <div class="pedido-dato">
-                    <span>📞 Teléfono</span>
+                    <span>Teléfono</span>
                     <strong><?= $pedido['telefono_cliente'] ?? '-' ?></strong>
                 </div>
 
                 <div class="pedido-dato">
-                    <span>📍 Dirección</span>
+                    <span>Dirección</span>
                     <strong><?= $pedido['direccion_envio'] ?? '-' ?></strong>
                 </div>
 
                 <div class="pedido-dato">
-                    <span>💳 Método de pago</span>
+                    <span>Método de pago</span>
                     <strong><?= ucfirst($pedido['metodo_pago'] ?? '-') ?></strong>
                 </div>
 
@@ -287,12 +287,34 @@ if(!empty($pedido['telefono_cliente'])){
 
                 <?php endif; ?>
 
+                <?php if(!empty($pedido['solicitud_tipo'])): ?>
+
+                    <div class="pedido-dato">
+                        <span>Solicitud cliente</span>
+                        <strong>
+                            <?= htmlspecialchars($pedido['solicitud_tipo']) ?>
+                            -
+                            <?= htmlspecialchars($pedido['solicitud_estado'] ?? 'Pendiente') ?>
+                        </strong>
+                    </div>
+
+                    <?php if(!empty($pedido['solicitud_motivo'])): ?>
+
+                        <div class="pedido-dato">
+                            <span>Motivo</span>
+                            <strong><?= htmlspecialchars($pedido['solicitud_motivo']) ?></strong>
+                        </div>
+
+                    <?php endif; ?>
+
+                <?php endif; ?>
+
                 <?php if(!empty($telefonoWhatsApp)): ?>
 
                     <a href="https://wa.me/54<?= $telefonoWhatsApp ?>?text=Hola%20<?= urlencode($pedido['nombre_cliente']) ?>,%20te%20contactamos%20desde%20SportStyle%20por%20tu%20pedido%20%23<?= $pedido['id'] ?>"
                        target="_blank"
                        class="btn-whatsapp-admin">
-                        📲 Contactar por WhatsApp
+                        Contactar por WhatsApp
                     </a>
 
                 <?php endif; ?>
@@ -390,6 +412,10 @@ if(!empty($pedido['telefono_cliente'])){
 
                             <td>
                                 <strong><?= $p['nombre'] ?></strong>
+                                <?php if(!empty($p['talle_label'])): ?>
+                                    <br>
+                                    <small>Talle: <?= htmlspecialchars($p['talle_label']) ?></small>
+                                <?php endif; ?>
                             </td>
 
                             <td>

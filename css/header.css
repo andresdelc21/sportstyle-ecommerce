@@ -27,7 +27,130 @@
     cursor: pointer;
 }
 
+/* ===== ESCALA COMERCIAL HEADER ===== */
+.header {
+    padding: 12px 32px;
+}
+
+.logo {
+    font-size: 24px;
+}
+
+.nav {
+    gap: 18px;
+}
+
+.nav > li > a,
+.nav-contacto {
+    font-size: 13px;
+}
+
+.buscador {
+    min-height: 40px;
+}
+
+.input-buscador {
+    padding: 9px 13px;
+    font-size: 13px;
+}
+
+.btn-buscador {
+    padding: 9px 13px;
+}
+
+.user-greeting,
+.rol-badge {
+    font-size: 12px;
+}
+
+.admin-link,
+.logout-link {
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.carrito-icono {
+    font-size: 21px;
+}
+
+.mega-menu {
+    border-radius: 8px;
+}
+
+@media(max-width: 900px) {
+    .header {
+        padding: 11px 16px;
+    }
+
+    .logo {
+        font-size: 22px;
+    }
+}
+
 .acciones-header { display: flex; align-items: center; gap: 15px; }
+
+.user-menu {
+    position: relative;
+}
+
+.user-menu-btn {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 6px;
+    background: rgba(255,255,255,.05);
+    color: #e5edf6;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.user-menu-btn span {
+    color: var(--verde);
+    font-size: 14px;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 190px;
+    display: grid;
+    gap: 0;
+    padding: 6px 0;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 14px 28px rgba(15,23,42,.16);
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: .18s ease;
+    z-index: 2200;
+}
+
+.user-menu:hover .user-dropdown,
+.user-menu:focus-within .user-dropdown {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.user-dropdown a {
+    padding: 10px 13px;
+    color: #111827;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.user-dropdown a:hover {
+    background: #f1f5f9;
+    color: var(--verde-dark);
+}
 
 .rol-badge-header {
     display: inline-flex;
@@ -234,10 +357,19 @@
         gap: 8px;
     }
 
-    .acciones-header > .nav-link,
-    .acciones-header > .rol-badge-header,
-    .acciones-header > .btn-admin-volver {
+    .acciones-header > .nav-link {
         display: none;
+    }
+
+    .user-menu-btn {
+        max-width: 150px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .user-dropdown {
+        right: -44px;
     }
 
     .buscador {

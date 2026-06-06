@@ -54,6 +54,7 @@ if(empty($MP_ACCESS_TOKEN)){
 $sqlProductos = "SELECT
                     detalle_pedidos.cantidad,
                     detalle_pedidos.precio,
+                    detalle_pedidos.talle_label,
                     productos.nombre
                  FROM detalle_pedidos
                  LEFT JOIN productos
@@ -72,8 +73,14 @@ $items = [];
 
 while($producto = mysqli_fetch_assoc($resultadoProductos)){
 
+    $tituloItem = $producto['nombre'] ?: "Producto SportStyle";
+
+    if(!empty($producto['talle_label'])){
+        $tituloItem .= " - " . $producto['talle_label'];
+    }
+
     $items[] = [
-        "title" => $producto['nombre'] ?: "Producto SportStyle",
+        "title" => $tituloItem,
         "quantity" => (int) $producto['cantidad'],
         "unit_price" => (float) $producto['precio'],
         "currency_id" => "ARS"

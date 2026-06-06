@@ -75,18 +75,24 @@ function guardarDetallePedido(
     int $pedido_id,
     int $producto_id,
     int $cantidad,
-    float $precio
+    float $precio,
+    ?int $talle_id = null,
+    string $talle_label = ''
 ){
 
     $sql = "INSERT INTO detalle_pedidos
     (
         pedido_id,
         producto_id,
+        talle_id,
+        talle_label,
         cantidad,
         precio
     )
     VALUES
     (
+        ?,
+        ?,
         ?,
         ?,
         ?,
@@ -97,9 +103,11 @@ function guardarDetallePedido(
 
     mysqli_stmt_bind_param(
         $stmt,
-        "iiid",
+        "iiisid",
         $pedido_id,
         $producto_id,
+        $talle_id,
+        $talle_label,
         $cantidad,
         $precio
     );
@@ -114,11 +122,31 @@ function guardarDetallePedido(
 function descontarStock(
     mysqli $conn,
     int $producto_id,
-    int $cantidad
+    int $cantidad,
+    ?int $talle_id = null
 ){
 
+    if($talle_id){
+        $sqlTalle = "UPDATE producto_talles
+        SET stock = GREATEST(stock - ?, 0)
+        WHERE id = ?
+        AND producto_id = ?";
+
+        $stmtTalle = mysqli_prepare($conn, $sqlTalle);
+
+        mysqli_stmt_bind_param(
+            $stmtTalle,
+            "iii",
+            $cantidad,
+            $talle_id,
+            $producto_id
+        );
+
+        mysqli_stmt_execute($stmtTalle);
+    }
+
     $sql = "UPDATE productos
-    SET stock = stock - ?
+    SET stock = GREATEST(stock - ?, 0)
     WHERE id = ?";
 
     $stmt = mysqli_prepare($conn, $sql);

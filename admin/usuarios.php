@@ -75,7 +75,7 @@ foreach($usuarios as $u){
                 </span>
 
                 <h1>
-                    Usuarios 👥
+                    Usuarios
                 </h1>
 
                 <p>
@@ -91,10 +91,6 @@ foreach($usuarios as $u){
 
             <div class="admin-card metrica-card">
 
-                <div class="metrica-icono">
-                    👥
-                </div>
-
                 <div>
 
                     <span>Total usuarios</span>
@@ -109,10 +105,6 @@ foreach($usuarios as $u){
 
             <div class="admin-card metrica-card venta">
 
-                <div class="metrica-icono">
-                    🛡️
-                </div>
-
                 <div>
 
                     <span>Administradores</span>
@@ -126,10 +118,6 @@ foreach($usuarios as $u){
             </div>
 
             <div class="admin-card metrica-card">
-
-                <div class="metrica-icono">
-                    🛍️
-                </div>
 
                 <div>
 
@@ -236,7 +224,7 @@ foreach($usuarios as $u){
                                    class="btn-tabla editar"
                                    title="Editar usuario">
 
-                                   ✏️
+                                   Editar
 
                                 </a>
 
@@ -245,7 +233,7 @@ foreach($usuarios as $u){
                                    title="Eliminar usuario"
                                    onclick="return confirm('¿Eliminar usuario?')">
 
-                                   ❌
+                                   Eliminar
 
                                 </a>
 

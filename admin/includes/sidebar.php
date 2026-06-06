@@ -17,6 +17,7 @@ $menuGestion = [
     'categorias.php' => ['label' => 'Categorías', 'match' => ['categorias.php']],
     'marcas.php' => ['label' => 'Marcas', 'match' => ['marcas.php']],
     'stock.php' => ['label' => 'Stock', 'match' => ['stock.php']],
+    'talles.php' => ['label' => 'Talles', 'match' => ['talles.php']],
     'configuracion.php' => ['label' => 'Configuración', 'match' => ['configuracion.php']],
 ];
 
@@ -60,7 +61,7 @@ function adminMenuLink(string $href, array $item, string $paginaActual): string 
         </a>
 
         <a href="../logout.php"
-           class="logout-btn">
+            class="logout-btn">
 
             <span>Cerrar sesión</span>
 

@@ -67,9 +67,9 @@ $_SESSION['ultimo_pedido_id'] = $pedidoId;
 
     <p>
         <?php if($estadoFinal === 'Pagado'): ?>
-            Registramos el pago de Mercado Pago. Desde el admin vas a poder seguir el estado del pedido.
+            Registramos el pago de Mercado Pago. Desde acá podés seguir el estado de tu pedido.
         <?php else: ?>
-            Mercado Pago nos devolvió la compra, pero todavía no pudimos confirmar el pago como aprobado.
+            Mercado Pago nos devolvió la compra, pero todavía no pudimos confirmar el pago como aprobado. Podés seguir el estado desde acá.
         <?php endif; ?>
     </p>
 
@@ -78,6 +78,11 @@ $_SESSION['ultimo_pedido_id'] = $pedidoId;
         <a href="index.php"
            class="btn-secundario-checkout">
             Volver al inicio
+        </a>
+
+        <a href="pedido_detalle.php?id=<?= (int) $pedidoId ?>"
+           class="btn-secundario-checkout">
+            Seguir mi pedido
         </a>
 
         <a href="productos.php"

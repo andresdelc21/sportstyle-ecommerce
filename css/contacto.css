@@ -169,3 +169,197 @@
     }
 
 }
+
+/* ===== ESCALA COMERCIAL CONTACTO ===== */
+.contacto-header {
+    margin: 28px auto 10px;
+}
+
+.contacto-header h1 {
+    font-size: 30px;
+}
+
+.contacto-header p {
+    font-size: 14px;
+}
+
+.contacto-container {
+    margin-bottom: 42px;
+    gap: 18px;
+}
+
+.contacto-form {
+    padding: 22px;
+    border-radius: 10px;
+    box-shadow: none;
+}
+
+.contacto-form-title {
+    margin-bottom: 18px;
+}
+
+.contacto-form h2 {
+    font-size: 21px;
+}
+
+.form-group input,
+.form-group textarea,
+.contacto-submit,
+.alerta-ok {
+    border-radius: 8px;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 12px 13px;
+}
+
+.form-group textarea {
+    min-height: 125px;
+}
+
+.contacto-card {
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: none;
+}
+
+.contacto-card:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.contacto-card .icono {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 20px;
+}
+
+/* ===== CONTACTO MINIMAL TIENDA ===== */
+.contacto-header {
+    width: min(1080px, calc(100% - 56px));
+    margin: 34px auto 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.contacto-header h1 {
+    margin: 0;
+    color: #020617;
+    font-size: 32px;
+    text-transform: uppercase;
+}
+
+.contacto-header p {
+    max-width: 560px;
+    color: #475569;
+}
+
+.contacto-container {
+    width: min(1080px, calc(100% - 56px));
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 34px;
+}
+
+.contacto-form {
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.contacto-form-title {
+    margin-bottom: 16px;
+}
+
+.contacto-form h2 {
+    font-size: 22px;
+    text-transform: uppercase;
+}
+
+.contacto-form-title p {
+    max-width: 520px;
+    font-size: 14px;
+}
+
+.form-group {
+    margin-bottom: 13px;
+}
+
+.form-group input,
+.form-group textarea {
+    border-radius: 0;
+    border-color: #cfd8e3;
+}
+
+.form-group textarea {
+    min-height: 118px;
+}
+
+.contacto-submit {
+    width: auto;
+    min-width: 180px;
+    border-radius: 0;
+    padding: 13px 20px;
+    text-transform: uppercase;
+}
+
+.contacto-lateral {
+    gap: 0;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    align-self: start;
+}
+
+.contacto-card {
+    padding: 16px;
+    border: 0;
+    border-bottom: 1px solid #edf2f7;
+    border-radius: 0;
+    background: transparent;
+    gap: 12px;
+}
+
+.contacto-card:last-child {
+    border-bottom: 0;
+}
+
+.contacto-card:hover {
+    border-color: #edf2f7;
+    background: #f8fafc;
+}
+
+.contacto-card .icono {
+    width: 28px;
+    height: 28px;
+    border-radius: 0;
+    background: transparent;
+    color: #020617;
+    font-size: 18px;
+}
+
+.contacto-card h3 {
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.contacto-card p {
+    font-size: 13px;
+}
+
+.alerta-ok {
+    border-left: 0;
+    border-radius: 0;
+    background: #e0f2fe;
+}
+
+@media(max-width:850px) {
+    .contacto-header,
+    .contacto-container {
+        width: calc(100% - 32px);
+    }
+
+    .contacto-container {
+        grid-template-columns: 1fr;
+    }
+}

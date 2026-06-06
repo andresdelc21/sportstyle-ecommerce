@@ -1,5 +1,7 @@
 <?php
 
+include_once(__DIR__ . "/../data/carrito_helpers.php");
+
 /* =========================================
    OBTENER PRODUCTO POR ID
 ========================================= */
@@ -26,7 +28,9 @@ function calcularTotalCarrito(array $carrito, array $productos): float{
 
     $total = 0;
 
-    foreach($carrito as $id => $cantidad){
+    foreach($carrito as $key => $cantidad){
+
+        $id = carritoProductoId($key);
 
         $producto = obtenerProductoPorId($productos, $id);
 
@@ -49,7 +53,9 @@ function generarMensajeWhatsApp(array $carrito, array $productos): string{
 
     $mensaje = "Hola, quiero comprar:%0A";
 
-    foreach($carrito as $id => $cantidad){
+    foreach($carrito as $key => $cantidad){
+
+        $id = carritoProductoId($key);
 
         $producto = obtenerProductoPorId($productos, $id);
 

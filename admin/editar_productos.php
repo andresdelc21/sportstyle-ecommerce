@@ -307,11 +307,11 @@ $imagenesProducto = mysqli_stmt_get_result($stmtImagenes);
         </div>
 
         <?php if($success): ?>
-            <div class="admin-alert success-msg">✅ <?= $success ?></div>
+            <div class="admin-alert success-msg"><?= $success ?></div>
         <?php endif; ?>
 
         <?php if($error): ?>
-            <div class="admin-alert error-msg">❌ <?= $error ?></div>
+            <div class="admin-alert error-msg"><?= $error ?></div>
         <?php endif; ?>
 
         <form method="POST"
@@ -479,12 +479,12 @@ $imagenesProducto = mysqli_stmt_get_result($stmtImagenes);
                             <div class="admin-img-actions">
 
                                 <a href="editar_productos.php?id=<?= $id ?>&principal=<?= $img['id'] ?>&csrf_token=<?= csrfToken() ?>">
-                                    ⭐ Principal
+                                    Marcar principal
                                 </a>
 
                                 <a href="editar_productos.php?id=<?= $id ?>&eliminar_img=<?= $img['id'] ?>&csrf_token=<?= csrfToken() ?>"
                                    onclick="return confirm('¿Eliminar esta imagen?')">
-                                    🗑 Eliminar
+                                    Eliminar
                                 </a>
 
                             </div>

@@ -66,6 +66,11 @@ $_SESSION['ultimo_pedido_id'] = $pedidoId;
             Volver al inicio
         </a>
 
+        <a href="pedido_detalle.php?id=<?= (int) $pedidoId ?>"
+           class="btn-secundario-checkout">
+            Ver pedido
+        </a>
+
         <a href="productos.php"
            class="btn-pagar">
             Seguir comprando

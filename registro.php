@@ -97,29 +97,38 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 <div class="login-container">
 
-    <!-- IZQUIERDA -->
     <div class="login-info">
 
-        <h1>Únete a SportStyle</h1>
+        <span class="auth-eyebrow">Crear cuenta</span>
+
+        <h1>Comprá más rápido la próxima vez</h1>
 
         <p>
-            Regístrate para guardar favoritos,
-            comprar más rápido y acceder a ofertas.
+            Guardá tus datos, armá tu lista de favoritos y consultá el estado de tus pedidos desde tu cuenta.
         </p>
+
+        <div class="auth-benefits">
+            <span>Cuenta de cliente</span>
+            <span>Historial de pedidos</span>
+            <span>Favoritos disponibles</span>
+        </div>
 
     </div>
 
-    <!-- FORM -->
     <div class="login-box">
 
-        <h2>Crear cuenta</h2>
+        <div class="auth-form-header">
+            <span>SportStyle</span>
+            <h2>Crear cuenta</h2>
+            <p>Completá tus datos básicos para empezar a comprar.</p>
+        </div>
 
         <?php if($error): ?>
-            <p class="error-msg"><?= $error ?></p>
+            <p class="error-msg"><?= htmlspecialchars($error) ?></p>
         <?php endif; ?>
 
         <?php if($success): ?>
-            <p class="success-msg"><?= $success ?></p>
+            <p class="success-msg"><?= htmlspecialchars($success) ?>. Ya podés iniciar sesión.</p>
         <?php endif; ?>
 
         <form method="POST">
@@ -130,16 +139,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                 <input type="text"
                        name="nombre"
+                       placeholder="Tu nombre"
                        required>
 
             </div>
 
             <div class="input-group">
 
-                <label>Email</label>
+                <label>Correo electrónico</label>
 
                 <input type="email"
                        name="email"
+                       placeholder="ejemplo@gmail.com"
                        required>
 
             </div>
@@ -150,9 +161,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                 <input type="password"
                        name="password"
+                       placeholder="Mínimo 6 caracteres"
                        required>
 
             </div>
+
+            <p class="auth-note">
+                La contraseña se guarda protegida. No la compartas con nadie.
+            </p>
 
             <button type="submit"
                     class="btn-login">

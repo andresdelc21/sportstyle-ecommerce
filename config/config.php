@@ -16,6 +16,10 @@ $CBU_TIENDA = "0000000000000000000000";
 
 $TITULAR_TIENDA = "SportStyle";
 
+$DIRECCION_TIENDA = "SportStyle tienda";
+
+$MAPS_TIENDA = "https://www.google.com/maps/search/?api=1&query=SportStyle%20tienda";
+
 
 /* =========================
    REDES SOCIALES

@@ -148,7 +148,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 </span>
 
                 <h1>
-                    Agregar producto 📦
+                    Agregar producto
                 </h1>
 
                 <p>
@@ -171,7 +171,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <?php if($success): ?>
 
             <div class="admin-alert success-msg">
-                ✅ <?= $success ?>
+                <?= $success ?>
             </div>
 
         <?php endif; ?>
@@ -179,7 +179,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <?php if($error): ?>
 
             <div class="admin-alert error-msg">
-                ❌ <?= $error ?>
+                <?= $error ?>
             </div>
 
         <?php endif; ?>

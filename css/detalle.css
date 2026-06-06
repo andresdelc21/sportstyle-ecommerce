@@ -291,6 +291,132 @@
     line-height: 1;
 }
 
+/* GUIA DE TALLES */
+.guia-talles {
+    margin: 18px 0 4px;
+    padding: 16px 0;
+    border-top: 1px solid #edf2f7;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.guia-talles-header {
+    margin-bottom: 12px;
+}
+
+.guia-talles h3 {
+    margin: 0 0 5px;
+    color: #020617;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.guia-talles p {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.guia-talles-tabla {
+    overflow-x: auto;
+}
+
+.guia-talles table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.guia-talles th,
+.guia-talles td {
+    padding: 9px 10px;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 13px;
+}
+
+.guia-talles th {
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 900;
+}
+
+.guia-talles td {
+    color: #111827;
+    font-weight: 700;
+}
+
+.guia-talles-nota {
+    margin-top: 10px;
+}
+
+.selector-talles-producto {
+    margin: 16px 0 4px;
+}
+
+.selector-talles-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.selector-talles-header h3 {
+    margin: 0;
+    color: #020617;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.selector-talles-header span {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.talles-opciones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 8px;
+}
+
+.talle-opcion {
+    display: grid;
+    gap: 3px;
+    padding: 10px;
+    border: 1px solid #dbe2ea;
+    background: #fff;
+    cursor: pointer;
+}
+
+.talle-opcion input {
+    display: none;
+}
+
+.talle-opcion strong {
+    color: #020617;
+    font-size: 13px;
+}
+
+.talle-opcion small {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.talle-opcion:has(input:checked) {
+    border-color: #020617;
+    background: #020617;
+}
+
+.talle-opcion:has(input:checked) strong,
+.talle-opcion:has(input:checked) small {
+    color: #fff;
+}
+
+.talle-opcion.sin-stock-talle {
+    cursor: not-allowed;
+    opacity: .45;
+}
+
 /* DESCRIPCIÓN */
 .detalle-desc {
     margin-top: 26px;
@@ -412,4 +538,98 @@
     max-width:90%;
     max-height:90%;
     border-radius:12px;
+}
+
+/* ===== ESCALA COMERCIAL DETALLE ===== */
+.detalle {
+    width: min(1120px, calc(100% - 48px));
+    gap: 32px;
+    margin-top: 22px;
+    padding: 26px;
+    border-radius: 10px;
+    box-shadow: none;
+}
+
+.detalle-img {
+    min-height: 360px;
+    border-radius: 10px;
+    padding: 18px;
+}
+
+.detalle-img img {
+    max-height: 310px;
+}
+
+.detalle-categoria,
+.detalle-stock,
+.descuento {
+    border-radius: 6px;
+}
+
+.detalle-info h1 {
+    font-size: 28px;
+    line-height: 1.15;
+}
+
+.precio-actual {
+    font-size: 24px;
+}
+
+.detalle-precio {
+    margin: 14px 0;
+}
+
+.detalle-botones {
+    margin-top: 14px;
+}
+
+.btn-comprar,
+.btn-favorito-detalle,
+.btn-volver-detalle {
+    border-radius: 8px;
+}
+
+.btn-comprar {
+    min-height: 46px;
+    padding: 12px 18px;
+}
+
+.btn-favorito-detalle {
+    min-height: 46px;
+    padding: 11px 16px;
+}
+
+.detalle-desc {
+    margin-top: 20px;
+    padding-top: 18px;
+}
+
+.detalle-extra p {
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.miniaturas img {
+    width: 54px;
+    height: 54px;
+    border-radius: 8px;
+}
+
+@media(max-width: 768px) {
+    .detalle {
+        width: calc(100% - 28px);
+        padding: 16px;
+    }
+
+    .detalle-img {
+        min-height: 280px;
+    }
+
+    .detalle-img img {
+        max-height: 240px;
+    }
+
+    .detalle-info h1 {
+        font-size: 24px;
+    }
 }

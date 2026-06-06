@@ -1,0 +1,303 @@
+/* ===== PEDIDOS CLIENTE ===== */
+.pedidos-header {
+    width: min(1180px, calc(100% - 56px));
+    margin: 0 auto;
+    padding: 34px 0 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.pedidos-header h1 {
+    margin: 0;
+    color: #020617;
+    font-size: 34px;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.pedidos-header p {
+    margin-top: 10px;
+    color: #475569;
+}
+
+.pedidos-page,
+.pedido-detalle-page {
+    width: min(1180px, calc(100% - 56px));
+    margin: 22px auto 56px;
+}
+
+.pedidos-lista {
+    display: grid;
+    gap: 12px;
+}
+
+.pedido-item,
+.pedido-panel-cliente {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+}
+
+.pedido-item {
+    padding: 18px;
+}
+
+.pedido-item-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.pedido-numero {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.pedido-item h2 {
+    margin: 5px 0;
+    color: #020617;
+    font-size: 24px;
+}
+
+.pedido-item p {
+    color: #64748b;
+}
+
+.pedido-estado {
+    padding: 6px 10px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.estado-pagado,
+.estado-enviado,
+.estado-entregado {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.estado-cancelado {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.pedido-tracking-mini {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 18px 0 12px;
+}
+
+.pedido-tracking-mini span {
+    border-top: 3px solid #e5e7eb;
+    padding-top: 7px;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.pedido-tracking-mini span.activo {
+    border-color: var(--verde-dark);
+    color: #0f172a;
+}
+
+.pedido-solicitud {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 13px;
+}
+
+.pedido-link,
+.pedido-volver {
+    display: inline-flex;
+    margin-top: 8px;
+    color: #020617;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.pedido-link:hover,
+.pedido-volver:hover {
+    color: var(--verde-dark);
+}
+
+.pedidos-vacio {
+    max-width: 520px;
+    padding: 24px 0;
+}
+
+.pedidos-vacio h2 {
+    margin-bottom: 10px;
+    color: #020617;
+}
+
+.pedidos-vacio p {
+    margin-bottom: 18px;
+    color: #475569;
+}
+
+.pedido-detalle-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.pedido-panel-cliente {
+    padding: 20px;
+}
+
+.pedido-panel-cliente h2 {
+    margin-bottom: 16px;
+    color: #020617;
+    font-size: 20px;
+    text-transform: uppercase;
+}
+
+.pedido-timeline {
+    display: grid;
+    gap: 12px;
+}
+
+.timeline-step {
+    display: grid;
+    grid-template-columns: 16px 1fr;
+    gap: 10px;
+    align-items: center;
+    color: #94a3b8;
+}
+
+.timeline-step span {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #cbd5e1;
+    background: #fff;
+}
+
+.timeline-step.activo {
+    color: #020617;
+    font-weight: 800;
+}
+
+.timeline-step.activo span {
+    border-color: var(--verde-dark);
+    background: var(--verde-dark);
+}
+
+.pedido-nota,
+.pedido-motivo {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    color: #334155;
+    line-height: 1.5;
+}
+
+.pedido-resumen-cliente p {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 9px 0;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.pedido-resumen-cliente span {
+    color: #64748b;
+}
+
+.pedido-productos-lista {
+    display: grid;
+    gap: 10px;
+}
+
+.pedido-producto-row {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.pedido-producto-row img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    background: #f1f5f9;
+}
+
+.pedido-producto-row p {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.pedido-producto-row span {
+    font-weight: 900;
+}
+
+.pedido-solicitud-form {
+    display: grid;
+    gap: 10px;
+}
+
+.pedido-solicitud-form label {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.pedido-solicitud-form textarea {
+    min-height: 96px;
+    padding: 12px;
+    border: 1px solid #dbe7f3;
+    font-family: Arial, sans-serif;
+    resize: vertical;
+}
+
+.pedido-solicitud-form button {
+    width: max-content;
+    padding: 12px 18px;
+    border: 0;
+    background: #020617;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.pedido-alerta {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: 800;
+}
+
+@media(max-width: 850px) {
+    .pedidos-header,
+    .pedidos-page,
+    .pedido-detalle-page {
+        width: calc(100% - 32px);
+    }
+
+    .pedido-detalle-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pedido-tracking-mini {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .pedido-producto-row {
+        grid-template-columns: 56px 1fr;
+    }
+
+    .pedido-producto-row span {
+        grid-column: 2;
+    }
+}

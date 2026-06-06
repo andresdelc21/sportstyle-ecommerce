@@ -61,6 +61,52 @@ if(empty($imagenes)){
 
 $producto['imagenes'] = $imagenes;
 
+/* TALLES DEL PRODUCTO */
+$tallesProducto = [];
+$stockTalles = 0;
+
+$sqlTalles = "SELECT *
+              FROM producto_talles
+              WHERE producto_id = ?
+              ORDER BY
+                CASE WHEN etiqueta = 'Único' THEN 0 ELSE 1 END,
+                talle_arg + 0 ASC,
+                id ASC";
+
+$stmtTalles = mysqli_prepare($conn, $sqlTalles);
+mysqli_stmt_bind_param($stmtTalles, "i", $id);
+mysqli_stmt_execute($stmtTalles);
+$resultadoTalles = mysqli_stmt_get_result($stmtTalles);
+
+while($talle = mysqli_fetch_assoc($resultadoTalles)){
+    $tallesProducto[] = $talle;
+    $stockTalles += (int) $talle['stock'];
+}
+
+if(!empty($tallesProducto)){
+    $producto['stock'] = $stockTalles;
+}
+
+function tipoTalleProducto($producto){
+    $texto = strtolower(($producto['categoria_nombre'] ?? '') . ' ' . ($producto['nombre'] ?? ''));
+
+    if(strpos($texto, 'zapat') !== false || strpos($texto, 'calzado') !== false){
+        return 'calzado';
+    }
+
+    if(strpos($texto, 'media') !== false){
+        return 'medias';
+    }
+
+    if(strpos($texto, 'remera') !== false || strpos($texto, 'buzo') !== false || strpos($texto, 'pantal') !== false || strpos($texto, 'short') !== false){
+        return 'indumentaria';
+    }
+
+    return 'general';
+}
+
+$tipoTalle = tipoTalleProducto($producto);
+
 /* FAVORITO DEL USUARIO */
 $esFavorito = false;
 
@@ -175,7 +221,7 @@ $desc = descuento(
         </h1>
 
         <p>
-            ⭐ <?= number_format($producto['rating'] ?? 5, 1, ',', '.') ?>
+            Calificación <?= number_format($producto['rating'] ?? 5, 1, ',', '.') ?>/5
         </p>
 
         <p>
@@ -207,11 +253,11 @@ $desc = descuento(
 
             <?php if($producto['stock'] > 0): ?>
 
-                ✅ Stock disponible (<?= $producto['stock'] ?> unidades)
+                Stock disponible (<?= $producto['stock'] ?> unidades)
 
             <?php else: ?>
 
-                ❌ Sin stock
+                Sin stock
 
             <?php endif; ?>
 
@@ -221,6 +267,116 @@ $desc = descuento(
             <strong>Género:</strong>
             <?= $producto['genero'] ?>
         </p>
+
+        <section class="guia-talles">
+
+            <div class="guia-talles-header">
+
+                <h3>Guía de talles</h3>
+
+                <?php if($tipoTalle === 'calzado'): ?>
+                    <p>Referencia orientativa. Para calzado, medí tu pie desde el talón hasta la punta.</p>
+                <?php elseif($tipoTalle === 'indumentaria'): ?>
+                    <p>Referencia orientativa para remeras, buzos, pantalones y shorts.</p>
+                <?php elseif($tipoTalle === 'medias'): ?>
+                    <p>Las medias suelen agruparse por rango de calzado. Revisá el rango indicado.</p>
+                <?php else: ?>
+                    <p>Referencia orientativa. Verificá el talle disponible antes de agregar al carrito.</p>
+                <?php endif; ?>
+
+            </div>
+
+            <div class="guia-talles-tabla">
+
+                <table>
+                    <?php if($tipoTalle === 'calzado'): ?>
+                        <thead><tr><th>ARG</th><th>US</th><th>BR</th><th>CM</th></tr></thead>
+                        <tbody>
+                            <tr><td>38</td><td>6.5</td><td>37</td><td>24.5</td></tr>
+                            <tr><td>39</td><td>7</td><td>38</td><td>25</td></tr>
+                            <tr><td>40</td><td>8</td><td>39</td><td>26</td></tr>
+                            <tr><td>41</td><td>8.5</td><td>40</td><td>26.5</td></tr>
+                            <tr><td>42</td><td>9</td><td>41</td><td>27</td></tr>
+                            <tr><td>43</td><td>10</td><td>42</td><td>28</td></tr>
+                        </tbody>
+                    <?php elseif($tipoTalle === 'indumentaria'): ?>
+                        <thead><tr><th>Talle</th><th>Pecho</th><th>Cintura</th><th>Referencia</th></tr></thead>
+                        <tbody>
+                            <tr><td>S</td><td>86-94 cm</td><td>72-80 cm</td><td>Chico</td></tr>
+                            <tr><td>M</td><td>94-102 cm</td><td>80-88 cm</td><td>Medio</td></tr>
+                            <tr><td>L</td><td>102-110 cm</td><td>88-96 cm</td><td>Grande</td></tr>
+                            <tr><td>XL</td><td>110-118 cm</td><td>96-104 cm</td><td>Extra grande</td></tr>
+                            <tr><td>XXL</td><td>118-126 cm</td><td>104-112 cm</td><td>Amplio</td></tr>
+                        </tbody>
+                    <?php elseif($tipoTalle === 'medias'): ?>
+                        <thead><tr><th>Talle</th><th>Calzado ARG</th><th>Uso</th></tr></thead>
+                        <tbody>
+                            <tr><td>Único</td><td>35-43</td><td>Adulto</td></tr>
+                        </tbody>
+                    <?php else: ?>
+                        <thead><tr><th>Talle</th><th>Referencia</th></tr></thead>
+                        <tbody><tr><td>Único</td><td>Según disponibilidad del producto</td></tr></tbody>
+                    <?php endif; ?>
+                </table>
+
+            </div>
+
+            <p class="guia-talles-nota">
+                Si estás entre dos talles, elegí el mayor para más comodidad.
+            </p>
+
+        </section>
+
+        <?php if(!empty($tallesProducto)): ?>
+
+            <section class="selector-talles-producto">
+
+                <div class="selector-talles-header">
+                    <h3>Seleccioná talle</h3>
+                    <span>Stock por variante</span>
+                </div>
+
+                <div class="talles-opciones">
+
+                    <?php foreach($tallesProducto as $talle): ?>
+
+                        <?php
+                            $labelTalle = trim(
+                                !empty($talle['etiqueta']) && $talle['etiqueta'] !== 'Único'
+                                    ? $talle['etiqueta']
+                                    : implode(' / ', array_filter([
+                                        !empty($talle['talle_arg']) ? 'ARG ' . $talle['talle_arg'] : '',
+                                        !empty($talle['talle_us']) ? 'US ' . $talle['talle_us'] : '',
+                                        !empty($talle['talle_br']) ? 'BR ' . $talle['talle_br'] : '',
+                                        !empty($talle['cm']) ? $talle['cm'] . ' cm' : ''
+                                    ]))
+                            );
+
+                            if($labelTalle === ''){
+                                $labelTalle = $talle['etiqueta'] ?: 'Único';
+                            }
+
+                            $sinStockTalle = (int) $talle['stock'] <= 0;
+                        ?>
+
+                        <label class="talle-opcion <?= $sinStockTalle ? 'sin-stock-talle' : '' ?>">
+                            <input type="radio"
+                                   name="talle_id"
+                                   value="<?= (int) $talle['id'] ?>"
+                                   <?= $sinStockTalle ? 'disabled' : '' ?>
+                                   <?= count($tallesProducto) === 1 && !$sinStockTalle ? 'checked' : '' ?>>
+
+                            <strong><?= htmlspecialchars($labelTalle) ?></strong>
+                            <small><?= (int) $talle['stock'] ?> disp.</small>
+                        </label>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            </section>
+
+        <?php endif; ?>
 
         <div class="detalle-botones">
 
@@ -314,7 +470,7 @@ $desc = descuento(
     <div class="review-form-header">
 
         <span class="review-icon">
-            ⭐
+            Nota
         </span>
 
         <div>
@@ -347,7 +503,7 @@ $desc = descuento(
                        required
                        checked>
 
-                <span>⭐⭐⭐⭐⭐</span>
+                <span>5/5</span>
                 <small>Excelente</small>
 
             </label>
@@ -358,7 +514,7 @@ $desc = descuento(
                        name="rating"
                        value="4">
 
-                <span>⭐⭐⭐⭐</span>
+                <span>4/5</span>
                 <small>Muy bueno</small>
 
             </label>
@@ -369,7 +525,7 @@ $desc = descuento(
                        name="rating"
                        value="3">
 
-                <span>⭐⭐⭐</span>
+                <span>3/5</span>
                 <small>Bueno</small>
 
             </label>
@@ -380,7 +536,7 @@ $desc = descuento(
                        name="rating"
                        value="2">
 
-                <span>⭐⭐</span>
+                <span>2/5</span>
                 <small>Regular</small>
 
             </label>
@@ -391,7 +547,7 @@ $desc = descuento(
                        name="rating"
                        value="1">
 
-                <span>⭐</span>
+                <span>1/5</span>
                 <small>Malo</small>
 
             </label>
@@ -463,7 +619,7 @@ $desc = descuento(
                     </h3>
 
                     <p class="review-stars">
-                        <?= str_repeat("⭐", (int)$r['rating']) ?>
+                        <?= (int)$r['rating'] ?>/5
                     </p>
 
                     <p>

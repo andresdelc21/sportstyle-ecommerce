@@ -125,7 +125,7 @@ $ultimasVentas = mysqli_query($conn, $sqlUltimas);
                 </span>
 
                 <h1>
-                    Ventas 📊
+                    Ventas
                 </h1>
 
                 <p>
@@ -140,10 +140,6 @@ $ultimasVentas = mysqli_query($conn, $sqlUltimas);
         <div class="admin-metricas mini-metricas">
 
             <div class="admin-card metrica-card venta">
-
-                <div class="metrica-icono">
-                    💰
-                </div>
 
                 <div>
 
@@ -161,10 +157,6 @@ $ultimasVentas = mysqli_query($conn, $sqlUltimas);
 
             <div class="admin-card metrica-card">
 
-                <div class="metrica-icono">
-                    🧾
-                </div>
-
                 <div>
 
                     <span>Pedidos confirmados</span>
@@ -181,10 +173,6 @@ $ultimasVentas = mysqli_query($conn, $sqlUltimas);
 
             <div class="admin-card metrica-card">
 
-                <div class="metrica-icono">
-                    👥
-                </div>
-
                 <div>
 
                     <span>Clientes</span>
@@ -200,10 +188,6 @@ $ultimasVentas = mysqli_query($conn, $sqlUltimas);
             </div>
 
             <div class="admin-card metrica-card alerta">
-
-                <div class="metrica-icono">
-                    🔥
-                </div>
 
                 <div>
 
@@ -259,7 +243,6 @@ $ultimasVentas = mysqli_query($conn, $sqlUltimas);
                 <div class="quick-actions">
 
                     <a href="pedidos.php" class="quick-action">
-                        <span>🧾</span>
                         <div>
                             <h3>Pedidos</h3>
                             <p>Revisar estados y pagos</p>
@@ -267,7 +250,6 @@ $ultimasVentas = mysqli_query($conn, $sqlUltimas);
                     </a>
 
                     <a href="productos.php" class="quick-action">
-                        <span>📦</span>
                         <div>
                             <h3>Productos</h3>
                             <p>Controlar stock y catálogo</p>
@@ -342,7 +324,7 @@ $ultimasVentas = mysqli_query($conn, $sqlUltimas);
                                     <a href="ver_pedido.php?id=<?= $v['id'] ?>"
                                        class="btn-tabla editar">
 
-                                       👁️
+                                       Ver
 
                                     </a>
 

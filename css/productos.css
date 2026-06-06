@@ -252,3 +252,121 @@
     color:white !important;
     transform:scale(1.08);
 }
+
+/* ===== ESCALA COMERCIAL CATALOGO ===== */
+.grid {
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 18px;
+    padding: 28px 40px 36px;
+}
+
+.card-v2 {
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.card-v2:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(15,23,42,.08);
+}
+
+.card-v2-img {
+    height: 190px;
+}
+
+.card-v2-img img {
+    max-height: 158px;
+    transform: none;
+}
+
+.card-v2:hover img {
+    transform: scale(1.04);
+}
+
+.card-v2-info {
+    padding: 13px;
+}
+
+.card-v2-nombre {
+    font-size: 14px;
+}
+
+.precio-actual {
+    font-size: 18px;
+}
+
+.btn-card {
+    border-radius: 6px;
+}
+
+.badge,
+.badge-categoria,
+.badge-genero,
+.sin-stock,
+.btn-genero,
+.btn-filtro,
+.productos-badge,
+.favoritos-badge {
+    border-radius: 6px;
+}
+
+.genero-filtros {
+    padding: 18px 40px 8px;
+}
+
+.filtros {
+    padding: 8px 40px 18px;
+}
+
+.btn-genero,
+.btn-filtro {
+    padding: 8px 15px;
+    font-size: 13px;
+}
+
+.productos-header {
+    padding: 30px 20px 12px;
+}
+
+.productos-header h1 {
+    font-size: 32px;
+    margin-top: 10px;
+}
+
+.productos-header p {
+    font-size: 14px;
+}
+
+.favoritos-header {
+    padding: 34px 20px 14px;
+}
+
+.favoritos-header h1 {
+    font-size: 32px;
+    margin-top: 10px;
+}
+
+.favoritos-header p {
+    font-size: 14px;
+}
+
+@media(max-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 14px;
+        padding: 18px 16px 28px;
+    }
+
+    .card-v2-img {
+        height: 160px;
+    }
+
+    .card-v2-img img {
+        max-height: 132px;
+    }
+
+    .productos-header h1,
+    .favoritos-header h1 {
+        font-size: 26px;
+    }
+}

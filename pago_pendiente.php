@@ -56,7 +56,7 @@ $_SESSION['ultimo_pedido_id'] = $pedidoId;
     </p>
 
     <p>
-        Mercado Pago dejó el pago en revisión o pendiente de confirmación. Cuando se confirme, el pedido podrá marcarse como pagado.
+        Mercado Pago dejó el pago en revisión o pendiente de confirmación. Desde acá podés seguir el estado del pedido.
     </p>
 
     <div class="checkout-acciones">
@@ -64,6 +64,11 @@ $_SESSION['ultimo_pedido_id'] = $pedidoId;
         <a href="index.php"
            class="btn-secundario-checkout">
             Volver al inicio
+        </a>
+
+        <a href="pedido_detalle.php?id=<?= (int) $pedidoId ?>"
+           class="btn-secundario-checkout">
+            Seguir mi pedido
         </a>
 
         <a href="productos.php"

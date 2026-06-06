@@ -24,6 +24,15 @@ while($filaHeader = mysqli_fetch_assoc($resultadoProductosHeader)){
 
 }
 
+$tallesHeader = [];
+$resultadoTallesHeader = mysqli_query($conn, "SELECT * FROM producto_talles");
+
+if($resultadoTallesHeader){
+    while($talleHeader = mysqli_fetch_assoc($resultadoTallesHeader)){
+        $tallesHeader[(int) $talleHeader['id']] = $talleHeader;
+    }
+}
+
 /* ===== CARRITO ===== */
 $cantidadItems =
     isset($_SESSION['carrito'])
@@ -357,40 +366,42 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 
         <?php if(isset($_SESSION['usuario_nombre'])): ?>
 
-            <!-- USUARIO -->
-            <span class="nav-link">
+            <div class="user-menu">
 
-                👋 Hola <?= $_SESSION['usuario_nombre'] ?>
+                <button type="button"
+                        class="user-menu-btn"
+                        aria-haspopup="true">
 
-            </span>
+                    Bienvenido, <?= htmlspecialchars($_SESSION['usuario_nombre']) ?>
+                    <span>⌄</span>
 
-            <span class="rol-badge-header">
-                <?= ($_SESSION['usuario_rol'] ?? 'cliente') === 'admin' ? 'Administrador' : 'Cliente' ?>
-            </span>
+                </button>
 
-            <!-- PANEL ADMIN SOLO ADMIN -->
-            <?php if(
-                isset($_SESSION['usuario_rol'])
-                &&
-                $_SESSION['usuario_rol'] === 'admin'
-            ): ?>
+                <div class="user-dropdown">
 
-                <a href="/sportstyle/admin/index.php"
-                   class="btn-admin-volver">
+                    <a href="/sportstyle/favoritos.php">
+                        Favoritos
+                    </a>
 
-                   ⚙️ Panel Admin
+                    <?php if(
+                        isset($_SESSION['usuario_rol'])
+                        &&
+                        $_SESSION['usuario_rol'] === 'admin'
+                    ): ?>
 
-                </a>
+                        <a href="/sportstyle/admin/index.php">
+                            Panel de gestión
+                        </a>
 
-            <?php endif; ?>
+                    <?php endif; ?>
 
-            <!-- LOGOUT -->
-            <a href="/sportstyle/logout.php"
-               class="nav-link">
+                    <a href="/sportstyle/logout.php">
+                        Cerrar sesión
+                    </a>
 
-               Cerrar sesión
+                </div>
 
-            </a>
+            </div>
 
         <?php else: ?>
 
@@ -451,7 +462,9 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 
     <?php if(isset($_SESSION['carrito']) && count($_SESSION['carrito']) > 0): ?>
 
-        <?php foreach($_SESSION['carrito'] as $id => $cantidad): ?>
+        <?php foreach($_SESSION['carrito'] as $key => $cantidad): ?>
+
+            <?php $id = carritoProductoId($key); $talleId = carritoTalleId($key); ?>
 
             <?php foreach($productos as $p): ?>
 
@@ -469,6 +482,12 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 
                             </small>
 
+                            <?php if($talleId && isset($tallesHeader[$talleId])): ?>
+                                <small>
+                                    Talle: <?= htmlspecialchars(talleLabel($tallesHeader[$talleId])) ?>
+                                </small>
+                            <?php endif; ?>
+
                         </div>
 
                         <div style="text-align:right">
@@ -481,7 +500,7 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 
                             <br>
 
-                            <a href="/sportstyle/carrito.php?eliminar=<?= $p['id'] ?>"
+                            <a href="/sportstyle/carrito.php?eliminar=<?= urlencode($key) ?>"
                                class="btn-eliminar">
 
                                ❌

@@ -2,6 +2,7 @@
 session_start();
 
 require_once __DIR__ . "/includes/auth_admin.php";
+require_once __DIR__ . "/includes/csrf.php";
 require_once __DIR__ . "/../config/conexion.php";
 
 if(!isset($_SESSION['usuario_nombre'])){
@@ -12,28 +13,40 @@ if(!isset($_SESSION['usuario_nombre'])){
 $editando = null;
 $mensaje = '';
 
-if(isset($_GET['toggle'])){
-    $id = (int) $_GET['toggle'];
-    mysqli_query($conn, "UPDATE cupones SET activo = IF(activo = 1, 0, 1) WHERE id = $id");
-    header("Location: cupones.php");
-    exit;
-}
-
-if(isset($_GET['eliminar'])){
-    $id = (int) $_GET['eliminar'];
-    mysqli_query($conn, "DELETE FROM cupones WHERE id = $id");
-    header("Location: cupones.php");
-    exit;
-}
-
 if(isset($_GET['editar'])){
     $id = (int) $_GET['editar'];
-    $res = mysqli_query($conn, "SELECT * FROM cupones WHERE id = $id");
+    $stmtEditar = mysqli_prepare($conn, "SELECT * FROM cupones WHERE id = ?");
+    mysqli_stmt_bind_param($stmtEditar, "i", $id);
+    mysqli_stmt_execute($stmtEditar);
+    $res = mysqli_stmt_get_result($stmtEditar);
     $editando = mysqli_fetch_assoc($res);
 }
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    if(!validarCsrf()){
+        header("Location: cupones.php");
+        exit;
+    }
+
+    $accion = $_POST['accion'] ?? 'guardar';
     $id = (int) ($_POST['id'] ?? 0);
+
+    if($accion === 'toggle' && $id > 0){
+        $stmt = mysqli_prepare($conn, "UPDATE cupones SET activo = IF(activo = 1, 0, 1) WHERE id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        mysqli_stmt_execute($stmt);
+        header("Location: cupones.php");
+        exit;
+    }
+
+    if($accion === 'eliminar' && $id > 0){
+        $stmt = mysqli_prepare($conn, "DELETE FROM cupones WHERE id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        mysqli_stmt_execute($stmt);
+        header("Location: cupones.php");
+        exit;
+    }
+
     $codigo = strtoupper(trim($_POST['codigo'] ?? ''));
     $tipo = 'porcentaje';
     $valor = (float) ($_POST['valor'] ?? 0);
@@ -65,6 +78,8 @@ $cupones = mysqli_query($conn, "SELECT * FROM cupones ORDER BY id DESC");
 <?php if($mensaje): ?><div class="admin-alert error-msg"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?>
 <section class="pedido-panel">
 <form method="POST" class="form-admin-premium">
+<?= csrfInput() ?>
+<input type="hidden" name="accion" value="guardar">
 <input type="hidden" name="id" value="<?= (int)($editando['id'] ?? 0) ?>">
 <div class="admin-grid">
 <div class="input-group"><label>Código</label><input name="codigo" value="<?= htmlspecialchars($editando['codigo'] ?? '') ?>" required></div>
@@ -77,6 +92,6 @@ $cupones = mysqli_query($conn, "SELECT * FROM cupones ORDER BY id DESC");
 </form>
 </section>
 <div class="tabla-admin tabla-premium"><table><thead><tr><th>Código</th><th>Tipo</th><th>Valor</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
-<?php while($c = mysqli_fetch_assoc($cupones)): ?><tr><td><strong><?= htmlspecialchars($c['codigo']) ?></strong></td><td><?= htmlspecialchars($c['tipo']) ?></td><td><?= $c['tipo'] === 'porcentaje' ? number_format($c['valor'], 0, ',', '.') . '%' : '$' . number_format($c['valor'], 0, ',', '.') ?></td><td><span class="estado <?= $c['activo'] ? 'pagado' : 'cancelado' ?>"><?= $c['activo'] ? 'Activo' : 'Inactivo' ?></span></td><td class="acciones-tabla"><a class="btn-tabla editar" href="cupones.php?editar=<?= $c['id'] ?>">✎</a><a class="btn-tabla editar" href="cupones.php?toggle=<?= $c['id'] ?>">↕</a><a class="btn-tabla eliminar" href="cupones.php?eliminar=<?= $c['id'] ?>" onclick="return confirm('¿Eliminar cupón?')">x</a></td></tr><?php endwhile; ?>
+<?php while($c = mysqli_fetch_assoc($cupones)): ?><tr><td><strong><?= htmlspecialchars($c['codigo']) ?></strong></td><td><?= htmlspecialchars($c['tipo']) ?></td><td><?= $c['tipo'] === 'porcentaje' ? number_format($c['valor'], 0, ',', '.') . '%' : '$' . number_format($c['valor'], 0, ',', '.') ?></td><td><span class="estado <?= $c['activo'] ? 'pagado' : 'cancelado' ?>"><?= $c['activo'] ? 'Activo' : 'Inactivo' ?></span></td><td class="acciones-tabla"><a class="btn-tabla editar" href="cupones.php?editar=<?= $c['id'] ?>">Editar</a><form method="POST" style="display:inline"><?= csrfInput() ?><input type="hidden" name="accion" value="toggle"><input type="hidden" name="id" value="<?= (int)$c['id'] ?>"><button class="btn-tabla editar" type="submit">Cambiar estado</button></form><form method="POST" style="display:inline" onsubmit="return confirm('¿Eliminar cupón?')"><?= csrfInput() ?><input type="hidden" name="accion" value="eliminar"><input type="hidden" name="id" value="<?= (int)$c['id'] ?>"><button class="btn-tabla eliminar" type="submit">Eliminar</button></form></td></tr><?php endwhile; ?>
 </tbody></table></div>
 </main></div></body></html>

@@ -162,7 +162,7 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
                 </span>
 
                 <h1>
-                    Bienvenido, <?= $_SESSION['usuario_nombre'] ?> 👋
+                    Bienvenido, <?= htmlspecialchars($_SESSION['usuario_nombre']) ?>
                 </h1>
 
                 <p>
@@ -192,8 +192,6 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
 
             <div class="admin-card metrica-card">
 
-                <div class="metrica-icono">📦</div>
-
                 <div>
                     <span>Productos</span>
                     <h2><?= $totalProductos ?></h2>
@@ -203,8 +201,6 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
             </div>
 
             <div class="admin-card metrica-card">
-
-                <div class="metrica-icono">🧾</div>
 
                 <div>
                     <span>Pedidos</span>
@@ -216,8 +212,6 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
 
             <div class="admin-card metrica-card alerta">
 
-                <div class="metrica-icono">⏳</div>
-
                 <div>
                     <span>Pendientes</span>
                     <h2><?= $pedidosPendientes ?></h2>
@@ -227,8 +221,6 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
             </div>
 
             <div class="admin-card metrica-card venta">
-
-                <div class="metrica-icono">💰</div>
 
                 <div>
                     <span>Ventas totales</span>
@@ -240,8 +232,6 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
 
             <div class="admin-card metrica-card venta">
 
-                <div class="metrica-icono">📅</div>
-
                 <div>
                     <span>Ventas del mes</span>
                     <h2>$<?= number_format($ventasMes, 0, ',', '.') ?></h2>
@@ -251,8 +241,6 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
             </div>
 
             <div class="admin-card metrica-card">
-
-                <div class="metrica-icono">👥</div>
 
                 <div>
                     <span>Usuarios</span>
@@ -282,7 +270,6 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
                 <div class="quick-actions">
 
                     <a href="productos.php" class="quick-action">
-                        <span>📦</span>
                         <div>
                             <h3>Productos</h3>
                             <p>Precios, imágenes y stock</p>
@@ -290,7 +277,6 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
                     </a>
 
                     <a href="pedidos.php" class="quick-action">
-                        <span>🧾</span>
                         <div>
                             <h3>Pedidos</h3>
                             <p>Estados, pagos y envíos</p>
@@ -298,7 +284,6 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
                     </a>
 
                     <a href="usuarios.php" class="quick-action">
-                        <span>👥</span>
                         <div>
                             <h3>Usuarios</h3>
                             <p>Clientes y administradores</p>
@@ -306,7 +291,6 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
                     </a>
 
                     <a href="ventas.php" class="quick-action">
-                        <span>📊</span>
                         <div>
                             <h3>Ventas</h3>
                             <p>Ingresos y estadísticas</p>
@@ -403,7 +387,7 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
 
                                     <a href="editar_productos.php?id=<?= $p['id'] ?>"
                                        class="btn-tabla editar">
-                                       ✏️
+                                       Editar
                                     </a>
 
                                 </td>
@@ -522,7 +506,7 @@ $ultimosPedidos = mysqli_query($conn, $sqlUltimos);
 
                                     <a href="ver_pedido.php?id=<?= $pedido['id'] ?>"
                                        class="btn-tabla editar">
-                                       👁️
+                                       Ver
                                     </a>
 
                                 </td>

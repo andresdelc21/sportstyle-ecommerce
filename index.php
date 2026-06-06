@@ -6,20 +6,41 @@ if(session_status() === PHP_SESSION_NONE){
 
 include("config/conexion.php");
 
-/* PRODUCTOS DESTACADOS */
-$sqlDestacados = "SELECT
-                    productos.*,
-                    categorias.nombre AS categoria_nombre,
-                    marcas.nombre AS marca_nombre
-                  FROM productos
-                  LEFT JOIN categorias
-                  ON productos.categoria_id = categorias.id
-                  LEFT JOIN marcas
-                  ON productos.marca_id = marcas.id
-                  ORDER BY productos.id DESC
-                  LIMIT 5";
+/* CATEGORÍAS PARA PORTADA */
+$categoriasHome = [];
 
-$resultadoDestacados = mysqli_query($conn, $sqlDestacados);
+$sqlCategoriasHome = "SELECT
+                        categorias.id,
+                        categorias.nombre,
+                        productos.imagen
+                      FROM categorias
+                      INNER JOIN productos
+                      ON productos.id = (
+                          SELECT p2.id
+                          FROM productos p2
+                          WHERE p2.categoria_id = categorias.id
+                          ORDER BY p2.id DESC
+                          LIMIT 1
+                      )
+                      ORDER BY categorias.id
+                      LIMIT 5";
+
+$resultadoCategoriasHome = mysqli_query($conn, $sqlCategoriasHome);
+
+if($resultadoCategoriasHome){
+    while($categoriaHome = mysqli_fetch_assoc($resultadoCategoriasHome)){
+        $categoriasHome[] = $categoriaHome;
+    }
+}
+
+$envioGratisDesdeHome = null;
+$resultadoEnvioHome = mysqli_query($conn, "SELECT MIN(envio_gratis_desde) AS minimo FROM zonas_envio WHERE envio_gratis_desde > 0");
+if($resultadoEnvioHome){
+    $envioHome = mysqli_fetch_assoc($resultadoEnvioHome);
+    if(!empty($envioHome['minimo'])){
+        $envioGratisDesdeHome = (float) $envioHome['minimo'];
+    }
+}
 
 /* BANNER PRINCIPAL */
 $bannerPrincipal = null;
@@ -83,18 +104,34 @@ $heroEnlace = !empty($bannerPrincipal['enlace'])
 ?>
 
 <section class="hero"
-         style="background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.7)), url('<?= htmlspecialchars($heroImagen) ?>') center/cover no-repeat;">
+         style="background: linear-gradient(90deg, rgba(15,23,42,.50), rgba(15,23,42,.26)), url('<?= htmlspecialchars($heroImagen) ?>') center/cover no-repeat;">
 
     <div class="hero-overlay"></div>
 
+    <aside class="hero-promo-rail hero-promo-left">
+
+        <article class="hero-promo-card hero-promo-dark">
+            <span class="promo-logo promo-logo-macro">Banco Macro</span>
+            <strong>6 cuotas</strong>
+            <p>Sin interés en selección deportiva.</p>
+        </article>
+
+        <article class="hero-promo-card hero-promo-light">
+            <span class="promo-logo promo-logo-transferencia">Transferencia</span>
+            <strong>10% OFF</strong>
+            <p>Validando comprobante.</p>
+        </article>
+
+    </aside>
+
     <div class="hero-contenido">
 
-        <span class="hero-badge">SportStyle 2026</span>
+        <span class="hero-badge">Promos de temporada</span>
 
-        <h1><?= htmlspecialchars($heroTitulo) ?></h1>
+        <h1>Beneficios para comprar mejor</h1>
 
         <p>
-            <?= htmlspecialchars($heroSubtitulo) ?>
+            Hasta 30% OFF, cuotas y medios de pago para indumentaria, calzado y accesorios.
         </p>
 
         <div class="hero-actions">
@@ -111,189 +148,51 @@ $heroEnlace = !empty($bannerPrincipal['enlace'])
 
     </div>
 
+    <aside class="hero-promo-rail hero-promo-right">
+
+        <article class="hero-promo-card hero-promo-mp">
+            <span class="promo-logo promo-logo-mp">Mercado Pago</span>
+            <strong>Pagá como quieras</strong>
+            <p>Crédito, débito o dinero en cuenta.</p>
+        </article>
+
+        <article class="hero-promo-card hero-promo-envio">
+            <span class="promo-logo promo-logo-envio">Envíos</span>
+            <strong>
+                <?php if($envioGratisDesdeHome): ?>
+                    Gratis desde $<?= number_format($envioGratisDesdeHome, 0, ',', '.') ?>
+                <?php else: ?>
+                    Consultá tu zona
+                <?php endif; ?>
+            </strong>
+            <p>Según zona y disponibilidad.</p>
+        </article>
+
+    </aside>
+
 </section>
 
 <section class="home-intro">
 
-    <span>🔥 Nuevos ingresos</span>
+    <span>Compra por sección</span>
 
-    <h2>Productos destacados</h2>
+    <h2>Categorías principales</h2>
 
     <p>
-        Selección de productos recientes disponibles en SportStyle.
+        Entrá directo a las secciones más buscadas de la tienda.
     </p>
 
 </section>
 
-<section class="productos-destacados">
+<section class="home-categorias-imagenes">
 
-    <div class="grid">
-
-        <?php if(mysqli_num_rows($resultadoDestacados) > 0): ?>
-
-            <?php while($p = mysqli_fetch_assoc($resultadoDestacados)): ?>
-
-                <div class="card-v2 <?= $p['stock'] <= 0 ? 'card-sin-stock' : '' ?>"
-                     onclick="window.location='detalle.php?id=<?= $p['id'] ?>'">
-
-                    <div class="card-v2-img">
-
-                        <img src="<?= $p['imagen'] ?>"
-                             alt="<?= $p['nombre'] ?>">
-
-                        <?php if($p['stock'] <= 0): ?>
-
-                            <span class="stock-overlay">
-                                Sin stock
-                            </span>
-
-                        <?php endif; ?>
-
-                    </div>
-                    <div class="card-v2-acciones">
-
-                        <a href="#"
-                           class="accion-btn btn-favorito-js <?= in_array((int) $p['id'], $favoritosUsuario, true) ? 'favorito-activo' : '' ?>"
-                           data-producto="<?= $p['id'] ?>"
-                           onclick="event.stopPropagation()"
-                           title="Favoritos"
-                           aria-label="Agregar o quitar favorito">
-
-                            ❤️
-
-                        </a>
-
-                    </div>
-
-                    <div class="card-v2-info">
-
-                        <div class="card-v2-tags">
-
-                            <?php if(!empty($p['categoria_nombre'])): ?>
-
-                                <span class="badge-categoria">
-                                    <?= $p['categoria_nombre'] ?>
-                                </span>
-
-                            <?php endif; ?>
-
-                            <?php if(!empty($p['marca_nombre'])): ?>
-
-                                <span class="badge-genero">
-                                    <?= $p['marca_nombre'] ?>
-                                </span>
-
-                            <?php endif; ?>
-
-                        </div>
-
-                        <h3 class="card-v2-nombre">
-                            <?= $p['nombre'] ?>
-                        </h3>
-
-                        <div class="card-v2-precio">
-
-                            <span class="precio-actual">
-                                $<?= number_format($p['precio'], 0, ',', '.') ?>
-                            </span>
-
-                        </div>
-
-                        <div class="card-v2-botones">
-
-                            <?php if($p['stock'] > 0): ?>
-
-                                <a href="carrito.php?agregar=<?= $p['id'] ?>"
-                                   class="btn-card btn-agregar-carrito-js"
-                                   data-producto="<?= $p['id'] ?>"
-                                   onclick="event.stopPropagation()">
-                                    🛒
-                                </a>
-
-                            <?php else: ?>
-
-                                <span class="sin-stock">
-                                    Sin stock
-                                </span>
-
-                            <?php endif; ?>
-
-                            <a href="detalle.php?id=<?= $p['id'] ?>"
-                               class="btn-card btn-detalle"
-                               onclick="event.stopPropagation()">
-                                👁️
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            <?php endwhile; ?>
-
-        <?php else: ?>
-
-            <p class="home-empty">
-                Todavía no hay productos destacados cargados.
-            </p>
-
-        <?php endif; ?>
-
-    </div>
-
-</section>
-
-<section class="home-beneficios-pro">
-
-    <div class="beneficio-pro">
-        <strong>🚚 Envíos</strong>
-        <span>Consultá disponibilidad y tiempos según tu zona.</span>
-    </div>
-
-    <div class="beneficio-pro">
-        <strong>💳 Pagos</strong>
-        <span>Opciones simples para comprar con seguridad.</span>
-    </div>
-
-    <div class="beneficio-pro">
-        <strong>🔒 Compra segura</strong>
-        <span>Tu pedido queda registrado y protegido.</span>
-    </div>
-
-    <div class="beneficio-pro">
-        <strong>↩️ Cambios</strong>
-        <span>Consultá cambios por talle, producto o disponibilidad.</span>
-    </div>
-
-</section>
-
-<section class="banner-promo">
-
-    <div class="banner-contenido">
-
-        <span class="badge-oferta">
-            🔥 OFERTA LIMITADA
-        </span>
-
-        <h2>
-            Hasta 70% OFF
-        </h2>
-
-        <p>
-            En indumentaria deportiva seleccionada.
-        </p>
-
-        <span class="fecha">
-            Promociones disponibles por tiempo limitado.
-        </span>
-
-        <a href="productos.php"
-           class="btn-banner">
-           Ver ofertas
+    <?php foreach($categoriasHome as $categoriaHome): ?>
+        <a href="productos.php?categoria_id=<?= (int) $categoriaHome['id'] ?>" class="categoria-imagen-card">
+            <img src="<?= htmlspecialchars($categoriaHome['imagen']) ?>" alt="<?= htmlspecialchars($categoriaHome['nombre']) ?>">
+            <span>Compra</span>
+            <strong><?= htmlspecialchars($categoriaHome['nombre']) ?></strong>
         </a>
-
-    </div>
+    <?php endforeach; ?>
 
 </section>
 

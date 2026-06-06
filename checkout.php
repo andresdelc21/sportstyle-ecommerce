@@ -6,6 +6,22 @@ include("config/conexion.php");
 include("config/config.php");
 include("includes/funciones.php");
 include("includes/pedidos.php");
+include("includes/csrf.php");
+
+function limpiarCompraCheckout(): void {
+    unset($_SESSION['carrito']);
+    unset($_SESSION['cliente']);
+    $_SESSION['descuento'] = 0;
+    $_SESSION['cupon'] = '';
+    $_SESSION['cupon_tipo'] = '';
+    $_SESSION['cupon_valor'] = 0;
+    $_SESSION['cupon_error'] = '';
+    $_SESSION['envio'] = 0;
+    $_SESSION['cp'] = '';
+    $_SESSION['zona_envio'] = '';
+    $_SESSION['envio_gratis_desde'] = 0;
+    $_SESSION['carrito_msg'] = '';
+}
 
 /* PROTEGER CHECKOUT */
 if(!isset($_SESSION['usuario_id'])){
@@ -21,6 +37,15 @@ $productos = [];
 
 while($fila = mysqli_fetch_assoc($resultadoProductos)){
     $productos[] = $fila;
+}
+
+$tallesPorId = [];
+$resultadoTallesCheckout = mysqli_query($conn, "SELECT * FROM producto_talles");
+
+if($resultadoTallesCheckout){
+    while($talleCheckout = mysqli_fetch_assoc($resultadoTallesCheckout)){
+        $tallesPorId[(int) $talleCheckout['id']] = $talleCheckout;
+    }
 }
 
 /* EVITAR ACCESO VACÍO */
@@ -84,6 +109,15 @@ $datosCheckout = [
 ];
 $pedidoConfirmadoId = $_SESSION['ultimo_pedido_id'] ?? null;
 
+if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancelar_compra'])){
+    if(validarCsrf()){
+        limpiarCompraCheckout();
+    }
+
+    header("Location: index.php");
+    exit;
+}
+
 /* PROCESAR CHECKOUT */
 if(isset($_POST['confirmar'])){
 
@@ -132,7 +166,10 @@ if(isset($_POST['confirmar'])){
     ];
 
     /* VALIDAR STOCK */
-    foreach($_SESSION['carrito'] as $id => $cantidad){
+    foreach($_SESSION['carrito'] as $key => $cantidad){
+
+        $id = carritoProductoId($key);
+        $talleId = carritoTalleId($key);
 
         $producto = obtenerProductoPorId($productos, $id);
 
@@ -141,7 +178,11 @@ if(isset($_POST['confirmar'])){
             continue;
         }
 
-        if($producto['stock'] < $cantidad){
+        $stockDisponible = $talleId && isset($tallesPorId[$talleId])
+            ? (int) $tallesPorId[$talleId]['stock']
+            : (int) $producto['stock'];
+
+        if($stockDisponible < $cantidad){
             $erroresCheckout[] = 'No hay stock suficiente para: ' . $producto['nombre'];
         }
 
@@ -178,7 +219,10 @@ if(isset($_POST['confirmar'])){
     $_SESSION['ultimo_pedido_id'] = $pedido_id;
 
     /* GUARDAR DETALLES */
-    foreach($_SESSION['carrito'] as $id => $cantidad){
+    foreach($_SESSION['carrito'] as $key => $cantidad){
+
+        $id = carritoProductoId($key);
+        $talleId = carritoTalleId($key);
 
         $producto = obtenerProductoPorId(
             $productos,
@@ -192,13 +236,16 @@ if(isset($_POST['confirmar'])){
                 $pedido_id,
                 $id,
                 $cantidad,
-                $producto['precio']
+                $producto['precio'],
+                $talleId,
+                $talleId && isset($tallesPorId[$talleId]) ? talleLabel($tallesPorId[$talleId]) : ''
             );
 
             descontarStock(
                 $conn,
                 $id,
-                $cantidad
+                $cantidad,
+                $talleId
             );
 
         }
@@ -291,15 +338,30 @@ $subtotalVista = 0;
         <?php endif; ?>
 
         <p>
-            Registramos tu compra correctamente. Desde el panel administrativo se podrá seguir el estado del pedido.
+            Registramos tu compra correctamente. Desde acá podés seguir el estado de tu pedido.
         </p>
 
-        <a href="productos.php"
-           class="btn-pagar">
+        <div class="checkout-acciones">
 
-            Seguir comprando
+            <?php if($pedidoConfirmadoId): ?>
 
-        </a>
+                <a href="pedido_detalle.php?id=<?= (int) $pedidoConfirmadoId ?>"
+                   class="btn-pagar">
+
+                    Seguir mi pedido
+
+                </a>
+
+            <?php endif; ?>
+
+            <a href="productos.php"
+               class="btn-secundario-checkout">
+
+                Seguir comprando
+
+            </a>
+
+        </div>
 
     </section>
 
@@ -351,6 +413,17 @@ $subtotalVista = 0;
                 Volver al inicio
 
             </a>
+
+            <?php if($pedidoConfirmadoId): ?>
+
+                <a href="pedido_detalle.php?id=<?= (int) $pedidoConfirmadoId ?>"
+                   class="btn-secundario-checkout">
+
+                    Seguir mi pedido
+
+                </a>
+
+            <?php endif; ?>
 
             <a href="productos.php"
                class="btn-secundario-checkout">
@@ -408,38 +481,53 @@ $subtotalVista = 0;
 
         </div>
 
-        <input type="text"
-               name="nombre"
-               placeholder="Nombre completo"
-               value="<?= htmlspecialchars($datosCheckout['nombre']) ?>"
-               required
-               class="input-cupon">
+        <label class="checkout-field">
+            <span>Nombre completo</span>
+            <input type="text"
+                   name="nombre"
+                   placeholder="Nombre y apellido"
+                   value="<?= htmlspecialchars($datosCheckout['nombre']) ?>"
+                   required
+                   class="input-cupon">
+        </label>
 
-        <input type="text"
-               name="telefono"
-               placeholder="Teléfono"
-               value="<?= htmlspecialchars($datosCheckout['telefono']) ?>"
-               required
-               class="input-cupon">
+        <label class="checkout-field">
+            <span>Teléfono</span>
+            <input type="text"
+                   name="telefono"
+                   placeholder="Código de área + número"
+                   value="<?= htmlspecialchars($datosCheckout['telefono']) ?>"
+                   required
+                   class="input-cupon">
+        </label>
 
-        <input type="text"
-               name="direccion"
-               placeholder="Dirección de envío"
-               value="<?= htmlspecialchars($datosCheckout['direccion']) ?>"
-               required
-               class="input-cupon">
+        <label class="checkout-field">
+            <span>Dirección de envío</span>
+            <input type="text"
+                   name="direccion"
+                   placeholder="Calle, número, piso/depto"
+                   value="<?= htmlspecialchars($datosCheckout['direccion']) ?>"
+                   required
+                   class="input-cupon">
+        </label>
 
-        <input type="text"
-               value="<?= $codigoPostal ?>"
-               placeholder="Código postal"
-               readonly
-               class="input-cupon">
+        <div class="checkout-field-grid">
+            <label class="checkout-field">
+                <span>Código postal</span>
+                <input type="text"
+                       value="<?= $codigoPostal ?>"
+                       readonly
+                       class="input-cupon">
+            </label>
 
-        <input type="text"
-               value="<?= $zonaEnvio ?>"
-               placeholder="Zona de envío"
-               readonly
-               class="input-cupon">
+            <label class="checkout-field">
+                <span>Zona</span>
+                <input type="text"
+                       value="<?= $zonaEnvio ?>"
+                       readonly
+                       class="input-cupon">
+            </label>
+        </div>
 
         <div class="checkout-panel-title mini">
 
@@ -459,9 +547,11 @@ $subtotalVista = 0;
 
         </div>
 
-        <select name="pago"
-                class="input-cupon"
-                required>
+        <label class="checkout-field">
+            <span>Forma de pago</span>
+            <select name="pago"
+                    class="input-cupon"
+                    required>
 
             <option value=""
                     <?= $datosCheckout['pago'] === '' ? 'selected' : '' ?>>
@@ -483,7 +573,8 @@ $subtotalVista = 0;
                 Coordinar por WhatsApp
             </option>
 
-        </select>
+            </select>
+        </label>
 
         <button type="submit"
                 name="confirmar"
@@ -493,7 +584,21 @@ $subtotalVista = 0;
 
         </button>
 
+        <?= csrfInput() ?>
+
+        <button type="submit"
+                name="cancelar_compra"
+                class="cancelar-compra-link"
+                formnovalidate
+                onclick="return confirm('¿Cancelar la compra y volver al inicio?')">
+
+            Cancelar compra
+
+        </button>
+
     </form>
+
+    <aside class="checkout-side">
 
     <!-- PRODUCTOS -->
     <div class="carrito-items checkout-productos">
@@ -516,9 +621,11 @@ $subtotalVista = 0;
 
         </div>
 
-        <?php foreach($_SESSION['carrito'] as $id => $cantidad): ?>
+        <?php foreach($_SESSION['carrito'] as $key => $cantidad): ?>
 
             <?php
+            $id = carritoProductoId($key);
+            $talleId = carritoTalleId($key);
 
             $producto = obtenerProductoPorId(
                 $productos,
@@ -542,6 +649,12 @@ $subtotalVista = 0;
                 <p>
                     Cantidad: <?= $cantidad ?>
                 </p>
+
+                <?php if($talleId && isset($tallesPorId[$talleId])): ?>
+                    <p>
+                        Talle: <?= htmlspecialchars(talleLabel($tallesPorId[$talleId])) ?>
+                    </p>
+                <?php endif; ?>
 
                 <p>
                     Subtotal:
@@ -583,6 +696,8 @@ $subtotalVista = 0;
         </h3>
 
     </div>
+
+    </aside>
 
 </div>
 

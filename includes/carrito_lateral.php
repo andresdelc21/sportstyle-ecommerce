@@ -19,6 +19,15 @@ while($fila = mysqli_fetch_assoc($resultadoProductos)){
     $productos[(int) $fila['id']] = $fila;
 }
 
+$tallesPorId = [];
+$resultadoTalles = mysqli_query($conn, "SELECT * FROM producto_talles");
+
+if($resultadoTalles){
+    while($talle = mysqli_fetch_assoc($resultadoTalles)){
+        $tallesPorId[(int) $talle['id']] = $talle;
+    }
+}
+
 $total = 0;
 
 ?>
@@ -38,11 +47,12 @@ $total = 0;
 
 <?php if(!empty($carrito)): ?>
 
-    <?php foreach($carrito as $id => $cantidad): ?>
+    <?php foreach($carrito as $key => $cantidad): ?>
 
         <?php
 
-        $id = (int) $id;
+        $id = carritoProductoId($key);
+        $talleId = carritoTalleId($key);
         $cantidad = (int) $cantidad;
 
         if(!isset($productos[$id]) || $cantidad <= 0){
@@ -67,6 +77,12 @@ $total = 0;
                     Cantidad: <?= $cantidad ?>
                 </small>
 
+                <?php if($talleId && isset($tallesPorId[$talleId])): ?>
+                    <small>
+                        Talle: <?= htmlspecialchars(talleLabel($tallesPorId[$talleId])) ?>
+                    </small>
+                <?php endif; ?>
+
             </div>
 
             <div style="text-align:right">
@@ -77,7 +93,7 @@ $total = 0;
 
                 <br>
 
-                <a href="<?= $BASE ?>carrito.php?eliminar=<?= $id ?>"
+                <a href="<?= $BASE ?>carrito.php?eliminar=<?= urlencode($key) ?>"
                    class="btn-eliminar"
                    title="Eliminar">
 

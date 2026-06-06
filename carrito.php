@@ -4,6 +4,21 @@ session_start();
 
 include("config/conexion.php");
 include("data/carrito_helpers.php");
+include("includes/csrf.php");
+
+function limpiarCompraActual(): void {
+    unset($_SESSION['carrito']);
+    $_SESSION['descuento'] = 0;
+    $_SESSION['cupon'] = '';
+    $_SESSION['cupon_tipo'] = '';
+    $_SESSION['cupon_valor'] = 0;
+    $_SESSION['cupon_error'] = '';
+    $_SESSION['envio'] = 0;
+    $_SESSION['cp'] = '';
+    $_SESSION['zona_envio'] = '';
+    $_SESSION['envio_gratis_desde'] = 0;
+    $_SESSION['carrito_msg'] = '';
+}
 
 /* ===== TRAER PRODUCTOS MYSQL ===== */
 $sqlProductos = "SELECT * FROM productos";
@@ -19,6 +34,15 @@ $productosPorId = [];
 
 foreach($productos as $producto){
     $productosPorId[(int) $producto['id']] = $producto;
+}
+
+$tallesPorId = [];
+$resultadoTallesCarrito = mysqli_query($conn, "SELECT * FROM producto_talles");
+
+if($resultadoTallesCarrito){
+    while($talleCarrito = mysqli_fetch_assoc($resultadoTallesCarrito)){
+        $tallesPorId[(int) $talleCarrito['id']] = $talleCarrito;
+    }
 }
 
 /* ===== CREAR CARRITO ===== */
@@ -62,10 +86,20 @@ if(!isset($_SESSION['carrito_msg'])){
     $_SESSION['carrito_msg'] = '';
 }
 
-/* ===== LIMPIAR CARRITO CONTRA STOCK ACTUAL ===== */
-foreach($_SESSION['carrito'] as $id => $cantidad){
+if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancelar_compra'])){
+    if(validarCsrf()){
+        limpiarCompraActual();
+    }
 
-    $id = (int) $id;
+    header("Location: index.php");
+    exit;
+}
+
+/* ===== LIMPIAR CARRITO CONTRA STOCK ACTUAL ===== */
+foreach($_SESSION['carrito'] as $key => $cantidad){
+
+    $id = carritoProductoId($key);
+    $talleId = carritoTalleId($key);
     $cantidad = (int) $cantidad;
 
     if(!isset($productosPorId[$id]) || $cantidad <= 0){
@@ -73,16 +107,18 @@ foreach($_SESSION['carrito'] as $id => $cantidad){
         continue;
     }
 
-    $stock = (int) $productosPorId[$id]['stock'];
+    $stock = $talleId && isset($tallesPorId[$talleId])
+        ? (int) $tallesPorId[$talleId]['stock']
+        : (int) $productosPorId[$id]['stock'];
 
     if($stock <= 0){
-        unset($_SESSION['carrito'][$id]);
+        unset($_SESSION['carrito'][$key]);
         $_SESSION['carrito_msg'] = 'Quitamos productos sin stock de tu carrito.';
         continue;
     }
 
     if($cantidad > $stock){
-        $_SESSION['carrito'][$id] = $stock;
+        $_SESSION['carrito'][$key] = $stock;
         $_SESSION['carrito_msg'] = 'Ajustamos algunas cantidades al stock disponible.';
     }
 
@@ -92,6 +128,7 @@ foreach($_SESSION['carrito'] as $id => $cantidad){
 if(isset($_GET['agregar'])){
 
     $id = (int) $_GET['agregar'];
+    $talleId = isset($_GET['talle']) ? (int) $_GET['talle'] : 0;
 
     if(!isset($productosPorId[$id])){
 
@@ -99,9 +136,20 @@ if(isset($_GET['agregar'])){
 
     } else {
 
-        $stock = (int) $productosPorId[$id]['stock'];
-        $cantidadActual = isset($_SESSION['carrito'][$id])
-            ? (int) $_SESSION['carrito'][$id]
+        if($talleId <= 0){
+            $tallesProducto = array_filter($tallesPorId, fn($t) => (int) $t['producto_id'] === $id);
+            if(count($tallesProducto) === 1){
+                $talleTmp = reset($tallesProducto);
+                $talleId = (int) $talleTmp['id'];
+            }
+        }
+
+        $key = carritoKey($id, $talleId > 0 ? $talleId : null);
+        $stock = $talleId > 0 && isset($tallesPorId[$talleId])
+            ? (int) $tallesPorId[$talleId]['stock']
+            : (int) $productosPorId[$id]['stock'];
+        $cantidadActual = isset($_SESSION['carrito'][$key])
+            ? (int) $_SESSION['carrito'][$key]
             : 0;
 
         if($stock <= 0){
@@ -114,7 +162,7 @@ if(isset($_GET['agregar'])){
 
         } else {
 
-            $_SESSION['carrito'][$id] = $cantidadActual + 1;
+            $_SESSION['carrito'][$key] = $cantidadActual + 1;
             $_SESSION['carrito_msg'] = '';
 
         }
@@ -140,9 +188,9 @@ if(isset($_GET['agregar'])){
 /* ===== ELIMINAR PRODUCTO ===== */
 if(isset($_GET['eliminar'])){
 
-    $id = (int) $_GET['eliminar'];
+    $key = $_GET['eliminar'];
 
-    unset($_SESSION['carrito'][$id]);
+    unset($_SESSION['carrito'][$key]);
     $_SESSION['carrito_msg'] = '';
 
     header("Location: carrito.php");
@@ -153,14 +201,14 @@ if(isset($_GET['eliminar'])){
 /* ===== RESTAR CANTIDAD ===== */
 if(isset($_GET['restar'])){
 
-    $id = (int) $_GET['restar'];
+    $key = $_GET['restar'];
 
-    if(isset($_SESSION['carrito'][$id])){
+    if(isset($_SESSION['carrito'][$key])){
 
-        $_SESSION['carrito'][$id]--;
+        $_SESSION['carrito'][$key]--;
 
-        if($_SESSION['carrito'][$id] <= 0){
-            unset($_SESSION['carrito'][$id]);
+        if($_SESSION['carrito'][$key] <= 0){
+            unset($_SESSION['carrito'][$key]);
         }
 
     }
@@ -326,6 +374,8 @@ $envioListo = (
     $_SESSION['zona_envio'] !== 'No configurado'
 );
 
+$cantidadItemsCarrito = array_sum(array_map('intval', $carrito));
+
 ?>
 
 <?php include("includes/header.php"); ?>
@@ -336,26 +386,46 @@ $envioListo = (
 
         <div>
 
-            <span class="productos-badge">
-                Tu compra
-            </span>
-
             <h1>
-                Carrito
+                Tu carrito
+                <span class="carrito-count-header">
+                    (<?= (int) $cantidadItemsCarrito ?> <?= $cantidadItemsCarrito === 1 ? 'producto' : 'productos' ?>)
+                </span>
             </h1>
 
             <p>
-                Revisá tus productos, calculá el envío y finalizá la compra.
+                Revisá tus artículos antes de finalizar la compra.
             </p>
 
         </div>
 
-        <a href="productos.php"
+            <a href="productos.php"
            class="seguir-comprando carrito-header-link">
 
-           ← Seguir comprando
+           Seguir comprando →
 
         </a>
+
+        <?php if(count($carrito) > 0): ?>
+
+            <form method="POST"
+                  action="carrito.php"
+                  class="cancelar-compra-form">
+
+                <?= csrfInput() ?>
+
+                <button type="submit"
+                        name="cancelar_compra"
+                        class="cancelar-compra-btn"
+                        onclick="return confirm('¿Cancelar la compra y vaciar el carrito?')">
+
+                    Cancelar compra
+
+                </button>
+
+            </form>
+
+        <?php endif; ?>
 
     </div>
 
@@ -376,7 +446,9 @@ $envioListo = (
 
         <?php if(count($carrito) > 0): ?>
 
-            <?php foreach($carrito as $id => $cantidad): ?>
+            <?php foreach($carrito as $key => $cantidad): ?>
+
+                <?php $id = carritoProductoId($key); $talleId = carritoTalleId($key); ?>
 
                 <?php foreach($productos as $p): ?>
 
@@ -384,14 +456,22 @@ $envioListo = (
 
                         <div class="carrito-card premium-cart">
 
-                            <img src="<?= $p['imagen'] ?>"
-                                 alt="<?= $p['nombre'] ?>">
+                            <a href="detalle.php?id=<?= $p['id'] ?>"
+                               class="carrito-producto-img">
+
+                                <img src="<?= $p['imagen'] ?>"
+                                     alt="<?= $p['nombre'] ?>">
+
+                            </a>
 
                             <div class="carrito-info">
 
-                                <h3>
+                                <a href="detalle.php?id=<?= $p['id'] ?>"
+                                   class="carrito-producto-nombre">
+
                                     <?= $p['nombre'] ?>
-                                </h3>
+
+                                </a>
 
                                 <div class="mini-tags-cart">
 
@@ -409,58 +489,83 @@ $envioListo = (
                                     $<?= number_format($p['precio'], 0, ',', '.') ?> c/u
                                 </p>
 
-                                <p class="stock-cart">
-                                    Stock disponible: <?= (int) $p['stock'] ?>
-                                </p>
+                                <?php if($talleId && isset($tallesPorId[$talleId])): ?>
 
-                                <p class="precio-subtotal">
-                                    Subtotal:
-                                    $<?= number_format($p['precio'] * $cantidad, 0, ',', '.') ?>
-                                </p>
-
-                            </div>
-
-                            <div class="carrito-cantidad">
-
-                                <a href="carrito.php?restar=<?= $p['id'] ?>"
-                                   class="btn-cantidad">
-
-                                   −
-
-                                </a>
-
-                                <span>
-                                    <?= $cantidad ?>
-                                </span>
-
-                                <?php if($cantidad < (int) $p['stock']): ?>
-
-                                    <a href="carrito.php?agregar=<?= $p['id'] ?>"
-                                       class="btn-cantidad">
-
-                                       +
-
-                                    </a>
-
-                                <?php else: ?>
-
-                                    <span class="btn-cantidad btn-cantidad-disabled"
-                                          title="No hay más stock disponible">
-
-                                        +
-
-                                    </span>
+                                    <p class="stock-cart">
+                                        Talle: <?= htmlspecialchars(talleLabel($tallesPorId[$talleId])) ?>
+                                    </p>
 
                                 <?php endif; ?>
 
+                                <p class="stock-cart">
+                                    Stock disponible: <?= $talleId && isset($tallesPorId[$talleId]) ? (int) $tallesPorId[$talleId]['stock'] : (int) $p['stock'] ?>
+                                </p>
+
                             </div>
 
-                            <a href="carrito.php?eliminar=<?= $p['id'] ?>"
-                               class="btn-eliminar">
+                            <div class="carrito-item-control">
 
-                               ❌
+                                <span class="carrito-control-label">
+                                    Cantidad
+                                </span>
 
-                            </a>
+                                <div class="carrito-cantidad">
+
+                                    <a href="carrito.php?restar=<?= urlencode($key) ?>"
+                                       class="btn-cantidad">
+
+                                       −
+
+                                    </a>
+
+                                    <span>
+                                        <?= $cantidad ?>
+                                    </span>
+
+                                    <?php $stockItem = $talleId && isset($tallesPorId[$talleId]) ? (int) $tallesPorId[$talleId]['stock'] : (int) $p['stock']; ?>
+
+                                    <?php if($cantidad < $stockItem): ?>
+
+                                        <a href="carrito.php?agregar=<?= $p['id'] ?><?= $talleId ? '&talle=' . $talleId : '' ?>"
+                                           class="btn-cantidad">
+
+                                           +
+
+                                        </a>
+
+                                    <?php else: ?>
+
+                                        <span class="btn-cantidad btn-cantidad-disabled"
+                                              title="No hay más stock disponible">
+
+                                            +
+
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </div>
+
+                            </div>
+
+                            <div class="carrito-item-total">
+
+                                <span>
+                                    Subtotal
+                                </span>
+
+                                <strong>
+                                    $<?= number_format($p['precio'] * $cantidad, 0, ',', '.') ?>
+                                </strong>
+
+                                <a href="carrito.php?eliminar=<?= urlencode($key) ?>"
+                                   class="btn-eliminar">
+
+                                   Quitar
+
+                                </a>
+
+                            </div>
 
                         </div>
 
@@ -474,16 +579,12 @@ $envioListo = (
 
             <div class="carrito-vacio carrito-vacio-pro">
 
-                <span class="carrito-vacio-icono">
-                    🛒
-                </span>
-
                 <h2>
-                    Tu carrito está vacío
+                    El carrito está vacío
                 </h2>
 
                 <p>
-                    Explorá la colección y agregá productos para continuar con tu compra.
+                    Agregá productos desde el catálogo para comenzar tu pedido.
                 </p>
 
                 <div class="carrito-vacio-acciones">
@@ -491,14 +592,14 @@ $envioListo = (
                     <a href="productos.php"
                        class="btn-pagar">
 
-                        Ver productos
+                        Empezar compra →
 
                     </a>
 
                     <a href="index.php"
                        class="btn-secundario-checkout">
 
-                        Volver al inicio
+                        Volver al inicio →
 
                     </a>
 
@@ -516,7 +617,7 @@ $envioListo = (
         <div class="carrito-resumen">
 
             <h2>
-                Resumen
+                Resumen de compra
             </h2>
 
             <!-- CUPÓN -->
@@ -526,7 +627,7 @@ $envioListo = (
 
                     <p class="cupon-activo">
 
-                        ✅ Cupón
+                        Cupón
                         <strong><?= $_SESSION['cupon'] ?></strong>
                         aplicado
 
@@ -539,7 +640,7 @@ $envioListo = (
                         <?php endif; ?>
 
                         <a href="carrito.php?quitar_cupon=1">
-                            ✖ Quitar
+                            Quitar
                         </a>
 
                     </p>
@@ -566,7 +667,7 @@ $envioListo = (
                     <?php if(!empty($_SESSION['cupon_error'])): ?>
 
                         <p class="cupon-error">
-                            ❌ <?= $_SESSION['cupon_error'] ?>
+                            <?= $_SESSION['cupon_error'] ?>
                         </p>
 
                     <?php endif; ?>
@@ -579,7 +680,7 @@ $envioListo = (
             <div class="envio-box">
 
                 <h4>
-                    🚚 Calcular envío
+                    Calcular envío
                 </h4>
 
                 <form method="POST"
@@ -604,13 +705,13 @@ $envioListo = (
                 <?php if($_SESSION['zona_envio'] === 'No disponible'): ?>
 
                     <p class="envio-msg">
-                        ❌ No encontramos envíos para ese código postal.
+                        No encontramos envíos para ese código postal.
                     </p>
 
                 <?php elseif($_SESSION['zona_envio'] === 'No configurado'): ?>
 
                     <p class="envio-msg">
-                        ❌ El cálculo de envíos todavía no está configurado.
+                        El cálculo de envíos todavía no está configurado.
                     </p>
 
                 <?php elseif(!empty($_SESSION['cp'])): ?>
@@ -626,7 +727,7 @@ $envioListo = (
 
                     <p class="envio-msg">
 
-                        🚚 Envío:
+                        Envío:
                         <strong>
                             $<?= number_format($costoEnvio, 0, ',', '.') ?>
                         </strong>
@@ -636,7 +737,7 @@ $envioListo = (
                 <?php else: ?>
 
                     <p class="envio-msg">
-                        Envíos a todo el país 🇦🇷
+                        Ingresá tu código postal para ver el costo.
                     </p>
 
                 <?php endif; ?>
@@ -644,29 +745,38 @@ $envioListo = (
             </div>
 
             <!-- TOTALES -->
+            <div class="resumen-lineas">
+
+                <div class="resumen-linea">
+                    <span>Subtotal</span>
+                    <strong>$<?= number_format($totalSinDescuento, 0, ',', '.') ?></strong>
+                </div>
+
             <?php if($totalSinDescuento > $total): ?>
 
-                <p class="total-sin-descuento">
-                    Subtotal:
-                    $<?= number_format($totalSinDescuento, 0, ',', '.') ?>
-                </p>
-
-                <p class="descuento-aplicado">
-                    Descuento:
-                    -$<?= number_format($totalSinDescuento - $total, 0, ',', '.') ?>
-                </p>
+                <div class="resumen-linea descuento-aplicado">
+                    <span>Descuento</span>
+                    <strong>-$<?= number_format($totalSinDescuento - $total, 0, ',', '.') ?></strong>
+                </div>
 
             <?php endif; ?>
 
-            <h3 class="total-final">
-                Total:
-                $<?= number_format($totalFinal, 0, ',', '.') ?>
-            </h3>
+                <div class="resumen-linea">
+                    <span>Envío</span>
+                    <strong><?= $envioListo ? '$' . number_format($costoEnvio, 0, ',', '.') : 'A calcular' ?></strong>
+                </div>
+
+                <div class="resumen-linea resumen-total">
+                    <span>Total</span>
+                    <strong>$<?= number_format($totalFinal, 0, ',', '.') ?></strong>
+                </div>
+
+            </div>
 
            <?php if($envioListo && $envioGratisDesde > 0 && $total >= $envioGratisDesde): ?>
 
     <p class="envio-gratis">
-        🚚 Envío gratis aplicado
+        Envío gratis aplicado
     </p>
 
 <?php elseif($envioListo && $envioGratisDesde > 0): ?>
@@ -707,18 +817,35 @@ $envioListo = (
 
             <?php endif; ?>
 
+            <form method="POST"
+                  action="carrito.php"
+                  class="cancelar-compra-resumen">
+
+                <?= csrfInput() ?>
+
+                <button type="submit"
+                        name="cancelar_compra"
+                        class="cancelar-compra-link"
+                        onclick="return confirm('¿Cancelar la compra y vaciar el carrito?')">
+
+                    Cancelar compra
+
+                </button>
+
+            </form>
+
             <div class="beneficios-cart">
 
                 <div class="beneficio-item">
-                    🔒 Compra 100% segura
+                    Compra segura y pedido registrado
                 </div>
 
                 <div class="beneficio-item">
-                    🚚 Envíos a todo el país
+                    Envíos según zona configurada
                 </div>
 
                 <div class="beneficio-item">
-                    💳 Hasta 6 cuotas sin interés
+                    Opciones de pago al finalizar
                 </div>
 
             </div>

@@ -68,32 +68,38 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     <div class="login-container">
 
-        <!-- LADO IZQUIERDO -->
         <div class="login-info">
 
-            <h1>Bienvenido a SportStyle</h1>
+            <span class="auth-eyebrow">Mi cuenta</span>
+
+            <h1>Ingresá y seguí tu compra</h1>
 
             <p>
-                Accede a tu cuenta para guardar favoritos,
-                seguir tus pedidos y vivir la experiencia completa.
+                Revisá tus pedidos, guardá favoritos y finalizá tus compras con tus datos ya cargados.
             </p>
 
-            <img src="img/reza.jpg" alt="Login SportStyle">
+            <div class="auth-benefits">
+                <span>Pedidos y seguimiento</span>
+                <span>Favoritos guardados</span>
+                <span>Checkout más rápido</span>
+            </div>
 
         </div>
 
-        <!-- FORMULARIO -->
         <div class="login-box">
 
-            <h2>Iniciar Sesión</h2>
+            <div class="auth-form-header">
+                <span>SportStyle</span>
+                <h2>Iniciar sesión</h2>
+                <p>Usá el correo con el que compraste o creaste tu cuenta.</p>
+            </div>
 
             <?php if($error): ?>
-                <p class="error-msg"><?= $error ?></p>
+                <p class="error-msg"><?= htmlspecialchars($error) ?></p>
             <?php endif; ?>
 
             <form method="POST">
 
-                <!-- EMAIL -->
                 <div class="input-group">
 
                     <label>Correo electrónico</label>
@@ -105,7 +111,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                 </div>
 
-                <!-- PASSWORD -->
                 <div class="input-group">
 
                     <label>Contraseña</label>
@@ -120,9 +125,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                         <button type="button"
                                 class="toggle-password"
+                                aria-label="Mostrar u ocultar contraseña"
                                 onclick="togglePassword()">
 
-                            👁️
+                            Ver
 
                         </button>
 
@@ -130,7 +136,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                 </div>
 
-                <!-- OPCIONES -->
                 <div class="login-options">
 
                     <label class="remember">
@@ -144,26 +149,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                 </div>
 
-                <!-- BOTÓN -->
                 <button type="submit" class="btn-login">
                     Ingresar
                 </button>
 
-                <!-- DIVISOR -->
-                <div class="divider">
-                    <span>o continuar con</span>
-                </div>
-
-                <!-- GOOGLE -->
-                <button type="button" class="btn-google">
-
-                    <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
-
-                    Google
-
-                </button>
-
-                <!-- REGISTRO -->
                 <p class="registro-link">
 
                     ¿No tienes cuenta?

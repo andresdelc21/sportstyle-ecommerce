@@ -23,6 +23,8 @@ $sql = "SELECT
             pedidos.zona_envio,
             pedidos.total,
             pedidos.estado,
+            pedidos.solicitud_tipo,
+            pedidos.solicitud_estado,
             pedidos.fecha,
             pedidos.nombre_cliente,
             usuarios.nombre AS cliente
@@ -105,7 +107,7 @@ if($resultado){
                 </span>
 
                 <h1>
-                    Pedidos de clientes 🧾
+                    Pedidos de clientes
                 </h1>
 
                 <p>
@@ -121,10 +123,6 @@ if($resultado){
 
             <div class="admin-card metrica-card">
 
-                <div class="metrica-icono">
-                    🧾
-                </div>
-
                 <div>
 
                     <span>Total pedidos</span>
@@ -138,10 +136,6 @@ if($resultado){
             </div>
 
             <div class="admin-card metrica-card alerta">
-
-                <div class="metrica-icono">
-                    ⏳
-                </div>
 
                 <div>
 
@@ -157,10 +151,6 @@ if($resultado){
 
             <div class="admin-card metrica-card venta">
 
-                <div class="metrica-icono">
-                    ✅
-                </div>
-
                 <div>
 
                     <span>Pagados</span>
@@ -174,10 +164,6 @@ if($resultado){
             </div>
 
             <div class="admin-card metrica-card">
-
-                <div class="metrica-icono">
-                    🚚
-                </div>
 
                 <div>
 
@@ -294,6 +280,15 @@ if($resultado){
 
                             <?php endif; ?>
 
+                            <?php if(!empty($p['solicitud_tipo'])): ?>
+
+                                <small class="pedido-solicitud-admin">
+                                    <?= htmlspecialchars($p['solicitud_tipo']) ?>
+                                    <?= htmlspecialchars($p['solicitud_estado'] ?? 'Pendiente') ?>
+                                </small>
+
+                            <?php endif; ?>
+
                         </td>
 
                         <td>
@@ -305,7 +300,7 @@ if($resultado){
                             <a href="ver_pedido.php?id=<?= $p['id'] ?>"
                                class="btn-tabla editar">
 
-                               👁️
+                               Ver
 
                             </a>
 

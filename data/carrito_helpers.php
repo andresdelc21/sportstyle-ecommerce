@@ -3,7 +3,9 @@
 // Calcula el total del carrito respetando cantidades
 function calcularTotal(array $carrito, array $productos, float $descuento = 0): float {
     $total = 0;
-    foreach ($carrito as $id => $cantidad) {
+    foreach ($carrito as $key => $cantidad) {
+        $id = carritoProductoId($key);
+
         foreach ($productos as $p) {
             if ($p['id'] == $id) {
                 $total += $p['precio'] * $cantidad;
@@ -19,6 +21,43 @@ function calcularTotal(array $carrito, array $productos, float $descuento = 0): 
 // Devuelve la cantidad total de items en el carrito
 function cantidadItems(array $carrito): int {
     return array_sum($carrito);
+}
+
+function carritoKey(int $productoId, ?int $talleId = null): string {
+    return $talleId ? $productoId . ':' . $talleId : (string) $productoId;
+}
+
+function carritoProductoId($key): int {
+    $partes = explode(':', (string) $key);
+    return (int) $partes[0];
+}
+
+function carritoTalleId($key): ?int {
+    $partes = explode(':', (string) $key);
+    return isset($partes[1]) && (int) $partes[1] > 0
+        ? (int) $partes[1]
+        : null;
+}
+
+function talleLabel(?array $talle): string {
+    if(!$talle){
+        return '';
+    }
+
+    if(!empty($talle['etiqueta']) && $talle['etiqueta'] !== 'Único'){
+        return $talle['etiqueta'];
+    }
+
+    $partes = [];
+
+    if(!empty($talle['talle_arg'])){ $partes[] = 'ARG ' . $talle['talle_arg']; }
+    if(!empty($talle['talle_us'])){ $partes[] = 'US ' . $talle['talle_us']; }
+    if(!empty($talle['talle_br'])){ $partes[] = 'BR ' . $talle['talle_br']; }
+    if(!empty($talle['cm'])){ $partes[] = $talle['cm'] . ' cm'; }
+
+    return !empty($partes)
+        ? implode(' / ', $partes)
+        : ($talle['etiqueta'] ?? '');
 }
 
 // Cupones válidos: 'codigo' => % de descuento
