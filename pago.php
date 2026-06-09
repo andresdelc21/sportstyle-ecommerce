@@ -106,6 +106,11 @@ if(empty($items)){
 if($errorPago === ""){
 
     $baseUrl = mpBaseUrl();
+    $notificationUrl = $baseUrl . "/mp_webhook.php";
+
+    if(!empty($MP_WEBHOOK_TOKEN)){
+        $notificationUrl .= "?token=" . urlencode($MP_WEBHOOK_TOKEN);
+    }
 
     $payer = [
         "name" => $pedido['nombre_cliente']
@@ -123,6 +128,7 @@ if($errorPago === ""){
             "failure" => $baseUrl . "/pago_fallido.php?pedido=" . $pedidoId,
             "pending" => $baseUrl . "/pago_pendiente.php?pedido=" . $pedidoId
         ],
+        "notification_url" => $notificationUrl,
         "auto_return" => "approved",
         "external_reference" => "pedido_" . $pedidoId,
         "metadata" => [

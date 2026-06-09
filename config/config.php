@@ -38,6 +38,8 @@ $MP_PUBLIC_KEY = "";
 
 $MP_ACCESS_TOKEN = "";
 
+$MP_WEBHOOK_TOKEN = "";
+
 /* =========================
    CONFIGURACIÓN DESDE ADMIN
 ========================= */

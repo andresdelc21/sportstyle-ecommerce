@@ -18,7 +18,8 @@ $claves = [
     'INSTAGRAM_TIENDA' => 'Instagram',
     'FACEBOOK_TIENDA' => 'Facebook',
     'MP_PUBLIC_KEY' => 'MercadoPago Public Key',
-    'MP_ACCESS_TOKEN' => 'MercadoPago Access Token'
+    'MP_ACCESS_TOKEN' => 'MercadoPago Access Token',
+    'MP_WEBHOOK_TOKEN' => 'MercadoPago Webhook Token'
 ];
 
 if($_SERVER['REQUEST_METHOD']==='POST'){
@@ -46,6 +47,6 @@ while($fila = mysqli_fetch_assoc($res)){ $valores[$fila['clave']] = $fila['valor
 <section class="admin-hero small-hero"><div><span class="admin-badge">Tienda</span><h1>Configuración</h1><p>Datos comerciales, redes y credenciales principales.</p></div></section>
 <?php if(isset($_GET['ok'])): ?><div class="admin-alert success-msg">Configuración guardada.</div><?php endif; ?>
 <section class="pedido-panel"><form method="POST" class="form-admin-premium"><?= csrfInput() ?><div class="admin-grid">
-<?php foreach($claves as $clave => $label): ?><div class="input-group"><label><?= htmlspecialchars($label) ?></label><input type="<?= $clave === 'MP_ACCESS_TOKEN' ? 'password' : 'text' ?>" name="<?= $clave ?>" value="<?= htmlspecialchars($valores[$clave] ?? '') ?>" autocomplete="<?= $clave === 'MP_ACCESS_TOKEN' ? 'new-password' : 'off' ?>"></div><?php endforeach; ?>
+<?php foreach($claves as $clave => $label): ?><div class="input-group"><label><?= htmlspecialchars($label) ?></label><input type="<?= in_array($clave, ['MP_ACCESS_TOKEN', 'MP_WEBHOOK_TOKEN'], true) ? 'password' : 'text' ?>" name="<?= $clave ?>" value="<?= htmlspecialchars($valores[$clave] ?? '') ?>" autocomplete="<?= in_array($clave, ['MP_ACCESS_TOKEN', 'MP_WEBHOOK_TOKEN'], true) ? 'new-password' : 'off' ?>"></div><?php endforeach; ?>
 </div><button class="btn-admin-agregar" type="submit">Guardar configuración</button></form></section>
 </main></div></body></html>

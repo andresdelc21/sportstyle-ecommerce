@@ -172,19 +172,29 @@ El proyecto tiene preparado el flujo base para Mercado Pago Checkout Pro:
 - creación de preferencia de pago;
 - redirección a Mercado Pago;
 - páginas de retorno para pago exitoso, pendiente o fallido;
+- webhook para actualizar pedidos aunque el cliente no vuelva a la tienda;
 - guardado de `mp_preference_id`, `mp_payment_id` y `mp_status` en pedidos.
 
 Para probarlo se deben cargar credenciales de prueba desde el admin:
 
 - `MP_PUBLIC_KEY`
 - `MP_ACCESS_TOKEN`
+- `MP_WEBHOOK_TOKEN`
 
 Estado actual: la estructura está preparada, pero el pago real solo puede probarse cuando esas credenciales estén cargadas.
+
+El webhook queda disponible en:
+
+```text
+https://tu-dominio.com/sportstyle/mp_webhook.php?token=TU_TOKEN
+```
+
+En local funciona para desarrollo, pero Mercado Pago solo podrá llamar el webhook cuando la tienda esté publicada en una URL accesible desde internet.
 
 ## Próximas mejoras posibles
 
 - Prueba completa con credenciales reales o de prueba de Mercado Pago.
-- Webhook de Mercado Pago para actualizar pagos automáticamente en producción.
+- Prueba del webhook de Mercado Pago en servidor público.
 - Módulo profesional de variantes por color.
 - Exportación de ventas/pedidos.
 - Mejoras SEO.

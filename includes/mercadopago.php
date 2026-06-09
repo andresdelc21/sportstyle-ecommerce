@@ -142,3 +142,95 @@ function mpActualizarPedidoDesdeRetorno(mysqli $conn, string $accessToken, int $
     ];
 
 }
+
+function mpPedidoIdDesdePago(array $pago): int {
+
+    $metadataPedidoId = $pago['metadata']['pedido_id'] ?? null;
+
+    if($metadataPedidoId){
+        return (int) $metadataPedidoId;
+    }
+
+    $externalReference = (string) ($pago['external_reference'] ?? '');
+
+    if(preg_match('/pedido_(\d+)/', $externalReference, $matches)){
+        return (int) $matches[1];
+    }
+
+    return 0;
+
+}
+
+function mpActualizarPedidoPorPaymentId(mysqli $conn, string $accessToken, string $paymentId): array {
+
+    $paymentId = preg_replace('/[^0-9]/', '', $paymentId);
+
+    if($paymentId === ''){
+        return [
+            'ok' => false,
+            'pedido_id' => 0,
+            'estado' => 'Pendiente',
+            'mp_status' => null,
+            'payment_id' => null,
+            'mensaje' => 'Pago inválido.'
+        ];
+    }
+
+    $respuesta = mpApiRequest('GET', '/v1/payments/' . $paymentId, $accessToken);
+
+    if(!$respuesta['ok'] || empty($respuesta['data'])){
+        return [
+            'ok' => false,
+            'pedido_id' => 0,
+            'estado' => 'Pendiente',
+            'mp_status' => null,
+            'payment_id' => $paymentId,
+            'mensaje' => 'No se pudo consultar el pago en Mercado Pago.'
+        ];
+    }
+
+    $pago = $respuesta['data'];
+    $pedidoId = mpPedidoIdDesdePago($pago);
+    $mpStatus = $pago['status'] ?? null;
+    $estadoPedido = mpEstadoPedidoDesdeStatus($mpStatus);
+
+    if($pedidoId <= 0){
+        return [
+            'ok' => false,
+            'pedido_id' => 0,
+            'estado' => $estadoPedido,
+            'mp_status' => $mpStatus,
+            'payment_id' => $paymentId,
+            'mensaje' => 'El pago no trae referencia de pedido.'
+        ];
+    }
+
+    $sql = "UPDATE pedidos
+            SET estado = ?,
+                mp_payment_id = ?,
+                mp_status = ?
+            WHERE id = ?";
+
+    $stmt = mysqli_prepare($conn, $sql);
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "sssi",
+        $estadoPedido,
+        $paymentId,
+        $mpStatus,
+        $pedidoId
+    );
+
+    mysqli_stmt_execute($stmt);
+
+    return [
+        'ok' => true,
+        'pedido_id' => $pedidoId,
+        'estado' => $estadoPedido,
+        'mp_status' => $mpStatus,
+        'payment_id' => $paymentId,
+        'mensaje' => 'Pedido actualizado.'
+    ];
+
+}
