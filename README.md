@@ -7,9 +7,12 @@ SportStyle es una tienda online desarrollada en PHP, MySQL, HTML, CSS y JavaScri
 ### Tienda
 
 - Home con banner principal administrable.
+- Cartel superior de promociones administrable.
 - Catálogo de productos con filtros por categoría, marca, género y ofertas.
-- Detalle de producto con imágenes, stock, favoritos y opiniones.
+- Detalle de producto con galería de imágenes, zoom, stock por talle, favoritos y opiniones.
+- Guía de talles por tipo de producto.
 - Productos sin stock visibles con aviso, sin permitir compra.
+- Productos ocultables desde el admin sin borrar historial de pedidos.
 - Diseño responsive para escritorio y mobile.
 - Menú superior con categorías y marcas.
 - Página de contacto con canales de atención.
@@ -35,6 +38,7 @@ SportStyle es una tienda online desarrollada en PHP, MySQL, HTML, CSS y JavaScri
 - Checkout con datos del cliente, método de pago y resumen.
 - Flujo de transferencia con datos bancarios y botón para enviar comprobante.
 - Flujo de Mercado Pago preparado para Checkout Pro.
+- Mis pedidos con estado de compra y seguimiento de envío.
 
 ### Opiniones
 
@@ -47,9 +51,11 @@ SportStyle es una tienda online desarrollada en PHP, MySQL, HTML, CSS y JavaScri
 
 - Dashboard administrativo.
 - Gestión de productos.
-- Carga y edición de imágenes.
+- Carga y edición de múltiples imágenes por producto.
 - Gestión de stock.
+- Gestión de talles y stock por talle.
 - Gestión de pedidos y estados.
+- Carga de empresa de envío, número de guía y link de seguimiento.
 - Ventas.
 - Usuarios.
 - Categorías.
@@ -65,9 +71,11 @@ SportStyle es una tienda online desarrollada en PHP, MySQL, HTML, CSS y JavaScri
 - Registro con validaciones.
 - Roles protegidos para el admin.
 - Protección CSRF en acciones críticas del panel.
+- Protección CSRF en favoritos y reseñas.
 - Validación segura de subida de imágenes.
 - Restricción de tipos de archivo permitidos.
 - Control de acceso a páginas administrativas.
+- Productos con pedidos asociados se ocultan en lugar de eliminarse, para no romper el historial.
 
 ## Tecnologías utilizadas
 
@@ -87,6 +95,7 @@ sportstyle/
 ├── config/
 ├── css/
 ├── data/
+├── database/
 ├── img/
 ├── includes/
 ├── java/
@@ -125,15 +134,21 @@ CREATE DATABASE sportstyle;
 
 4. Importar las tablas necesarias desde la base usada en el proyecto.
 
-5. Configurar la conexión en:
+5. Ejecutar las migraciones incluidas en:
+
+```text
+database/migrations/
+```
+
+6. Configurar la conexión en:
 
 ```text
 config/conexion.php
 ```
 
-6. Iniciar Apache y MySQL desde XAMPP.
+7. Iniciar Apache y MySQL desde XAMPP.
 
-7. Abrir la tienda:
+8. Abrir la tienda:
 
 ```text
 http://localhost/sportstyle/
@@ -164,13 +179,15 @@ Para probarlo se deben cargar credenciales de prueba desde el admin:
 - `MP_PUBLIC_KEY`
 - `MP_ACCESS_TOKEN`
 
+Estado actual: la estructura está preparada, pero el pago real solo puede probarse cuando esas credenciales estén cargadas.
+
 ## Próximas mejoras posibles
 
 - Prueba completa con credenciales reales o de prueba de Mercado Pago.
 - Webhook de Mercado Pago para actualizar pagos automáticamente en producción.
+- Módulo profesional de variantes por color.
 - Exportación de ventas/pedidos.
 - Mejoras SEO.
-- Historial de pedidos para clientes.
 - Notificaciones por email.
 - Deploy en hosting.
 

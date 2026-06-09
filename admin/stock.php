@@ -2,10 +2,16 @@
 session_start();
 
 require_once __DIR__ . "/includes/auth_admin.php";
+require_once __DIR__ . "/includes/csrf.php";
 require_once __DIR__ . "/../config/conexion.php";
 if(!isset($_SESSION['usuario_nombre'])){ header("Location: ../login.php"); exit; }
 
 if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['stock'])){
+    if(!validarCsrf()){
+        header("Location: stock.php");
+        exit;
+    }
+
     foreach($_POST['stock'] as $id => $stock){
         $id=(int)$id;
         $stock=max(0, (int)$stock);
@@ -53,6 +59,7 @@ $productos=mysqli_query($conn,"SELECT id,nombre,imagen,stock,precio FROM product
 <a class="btn-admin-secundario" href="stock.php?filtro=sin">Sin stock</a>
 </div>
 <form method="POST">
+<?= csrfInput() ?>
 <div class="tabla-admin tabla-premium"><table><thead><tr><th>Producto</th><th>Precio</th><th>Stock total</th><th>Estado</th><th>Talles</th></tr></thead><tbody>
 <?php while($p=mysqli_fetch_assoc($productos)): ?><tr><td><div class="producto-admin-info"><img src="../<?= htmlspecialchars($p['imagen']) ?>" class="admin-img-producto"><strong><?= htmlspecialchars($p['nombre']) ?></strong></div></td><td>$<?= number_format($p['precio'],0,',','.') ?></td><td><input class="stock-input-admin" type="number" min="0" name="stock[<?= $p['id'] ?>]" value="<?= (int)$p['stock'] ?>"></td><td><?php if($p['stock']<=0): ?><span class="stock-bajo">Sin stock</span><?php elseif($p['stock']<=5): ?><span class="estado pendiente">Stock bajo</span><?php else: ?><span class="stock-ok">Disponible</span><?php endif; ?></td><td><a class="btn-tabla editar" href="talles.php?producto_id=<?= (int)$p['id'] ?>">Ver</a></td></tr><?php endwhile; ?>
 </tbody></table></div>

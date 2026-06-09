@@ -183,6 +183,53 @@ $ordenEstados = [
 
     </section>
 
+    <section class="pedido-panel-cliente pedido-entrega-cliente">
+        <div>
+            <span class="pedido-panel-label">Entrega</span>
+            <h2>Detalle del envío</h2>
+        </div>
+
+        <div class="pedido-envio-grid">
+            <p>
+                <span>Zona</span>
+                <strong><?= htmlspecialchars($pedido['zona_envio'] ?? 'A confirmar') ?></strong>
+            </p>
+
+            <p>
+                <span>Costo</span>
+                <strong>$<?= number_format((float) ($pedido['costo_envio'] ?? 0), 0, ',', '.') ?></strong>
+            </p>
+
+            <p>
+                <span>Estado</span>
+                <strong><?= htmlspecialchars($pedido['estado']) ?></strong>
+            </p>
+
+            <p>
+                <span>Seguimiento</span>
+                <strong>
+                    <?php if(!empty($pedido['empresa_envio']) || !empty($pedido['numero_seguimiento'])): ?>
+                        <?= htmlspecialchars($pedido['empresa_envio'] ?: 'Correo') ?>
+                        <?php if(!empty($pedido['numero_seguimiento'])): ?>
+                            · <?= htmlspecialchars($pedido['numero_seguimiento']) ?>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        A coordinar por la tienda
+                    <?php endif; ?>
+                </strong>
+            </p>
+        </div>
+
+        <?php if(!empty($pedido['link_seguimiento'])): ?>
+            <a href="<?= htmlspecialchars($pedido['link_seguimiento']) ?>"
+               target="_blank"
+               rel="noopener"
+               class="pedido-link pedido-link-envio">
+                Seguir envío
+            </a>
+        <?php endif; ?>
+    </section>
+
     <section class="pedido-panel-cliente">
         <h2>Productos</h2>
 

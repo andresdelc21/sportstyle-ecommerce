@@ -3,6 +3,7 @@
 session_start();
 
 require_once __DIR__ . "/config/conexion.php";
+require_once __DIR__ . "/includes/csrf.php";
 
 /* USUARIO LOGUEADO */
 if(!isset($_SESSION['usuario_id'])){
@@ -14,6 +15,13 @@ if(!isset($_SESSION['usuario_id'])){
 
 /* VALIDAR POST */
 if($_SERVER["REQUEST_METHOD"] !== "POST"){
+
+    header("Location: productos.php");
+    exit;
+
+}
+
+if(!validarCsrf()){
 
     header("Location: productos.php");
     exit;

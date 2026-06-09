@@ -43,7 +43,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: .08em;
-    color: #38bdf8;
+    color: #f59e0b;
     margin-bottom: 14px;
 }
 
@@ -70,7 +70,7 @@
 .auth-benefits span{
     display: block;
     width: fit-content;
-    color: #eaf6ff;
+    color: #fff7ed;
     font-size: 13px;
     font-weight: 700;
     border-bottom: 1px solid rgba(56, 189, 248, .45);
@@ -90,7 +90,7 @@
 
 .auth-form-header span{
     display: block;
-    color: #0284c7;
+    color: #ea580c;
     font-size: 13px;
     font-weight: 800;
     margin-bottom: 8px;
@@ -136,7 +136,7 @@
 }
 
 .input-group input:focus{
-    border-color: #0284c7;
+    border-color: #ea580c;
     box-shadow: 0 0 0 3px rgba(2, 132, 199, .12);
     outline: none;
 }
@@ -157,7 +157,7 @@
     height: 32px;
     border: 0;
     background: transparent;
-    color: #0284c7;
+    color: #ea580c;
     font-size: 12px;
     font-weight: 800;
     cursor: pointer;
@@ -175,7 +175,7 @@
 
 .login-options a,
 .registro-link a{
-    color: #0284c7;
+    color: #ea580c;
     text-decoration: none;
     font-weight: 800;
 }
@@ -211,7 +211,7 @@
 }
 
 .btn-login:hover{
-    background: #0284c7;
+    background: #ea580c;
 }
 
 .btn-login:active{

@@ -5,6 +5,8 @@ console.log("JS cargado");
 ========================= */
 document.addEventListener("DOMContentLoaded", () => {
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || "";
+
     /* ===== MENÚ MOBILE ===== */
     const menuToggle = document.getElementById("menuToggle");
     const menuPrincipal = document.getElementById("menuPrincipal");
@@ -73,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const formData = new FormData();
             formData.append("producto_id", productoId);
+            formData.append("csrf_token", csrfToken);
 
             fetch(BASE_URL + "toggle_favorito.php", {
                 method: "POST",
@@ -221,13 +224,13 @@ function mostrarMensajeCarrito(mensaje, ok) {
     aviso.classList.toggle("error", !ok);
     aviso.classList.add("visible");
 
-    clearTimeout(aviso.dataset.timer);
+    clearTimeout(aviso._timer);
 
     const timer = setTimeout(() => {
         aviso.classList.remove("visible");
     }, 2200);
 
-    aviso.dataset.timer = timer;
+    aviso._timer = timer;
 }
 
 function toggleCarrito() {

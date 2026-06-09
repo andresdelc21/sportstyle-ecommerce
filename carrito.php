@@ -21,7 +21,7 @@ function limpiarCompraActual(): void {
 }
 
 /* ===== TRAER PRODUCTOS MYSQL ===== */
-$sqlProductos = "SELECT * FROM productos";
+$sqlProductos = "SELECT * FROM productos WHERE activo = 1";
 $resultadoProductos = mysqli_query($conn, $sqlProductos);
 
 $productos = [];
@@ -103,7 +103,8 @@ foreach($_SESSION['carrito'] as $key => $cantidad){
     $cantidad = (int) $cantidad;
 
     if(!isset($productosPorId[$id]) || $cantidad <= 0){
-        unset($_SESSION['carrito'][$id]);
+        unset($_SESSION['carrito'][$key]);
+        $_SESSION['carrito_msg'] = 'Quitamos productos no disponibles de tu carrito.';
         continue;
     }
 

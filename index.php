@@ -19,6 +19,7 @@ $sqlCategoriasHome = "SELECT
                           SELECT p2.id
                           FROM productos p2
                           WHERE p2.categoria_id = categorias.id
+                          AND p2.activo = 1
                           ORDER BY p2.id DESC
                           LIMIT 1
                       )
@@ -55,6 +56,21 @@ $resultadoBanner = mysqli_query($conn, $sqlBanner);
 
 if($resultadoBanner && mysqli_num_rows($resultadoBanner) > 0){
     $bannerPrincipal = mysqli_fetch_assoc($resultadoBanner);
+}
+
+/* CARTEL SUPERIOR DE PROMOCIÓN */
+$promocionHome = null;
+
+$sqlPromocionHome = "SELECT *
+                     FROM promociones_home
+                     WHERE activo = 1
+                     ORDER BY id DESC
+                     LIMIT 1";
+
+$resultadoPromocionHome = mysqli_query($conn, $sqlPromocionHome);
+
+if($resultadoPromocionHome && mysqli_num_rows($resultadoPromocionHome) > 0){
+    $promocionHome = mysqli_fetch_assoc($resultadoPromocionHome);
 }
 
 /* FAVORITOS DEL USUARIO */
@@ -103,35 +119,29 @@ $heroEnlace = !empty($bannerPrincipal['enlace'])
 
 ?>
 
+<?php if($promocionHome): ?>
+    <section class="promo-ticker" aria-label="Promociones de SportStyle">
+        <div class="promo-ticker-track">
+            <?php for($i = 0; $i < 4; $i++): ?>
+                <span><?= htmlspecialchars($promocionHome['texto']) ?></span>
+            <?php endfor; ?>
+        </div>
+    </section>
+<?php endif; ?>
+
 <section class="hero"
          style="background: linear-gradient(90deg, rgba(15,23,42,.50), rgba(15,23,42,.26)), url('<?= htmlspecialchars($heroImagen) ?>') center/cover no-repeat;">
 
     <div class="hero-overlay"></div>
 
-    <aside class="hero-promo-rail hero-promo-left">
-
-        <article class="hero-promo-card hero-promo-dark">
-            <span class="promo-logo promo-logo-macro">Banco Macro</span>
-            <strong>6 cuotas</strong>
-            <p>Sin interés en selección deportiva.</p>
-        </article>
-
-        <article class="hero-promo-card hero-promo-light">
-            <span class="promo-logo promo-logo-transferencia">Transferencia</span>
-            <strong>10% OFF</strong>
-            <p>Validando comprobante.</p>
-        </article>
-
-    </aside>
-
     <div class="hero-contenido">
 
-        <span class="hero-badge">Promos de temporada</span>
+        <span class="hero-badge">Temporada actual</span>
 
-        <h1>Beneficios para comprar mejor</h1>
+        <h1><?= htmlspecialchars($heroTitulo) ?></h1>
 
         <p>
-            Hasta 30% OFF, cuotas y medios de pago para indumentaria, calzado y accesorios.
+            <?= htmlspecialchars($heroSubtitulo) ?>
         </p>
 
         <div class="hero-actions">
@@ -147,28 +157,6 @@ $heroEnlace = !empty($bannerPrincipal['enlace'])
         </div>
 
     </div>
-
-    <aside class="hero-promo-rail hero-promo-right">
-
-        <article class="hero-promo-card hero-promo-mp">
-            <span class="promo-logo promo-logo-mp">Mercado Pago</span>
-            <strong>Pagá como quieras</strong>
-            <p>Crédito, débito o dinero en cuenta.</p>
-        </article>
-
-        <article class="hero-promo-card hero-promo-envio">
-            <span class="promo-logo promo-logo-envio">Envíos</span>
-            <strong>
-                <?php if($envioGratisDesdeHome): ?>
-                    Gratis desde $<?= number_format($envioGratisDesdeHome, 0, ',', '.') ?>
-                <?php else: ?>
-                    Consultá tu zona
-                <?php endif; ?>
-            </strong>
-            <p>Según zona y disponibilidad.</p>
-        </article>
-
-    </aside>
 
 </section>
 

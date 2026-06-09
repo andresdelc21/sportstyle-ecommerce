@@ -27,7 +27,7 @@
 .cupon-box { margin: 15px 0; }
 .input-cupon { width: 100%; padding: 11px 15px; border: 2px solid #eee; border-radius: 10px; margin-bottom: 8px; font-size: 14px; outline: none; transition: 0.2s; }
 .input-cupon:focus { border-color: var(--verde); }
-.cupon-activo { background: #e0f2fe; padding: 12px; border-radius: 10px; font-size: 14px; border-left: 4px solid var(--verde); }
+.cupon-activo { background: #fff7d6; padding: 12px; border-radius: 10px; font-size: 14px; border-left: 4px solid var(--verde); }
 .cupon-activo a { color: #e53935; margin-left: 10px; text-decoration: none; font-weight: bold; }
 .cupon-error { color: #e53935; font-size: 13px; margin-top: 5px; }
 
@@ -426,7 +426,7 @@
     align-items:center;
     justify-content:center;
     font-size:30px;
-    background:#e0f2fe;
+    background:#fff7d6;
     border-radius:16px;
     margin-bottom:12px;
 }
@@ -550,7 +550,7 @@
     align-items:center;
     justify-content:center;
     border-radius:10px;
-    background:#e0f2fe;
+    background:#fff7d6;
     color:var(--verde-dark);
     font-weight:900;
 }
@@ -1019,7 +1019,7 @@
 }
 
 .btn-cantidad:hover {
-    background: #e0f2fe;
+    background: #fff7d6;
     color: #0369a1;
 }
 
@@ -1509,7 +1509,7 @@
     width: 24px;
     height: 24px;
     border-radius: 0;
-    background: #e0f2fe;
+    background: #fff7d6;
     font-size: 13px;
 }
 

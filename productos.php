@@ -11,12 +11,17 @@ include("config/conexion.php");
 $sql = "SELECT
             productos.*,
             categorias.nombre AS categoria_nombre,
-            marcas.nombre AS marca_nombre
+            subcategorias.nombre AS subcategoria_nombre,
+            marcas.nombre AS marca_nombre,
+            marcas.logo AS marca_logo
         FROM productos
         LEFT JOIN categorias
         ON productos.categoria_id = categorias.id
+        LEFT JOIN subcategorias
+        ON productos.subcategoria_id = subcategorias.id
         LEFT JOIN marcas
         ON productos.marca_id = marcas.id
+        WHERE productos.activo = 1
         ORDER BY productos.id DESC";
 
 $resultado = mysqli_query($conn, $sql);
@@ -75,8 +80,23 @@ while($cat = mysqli_fetch_assoc($resultadoCategorias)){
 
 }
 
+/* ===== TRAER SUBCATEGORÍAS ===== */
+$sqlSubcategorias = "SELECT * FROM subcategorias ORDER BY categoria_id ASC, nombre ASC";
+
+$resultadoSubcategorias = mysqli_query($conn, $sqlSubcategorias);
+
+$subcategorias = [];
+
+if($resultadoSubcategorias){
+    while($subcat = mysqli_fetch_assoc($resultadoSubcategorias)){
+        $subcategorias[] = $subcat;
+    }
+}
+
 /* ===== FILTROS ===== */
 $categoriaActiva = $_GET['categoria_id'] ?? 'todas';
+
+$subcategoriaActiva = $_GET['subcategoria_id'] ?? 'todas';
 
 $marcaActiva = $_GET['marca_id'] ?? 'todas';
 
@@ -91,6 +111,7 @@ $productosFiltrados = array_filter(
     $productos,
     function($p) use (
         $categoriaActiva,
+        $subcategoriaActiva,
         $marcaActiva,
         $generoActivo,
         $saleActivo,
@@ -102,6 +123,13 @@ $productosFiltrados = array_filter(
             $categoriaActiva === 'todas'
             ||
             $p['categoria_id'] == $categoriaActiva
+        );
+
+        $okSubcategoria =
+        (
+            $subcategoriaActiva === 'todas'
+            ||
+            $p['subcategoria_id'] == $subcategoriaActiva
         );
 
         $okMarca =
@@ -140,6 +168,8 @@ $productosFiltrados = array_filter(
 
         return
             $okCategoria
+            &&
+            $okSubcategoria
             &&
             $okMarca
             &&
@@ -202,7 +232,7 @@ function descuento(
 <div class="filtros">
 
     <a href="<?= $BASE ?>productos.php"
-       class="btn-filtro <?= $categoriaActiva === 'todas' ? 'activo' : '' ?>">
+       class="btn-filtro <?= $categoriaActiva === 'todas' && $subcategoriaActiva === 'todas' ? 'activo' : '' ?>">
 
        Todos
 
@@ -293,7 +323,15 @@ function descuento(
         <!-- ===== TAGS ===== -->
         <div class="card-v2-tags">
 
-            <?php if(!empty($p['categoria_nombre'])): ?>
+            <?php if(!empty($p['subcategoria_nombre'])): ?>
+
+                <span class="badge-categoria">
+
+                    <?= $p['subcategoria_nombre'] ?>
+
+                </span>
+
+            <?php elseif(!empty($p['categoria_nombre'])): ?>
 
                 <span class="badge-categoria">
 
@@ -307,7 +345,14 @@ function descuento(
 
                 <span class="badge-marca">
 
-                    <?= $p['marca_nombre'] ?>
+                    <?php if(!empty($p['marca_logo'])): ?>
+                        <span class="marca-logo-box">
+                            <img src="<?= $BASE . htmlspecialchars($p['marca_logo']) ?>"
+                                 alt="<?= htmlspecialchars($p['marca_nombre']) ?>">
+                        </span>
+                    <?php endif; ?>
+
+                    <?= htmlspecialchars($p['marca_nombre']) ?>
 
                 </span>
 

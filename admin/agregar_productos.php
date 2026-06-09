@@ -17,6 +17,24 @@ if(!isset($_SESSION['usuario_nombre'])){
 /* TRAER CATEGORÍAS */
 $sqlCategorias = "SELECT * FROM categorias ORDER BY nombre ASC";
 $resultadoCategorias = mysqli_query($conn, $sqlCategorias);
+$categorias = [];
+
+if($resultadoCategorias){
+    while($categoria = mysqli_fetch_assoc($resultadoCategorias)){
+        $categorias[] = $categoria;
+    }
+}
+
+/* TRAER SUBCATEGORÍAS */
+$sqlSubcategorias = "SELECT * FROM subcategorias ORDER BY categoria_id ASC, nombre ASC";
+$resultadoSubcategorias = mysqli_query($conn, $sqlSubcategorias);
+$subcategorias = [];
+
+if($resultadoSubcategorias){
+    while($subcategoria = mysqli_fetch_assoc($resultadoSubcategorias)){
+        $subcategorias[] = $subcategoria;
+    }
+}
 
 /* TRAER MARCAS */
 $sqlMarcas = "SELECT * FROM marcas ORDER BY nombre ASC";
@@ -44,19 +62,53 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $precio_original = (int) $_POST['precio_original'];
     $stock = (int) $_POST['stock'];
     $categoria_id = (int) $_POST['categoria_id'];
+    $subcategoria_id = !empty($_POST['subcategoria_id'])
+        ? (int) $_POST['subcategoria_id']
+        : null;
     $marca_id = (int) $_POST['marca_id'];
     $genero = trim($_POST['genero']);
+    $activo = isset($_POST['activo']) ? 1 : 0;
 
+    $imagenesSubidas = [];
     $imagen = "";
 
-    if(!$error && isset($_FILES['imagen']) && $_FILES['imagen']['error'] === 0){
+    if(!$error && isset($_FILES['imagenes'])){
 
-        $rutaImagen = guardarImagenSubida($_FILES['imagen'], $error);
+        $totalImagenes = count($_FILES['imagenes']['name']);
 
-        if($rutaImagen){
-            $imagen = $rutaImagen;
+        for($i = 0; $i < $totalImagenes; $i++){
+
+            if($_FILES['imagenes']['error'][$i] === UPLOAD_ERR_NO_FILE){
+                continue;
+            }
+
+            $archivo = [
+                'name' => $_FILES['imagenes']['name'][$i],
+                'type' => $_FILES['imagenes']['type'][$i],
+                'tmp_name' => $_FILES['imagenes']['tmp_name'][$i],
+                'error' => $_FILES['imagenes']['error'][$i],
+                'size' => $_FILES['imagenes']['size'][$i]
+            ];
+
+            $rutaImagen = guardarImagenSubida($archivo, $error);
+
+            if($rutaImagen){
+                $imagenesSubidas[] = $rutaImagen;
+            }
+
+            if($error){
+                break;
+            }
         }
 
+    }
+
+    if(!$error && empty($imagenesSubidas)){
+        $error = "Cargá al menos una imagen del producto.";
+    }
+
+    if(!$error){
+        $imagen = $imagenesSubidas[0];
     }
 
     if(!$error){
@@ -69,13 +121,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             precio_original,
             stock,
             categoria_id,
+            subcategoria_id,
             marca_id,
             genero,
-            imagen
+            imagen,
+            activo
         )
         VALUES
         (
-            ?,?,?,?,?,?,?,?,?
+            ?,?,?,?,?,?,?,?,?,?,?
         )";
 
         $stmt = mysqli_prepare($conn, $sql);
@@ -84,19 +138,48 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             mysqli_stmt_bind_param(
                 $stmt,
-                "ssiiiiiss",
+                "ssiiiiiissi",
                 $nombre,
                 $descripcion,
                 $precio,
                 $precio_original,
                 $stock,
                 $categoria_id,
+                $subcategoria_id,
                 $marca_id,
                 $genero,
-                $imagen
+                $imagen,
+                $activo
             );
 
             if(mysqli_stmt_execute($stmt)){
+                $productoId = mysqli_insert_id($conn);
+
+                foreach($imagenesSubidas as $orden => $rutaImagen){
+                    $principal = $orden === 0 ? 1 : 0;
+                    $ordenImagen = $orden + 1;
+
+                    $sqlImagen = "INSERT INTO imagenes_productos
+                                  (producto_id, imagen, orden, principal)
+                                  VALUES (?, ?, ?, ?)";
+
+                    $stmtImagen = mysqli_prepare($conn, $sqlImagen);
+
+                    if($stmtImagen){
+                        mysqli_stmt_bind_param(
+                            $stmtImagen,
+                            "isii",
+                            $productoId,
+                            $rutaImagen,
+                            $ordenImagen,
+                            $principal
+                        );
+
+                        mysqli_stmt_execute($stmtImagen);
+                        mysqli_stmt_close($stmtImagen);
+                    }
+                }
+
                 $success = "Producto agregado correctamente";
             } else {
                 $error = "Error al agregar producto";
@@ -250,19 +333,45 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                         <label>Categoría</label>
 
-                        <select name="categoria_id" required>
+                        <select name="categoria_id"
+                                id="categoriaSelect"
+                                required>
 
                             <option value="">
                                 Seleccionar categoría
                             </option>
 
-                            <?php while($categoria = mysqli_fetch_assoc($resultadoCategorias)): ?>
+                            <?php foreach($categorias as $categoria): ?>
 
                                 <option value="<?= $categoria['id'] ?>">
                                     <?= $categoria['nombre'] ?>
                                 </option>
 
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
+
+                        </select>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>Subcategoría</label>
+
+                        <select name="subcategoria_id"
+                                id="subcategoriaSelect">
+
+                            <option value="">
+                                Seleccionar subcategoría
+                            </option>
+
+                            <?php foreach($subcategorias as $subcategoria): ?>
+
+                                <option value="<?= (int) $subcategoria['id'] ?>"
+                                        data-categoria="<?= (int) $subcategoria['categoria_id'] ?>">
+                                    <?= htmlspecialchars($subcategoria['nombre']) ?>
+                                </option>
+
+                            <?php endforeach; ?>
 
                         </select>
 
@@ -320,12 +429,32 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                 <div class="input-group">
 
-                    <label>Imagen del producto</label>
+                    <label>Imágenes del producto</label>
 
                     <input type="file"
-                           name="imagen"
+                           name="imagenes[]"
                            accept="image/*"
+                           multiple
                            required>
+
+                    <small>
+                        La primera imagen queda como principal. Las demás se muestran como galería.
+                    </small>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label class="admin-check">
+                        <input type="checkbox"
+                               name="activo"
+                               checked>
+                        Visible en tienda
+                    </label>
+
+                    <small>
+                        Si lo desmarcás, queda guardado en el admin pero no aparece para clientes.
+                    </small>
 
                 </div>
 
@@ -361,5 +490,35 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 </div>
 <script src="../java/admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const categoriaSelect = document.getElementById('categoriaSelect');
+    const subcategoriaSelect = document.getElementById('subcategoriaSelect');
+
+    if(!categoriaSelect || !subcategoriaSelect){
+        return;
+    }
+
+    function filtrarSubcategorias(){
+        const categoriaId = categoriaSelect.value;
+
+        Array.from(subcategoriaSelect.options).forEach(function(option){
+            if(!option.value){
+                option.hidden = false;
+                return;
+            }
+
+            option.hidden = option.dataset.categoria !== categoriaId;
+        });
+
+        if(subcategoriaSelect.selectedOptions[0] && subcategoriaSelect.selectedOptions[0].hidden){
+            subcategoriaSelect.value = '';
+        }
+    }
+
+    categoriaSelect.addEventListener('change', filtrarSubcategorias);
+    filtrarSubcategorias();
+});
+</script>
 </body>
 </html>

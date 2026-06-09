@@ -32,6 +32,7 @@ if($producto_id <= 0){
 $sqlProducto = "SELECT *
                 FROM productos
                 WHERE id = ?
+                AND activo = 1
                 LIMIT 1";
 
 $stmtProducto = mysqli_prepare($conn, $sqlProducto);

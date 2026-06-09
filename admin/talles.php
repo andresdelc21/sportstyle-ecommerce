@@ -14,7 +14,11 @@ $productoId = (int) ($_GET['producto_id'] ?? $_POST['producto_id'] ?? 0);
 $mensaje = '';
 
 function tipoTalleAdmin($producto){
-    $texto = strtolower(($producto['categoria_nombre'] ?? '') . ' ' . ($producto['nombre'] ?? ''));
+    $texto = strtolower(
+        ($producto['categoria_nombre'] ?? '') . ' ' .
+        ($producto['subcategoria_nombre'] ?? '') . ' ' .
+        ($producto['nombre'] ?? '')
+    );
 
     if(strpos($texto, 'zapat') !== false || strpos($texto, 'calzado') !== false){
         return 'calzado';
@@ -24,7 +28,16 @@ function tipoTalleAdmin($producto){
         return 'medias';
     }
 
-    if(strpos($texto, 'remera') !== false || strpos($texto, 'buzo') !== false || strpos($texto, 'pantal') !== false || strpos($texto, 'short') !== false){
+    if(
+        strpos($texto, 'remera') !== false ||
+        strpos($texto, 'buzo') !== false ||
+        strpos($texto, 'campera') !== false ||
+        strpos($texto, 'conjunto') !== false ||
+        strpos($texto, 'pantal') !== false ||
+        strpos($texto, 'short') !== false ||
+        strpos($texto, 'camiseta') !== false ||
+        strpos($texto, 'calza') !== false
+    ){
         return 'indumentaria';
     }
 
@@ -118,7 +131,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         }
 
         if($accion === 'generar_sugeridos' && $productoId > 0){
-            $stmtProductoPreset = mysqli_prepare($conn, "SELECT productos.*, categorias.nombre AS categoria_nombre FROM productos LEFT JOIN categorias ON categorias.id = productos.categoria_id WHERE productos.id = ?");
+            $stmtProductoPreset = mysqli_prepare($conn, "SELECT
+                                                            productos.*,
+                                                            categorias.nombre AS categoria_nombre,
+                                                            subcategorias.nombre AS subcategoria_nombre
+                                                         FROM productos
+                                                         LEFT JOIN categorias
+                                                         ON categorias.id = productos.categoria_id
+                                                         LEFT JOIN subcategorias
+                                                         ON subcategorias.id = productos.subcategoria_id
+                                                         WHERE productos.id = ?");
             mysqli_stmt_bind_param($stmtProductoPreset, "i", $productoId);
             mysqli_stmt_execute($stmtProductoPreset);
             $productoPreset = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtProductoPreset));
@@ -155,7 +177,16 @@ $talles = null;
 $tipoProducto = 'general';
 
 if($productoId > 0){
-    $stmtProducto = mysqli_prepare($conn, "SELECT productos.*, categorias.nombre AS categoria_nombre FROM productos LEFT JOIN categorias ON categorias.id = productos.categoria_id WHERE productos.id = ?");
+    $stmtProducto = mysqli_prepare($conn, "SELECT
+                                            productos.*,
+                                            categorias.nombre AS categoria_nombre,
+                                            subcategorias.nombre AS subcategoria_nombre
+                                         FROM productos
+                                         LEFT JOIN categorias
+                                         ON categorias.id = productos.categoria_id
+                                         LEFT JOIN subcategorias
+                                         ON subcategorias.id = productos.subcategoria_id
+                                         WHERE productos.id = ?");
     mysqli_stmt_bind_param($stmtProducto, "i", $productoId);
     mysqli_stmt_execute($stmtProducto);
     $producto = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtProducto));

@@ -5,6 +5,7 @@ if(session_status() === PHP_SESSION_NONE){
 }
 
 require_once __DIR__ . "/config/conexion.php";
+require_once __DIR__ . "/includes/csrf.php";
 
 /* PROTEGER */
 if(!isset($_SESSION['usuario_id'])){
@@ -15,9 +16,14 @@ if(!isset($_SESSION['usuario_id'])){
 $usuario_id = (int) $_SESSION['usuario_id'];
 
 /* TOGGLE FAVORITO */
-if(isset($_GET['toggle'])){
+if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle'])){
 
-    $producto_id = (int) $_GET['toggle'];
+    if(!validarCsrf()){
+        header("Location: favoritos.php");
+        exit;
+    }
+
+    $producto_id = (int) $_POST['toggle'];
 
     $sqlCheck = "SELECT id FROM favoritos
                  WHERE usuario_id = ?
@@ -161,10 +167,13 @@ include("includes/header.php");
                        👁️ Ver
                     </a>
 
-                    <a href="favoritos.php?toggle=<?= $p['id'] ?>"
-                       class="btn-card">
-                       💔 Quitar
-                    </a>
+                    <form method="POST" class="form-inline-admin">
+                        <?= csrfInput() ?>
+                        <input type="hidden" name="toggle" value="<?= (int) $p['id'] ?>">
+                        <button type="submit" class="btn-card">
+                            Quitar
+                        </button>
+                    </form>
 
                 </div>
 

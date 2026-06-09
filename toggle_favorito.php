@@ -5,6 +5,7 @@ if(session_status() === PHP_SESSION_NONE){
 }
 
 require_once __DIR__ . "/config/conexion.php";
+require_once __DIR__ . "/includes/csrf.php";
 
 header("Content-Type: application/json");
 
@@ -14,6 +15,16 @@ if(!isset($_SESSION['usuario_id'])){
     echo json_encode([
         "ok" => false,
         "mensaje" => "Debes iniciar sesión para agregar favoritos"
+    ]);
+
+    exit;
+}
+
+if($_SERVER['REQUEST_METHOD'] !== 'POST' || !validarCsrf()){
+
+    echo json_encode([
+        "ok" => false,
+        "mensaje" => "Solicitud inválida"
     ]);
 
     exit;

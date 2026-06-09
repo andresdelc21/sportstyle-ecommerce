@@ -32,6 +32,35 @@ if(!isset($conn) || !$conn){
     exit;
 }
 
+$sqlUso = "SELECT COUNT(*) AS total
+           FROM detalle_pedidos
+           WHERE producto_id = ?";
+
+$stmtUso = mysqli_prepare($conn, $sqlUso);
+
+mysqli_stmt_bind_param($stmtUso, "i", $id);
+
+mysqli_stmt_execute($stmtUso);
+
+$uso = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUso));
+
+if((int) ($uso['total'] ?? 0) > 0){
+
+    $sqlOcultar = "UPDATE productos
+                   SET activo = 0
+                   WHERE id = ?";
+
+    $stmtOcultar = mysqli_prepare($conn, $sqlOcultar);
+
+    mysqli_stmt_bind_param($stmtOcultar, "i", $id);
+
+    mysqli_stmt_execute($stmtOcultar);
+
+    header("Location: productos.php?aviso=producto_con_pedidos");
+    exit;
+
+}
+
 $sql = "DELETE FROM productos WHERE id = ?";
 
 $stmt = mysqli_prepare($conn, $sql);
@@ -40,12 +69,13 @@ mysqli_stmt_bind_param($stmt, "i", $id);
 
 if(mysqli_stmt_execute($stmt)){
 
-    header("Location: productos.php");
+    header("Location: productos.php?aviso=producto_eliminado");
     exit;
 
 } else {
 
-    echo "Error al eliminar producto";
+    header("Location: productos.php?aviso=error_eliminar");
+    exit;
 
 }
 

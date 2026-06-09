@@ -17,10 +17,13 @@ if(!isset($_SESSION['usuario_nombre'])){
 $sql = "SELECT
             productos.*,
             categorias.nombre AS categoria_nombre,
+            subcategorias.nombre AS subcategoria_nombre,
             marcas.nombre AS marca_nombre
         FROM productos
         LEFT JOIN categorias
         ON productos.categoria_id = categorias.id
+        LEFT JOIN subcategorias
+        ON productos.subcategoria_id = subcategorias.id
         LEFT JOIN marcas
         ON productos.marca_id = marcas.id
         ORDER BY productos.id DESC";
@@ -37,6 +40,7 @@ while($fila = mysqli_fetch_assoc($resultado)){
 $totalProductos = count($productos);
 $stockBajo = 0;
 $sinStock = 0;
+$aviso = $_GET['aviso'] ?? '';
 
 foreach($productos as $p){
 
@@ -110,6 +114,20 @@ foreach($productos as $p){
 
         </section>
 
+        <?php if($aviso === 'producto_con_pedidos'): ?>
+            <div class="admin-alert">
+                El producto ya tiene pedidos asociados, por eso no se eliminó del historial. Se ocultó de la tienda para que no se venda más.
+            </div>
+        <?php elseif($aviso === 'producto_eliminado'): ?>
+            <div class="admin-alert">
+                Producto eliminado correctamente.
+            </div>
+        <?php elseif($aviso === 'error_eliminar'): ?>
+            <div class="admin-alert error-msg">
+                No se pudo eliminar el producto. Revisá si tiene datos asociados.
+            </div>
+        <?php endif; ?>
+
         <!-- RESUMEN -->
         <div class="admin-metricas mini-metricas">
 
@@ -181,6 +199,7 @@ foreach($productos as $p){
                         <th>Marca</th>
                         <th>Precio</th>
                         <th>Stock</th>
+                        <th>Visible</th>
                         <th>Acciones</th>
 
                     </tr>
@@ -224,6 +243,14 @@ foreach($productos as $p){
 
                             <td>
                                 <?= $p['categoria_nombre'] ?? 'Sin categoría' ?>
+
+                                <?php if(!empty($p['subcategoria_nombre'])): ?>
+
+                                    <small style="display:block; color:#64748b; margin-top:4px;">
+                                        <?= htmlspecialchars($p['subcategoria_nombre']) ?>
+                                    </small>
+
+                                <?php endif; ?>
                             </td>
 
                             <td>
@@ -258,6 +285,12 @@ foreach($productos as $p){
 
                                 <?php endif; ?>
 
+                            </td>
+
+                            <td>
+                                <span class="estado <?= (int) ($p['activo'] ?? 1) === 1 ? 'pagado' : 'cancelado' ?>">
+                                    <?= (int) ($p['activo'] ?? 1) === 1 ? 'Sí' : 'Oculto' ?>
+                                </span>
                             </td>
 
                             <td class="acciones-tabla">
@@ -299,7 +332,7 @@ foreach($productos as $p){
 
                     <tr>
 
-                        <td colspan="7"
+                        <td colspan="8"
                             style="text-align:center; padding:30px;">
 
                             No hay productos cargados

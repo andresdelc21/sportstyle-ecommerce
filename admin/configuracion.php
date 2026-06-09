@@ -2,6 +2,7 @@
 session_start();
 
 require_once __DIR__ . "/includes/auth_admin.php";
+require_once __DIR__ . "/includes/csrf.php";
 require_once __DIR__ . "/../config/conexion.php";
 if(!isset($_SESSION['usuario_nombre'])){ header("Location: ../login.php"); exit; }
 
@@ -21,6 +22,11 @@ $claves = [
 ];
 
 if($_SERVER['REQUEST_METHOD']==='POST'){
+    if(!validarCsrf()){
+        header("Location: configuracion.php");
+        exit;
+    }
+
     foreach($claves as $clave => $label){
         $valor = trim($_POST[$clave] ?? '');
         $stmt = mysqli_prepare($conn, "INSERT INTO configuracion_tienda (clave, valor) VALUES (?, ?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)");
@@ -39,7 +45,7 @@ while($fila = mysqli_fetch_assoc($res)){ $valores[$fila['clave']] = $fila['valor
 <body class="admin-body"><div class="admin-container"><?php include("includes/sidebar.php"); ?><main class="admin-content">
 <section class="admin-hero small-hero"><div><span class="admin-badge">Tienda</span><h1>Configuración</h1><p>Datos comerciales, redes y credenciales principales.</p></div></section>
 <?php if(isset($_GET['ok'])): ?><div class="admin-alert success-msg">Configuración guardada.</div><?php endif; ?>
-<section class="pedido-panel"><form method="POST" class="form-admin-premium"><div class="admin-grid">
-<?php foreach($claves as $clave => $label): ?><div class="input-group"><label><?= htmlspecialchars($label) ?></label><input name="<?= $clave ?>" value="<?= htmlspecialchars($valores[$clave] ?? '') ?>"></div><?php endforeach; ?>
+<section class="pedido-panel"><form method="POST" class="form-admin-premium"><?= csrfInput() ?><div class="admin-grid">
+<?php foreach($claves as $clave => $label): ?><div class="input-group"><label><?= htmlspecialchars($label) ?></label><input type="<?= $clave === 'MP_ACCESS_TOKEN' ? 'password' : 'text' ?>" name="<?= $clave ?>" value="<?= htmlspecialchars($valores[$clave] ?? '') ?>" autocomplete="<?= $clave === 'MP_ACCESS_TOKEN' ? 'new-password' : 'off' ?>"></div><?php endforeach; ?>
 </div><button class="btn-admin-agregar" type="submit">Guardar configuración</button></form></section>
 </main></div></body></html>

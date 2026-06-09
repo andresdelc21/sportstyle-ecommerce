@@ -10,7 +10,7 @@ include_once(__DIR__ . "/../data/carrito_helpers.php");
 $BASE = "/sportstyle/";
 $carrito = $_SESSION['carrito'] ?? [];
 
-$sqlProductos = "SELECT * FROM productos";
+$sqlProductos = "SELECT * FROM productos WHERE activo = 1";
 $resultadoProductos = mysqli_query($conn, $sqlProductos);
 
 $productos = [];

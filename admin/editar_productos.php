@@ -25,6 +25,28 @@ $id = (int) $_GET['id'];
 $success = "";
 $error = "";
 
+/* TRAER CATEGORÍAS */
+$sqlCategorias = "SELECT * FROM categorias ORDER BY nombre ASC";
+$resultadoCategorias = mysqli_query($conn, $sqlCategorias);
+$categorias = [];
+
+if($resultadoCategorias){
+    while($categoriaFila = mysqli_fetch_assoc($resultadoCategorias)){
+        $categorias[] = $categoriaFila;
+    }
+}
+
+/* TRAER SUBCATEGORÍAS */
+$sqlSubcategorias = "SELECT * FROM subcategorias ORDER BY categoria_id ASC, nombre ASC";
+$resultadoSubcategorias = mysqli_query($conn, $sqlSubcategorias);
+$subcategorias = [];
+
+if($resultadoSubcategorias){
+    while($subcategoriaFila = mysqli_fetch_assoc($resultadoSubcategorias)){
+        $subcategorias[] = $subcategoriaFila;
+    }
+}
+
 /* ACCIONES IMÁGENES */
 if(isset($_GET['principal'])){
 
@@ -35,16 +57,25 @@ if(isset($_GET['principal'])){
 
     $img_id = (int) $_GET['principal'];
 
-    mysqli_query($conn, "UPDATE imagenes_productos SET principal = 0 WHERE producto_id = $id");
-    mysqli_query($conn, "UPDATE imagenes_productos SET principal = 1 WHERE id = $img_id AND producto_id = $id");
+    $stmtResetPrincipal = mysqli_prepare($conn, "UPDATE imagenes_productos SET principal = 0 WHERE producto_id = ?");
+    mysqli_stmt_bind_param($stmtResetPrincipal, "i", $id);
+    mysqli_stmt_execute($stmtResetPrincipal);
 
-    $sqlPrincipal = "SELECT imagen FROM imagenes_productos WHERE id = $img_id AND producto_id = $id";
-    $resPrincipal = mysqli_query($conn, $sqlPrincipal);
+    $stmtNuevaPrincipal = mysqli_prepare($conn, "UPDATE imagenes_productos SET principal = 1 WHERE id = ? AND producto_id = ?");
+    mysqli_stmt_bind_param($stmtNuevaPrincipal, "ii", $img_id, $id);
+    mysqli_stmt_execute($stmtNuevaPrincipal);
+
+    $stmtPrincipal = mysqli_prepare($conn, "SELECT imagen FROM imagenes_productos WHERE id = ? AND producto_id = ?");
+    mysqli_stmt_bind_param($stmtPrincipal, "ii", $img_id, $id);
+    mysqli_stmt_execute($stmtPrincipal);
+    $resPrincipal = mysqli_stmt_get_result($stmtPrincipal);
     $imgPrincipal = mysqli_fetch_assoc($resPrincipal);
 
     if($imgPrincipal){
         $rutaPrincipal = $imgPrincipal['imagen'];
-        mysqli_query($conn, "UPDATE productos SET imagen = '$rutaPrincipal' WHERE id = $id");
+        $stmtProductoPrincipal = mysqli_prepare($conn, "UPDATE productos SET imagen = ? WHERE id = ?");
+        mysqli_stmt_bind_param($stmtProductoPrincipal, "si", $rutaPrincipal, $id);
+        mysqli_stmt_execute($stmtProductoPrincipal);
     }
 
     header("Location: editar_productos.php?id=$id");
@@ -60,29 +91,45 @@ if(isset($_GET['eliminar_img'])){
 
     $img_id = (int) $_GET['eliminar_img'];
 
-    $sqlImg = "SELECT imagen, principal FROM imagenes_productos WHERE id = $img_id AND producto_id = $id";
-    $resImg = mysqli_query($conn, $sqlImg);
+    $stmtImg = mysqli_prepare($conn, "SELECT imagen, principal FROM imagenes_productos WHERE id = ? AND producto_id = ?");
+    mysqli_stmt_bind_param($stmtImg, "ii", $img_id, $id);
+    mysqli_stmt_execute($stmtImg);
+    $resImg = mysqli_stmt_get_result($stmtImg);
     $imgData = mysqli_fetch_assoc($resImg);
 
     if($imgData){
 
         $rutaArchivo = "../" . $imgData['imagen'];
+        $rutaReal = realpath($rutaArchivo);
+        $raizProyecto = realpath(__DIR__ . "/..");
 
-        if(file_exists($rutaArchivo)){
-            unlink($rutaArchivo);
+        if($rutaReal && $raizProyecto && strpos($rutaReal, $raizProyecto) === 0){
+            unlink($rutaReal);
         }
 
-        mysqli_query($conn, "DELETE FROM imagenes_productos WHERE id = $img_id AND producto_id = $id");
+        $stmtDeleteImg = mysqli_prepare($conn, "DELETE FROM imagenes_productos WHERE id = ? AND producto_id = ?");
+        mysqli_stmt_bind_param($stmtDeleteImg, "ii", $img_id, $id);
+        mysqli_stmt_execute($stmtDeleteImg);
 
         if($imgData['principal'] == 1){
 
-            $sqlNueva = "SELECT * FROM imagenes_productos WHERE producto_id = $id ORDER BY orden ASC, id ASC LIMIT 1";
-            $resNueva = mysqli_query($conn, $sqlNueva);
+            $stmtNueva = mysqli_prepare($conn, "SELECT * FROM imagenes_productos WHERE producto_id = ? ORDER BY orden ASC, id ASC LIMIT 1");
+            mysqli_stmt_bind_param($stmtNueva, "i", $id);
+            mysqli_stmt_execute($stmtNueva);
+            $resNueva = mysqli_stmt_get_result($stmtNueva);
             $nueva = mysqli_fetch_assoc($resNueva);
 
             if($nueva){
-                mysqli_query($conn, "UPDATE imagenes_productos SET principal = 1 WHERE id = {$nueva['id']}");
-                mysqli_query($conn, "UPDATE productos SET imagen = '{$nueva['imagen']}' WHERE id = $id");
+                $nuevaId = (int) $nueva['id'];
+                $nuevaImagen = $nueva['imagen'];
+
+                $stmtSetPrincipal = mysqli_prepare($conn, "UPDATE imagenes_productos SET principal = 1 WHERE id = ?");
+                mysqli_stmt_bind_param($stmtSetPrincipal, "i", $nuevaId);
+                mysqli_stmt_execute($stmtSetPrincipal);
+
+                $stmtSetProducto = mysqli_prepare($conn, "UPDATE productos SET imagen = ? WHERE id = ?");
+                mysqli_stmt_bind_param($stmtSetProducto, "si", $nuevaImagen, $id);
+                mysqli_stmt_execute($stmtSetProducto);
             }
 
         }
@@ -124,7 +171,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $precio_original = (float) $_POST['precio_original'];
     $stock = (int) $_POST['stock'];
     $categoria = (int) $_POST['categoria'];
+    $subcategoria = !empty($_POST['subcategoria'])
+        ? (int) $_POST['subcategoria']
+        : null;
     $genero = trim($_POST['genero']);
+    $activo = isset($_POST['activo']) ? 1 : 0;
 
     $imagen = $producto['imagen'];
 
@@ -149,16 +200,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                 if($rutaBD){
 
-                    $sqlOrden = "SELECT COALESCE(MAX(orden), 0) + 1 AS nuevo_orden
-                                 FROM imagenes_productos
-                                 WHERE producto_id = $id";
-
-                    $resOrden = mysqli_query($conn, $sqlOrden);
+                    $stmtOrden = mysqli_prepare($conn, "SELECT COALESCE(MAX(orden), 0) + 1 AS nuevo_orden FROM imagenes_productos WHERE producto_id = ?");
+                    mysqli_stmt_bind_param($stmtOrden, "i", $id);
+                    mysqli_stmt_execute($stmtOrden);
+                    $resOrden = mysqli_stmt_get_result($stmtOrden);
                     $ordenData = mysqli_fetch_assoc($resOrden);
                     $orden = (int) $ordenData['nuevo_orden'];
 
-                    $sqlTieneImagenes = "SELECT COUNT(*) AS total FROM imagenes_productos WHERE producto_id = $id";
-                    $resTieneImagenes = mysqli_query($conn, $sqlTieneImagenes);
+                    $stmtTieneImagenes = mysqli_prepare($conn, "SELECT COUNT(*) AS total FROM imagenes_productos WHERE producto_id = ?");
+                    mysqli_stmt_bind_param($stmtTieneImagenes, "i", $id);
+                    mysqli_stmt_execute($stmtTieneImagenes);
+                    $resTieneImagenes = mysqli_stmt_get_result($stmtTieneImagenes);
                     $dataTieneImagenes = mysqli_fetch_assoc($resTieneImagenes);
 
                     $principal = ($dataTieneImagenes['total'] == 0) ? 1 : 0;
@@ -209,23 +261,27 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             precio_original = ?,
             stock = ?,
             categoria_id = ?,
+            subcategoria_id = ?,
             genero = ?,
-            imagen = ?
+            imagen = ?,
+            activo = ?
             WHERE id = ?";
 
         $stmtUpdate = mysqli_prepare($conn, $update);
 
         mysqli_stmt_bind_param(
             $stmtUpdate,
-            "ssddiissi",
+            "ssddiiissii",
             $nombre,
             $descripcion,
             $precio,
             $precio_original,
             $stock,
             $categoria,
+            $subcategoria,
             $genero,
             $imagen,
+            $activo,
             $id
         );
 
@@ -239,8 +295,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $producto['precio_original'] = $precio_original;
             $producto['stock'] = $stock;
             $producto['categoria_id'] = $categoria;
+            $producto['subcategoria_id'] = $subcategoria;
             $producto['genero'] = $genero;
             $producto['imagen'] = $imagen;
+            $producto['activo'] = $activo;
 
         } else {
 
@@ -371,23 +429,47 @@ $imagenesProducto = mysqli_stmt_get_result($stmtImagenes);
 
                     <label>Categoría</label>
 
-                    <select name="categoria" required>
+                    <select name="categoria"
+                            id="categoriaSelect"
+                            required>
 
-                        <option value="1" <?= $producto['categoria_id'] == 1 ? 'selected' : '' ?>>
-                            Calzado
+                        <option value="">
+                            Seleccionar categoría
                         </option>
 
-                        <option value="2" <?= $producto['categoria_id'] == 2 ? 'selected' : '' ?>>
-                            Remeras
+                        <?php foreach($categorias as $categoria): ?>
+
+                            <option value="<?= (int) $categoria['id'] ?>"
+                                <?= (int) $producto['categoria_id'] === (int) $categoria['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($categoria['nombre']) ?>
+                            </option>
+
+                        <?php endforeach; ?>
+
+                    </select>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>Subcategoría</label>
+
+                    <select name="subcategoria"
+                            id="subcategoriaSelect">
+
+                        <option value="">
+                            Seleccionar subcategoría
                         </option>
 
-                        <option value="3" <?= $producto['categoria_id'] == 3 ? 'selected' : '' ?>>
-                            Pantalones / Shorts
-                        </option>
+                        <?php foreach($subcategorias as $subcategoriaFila): ?>
 
-                        <option value="4" <?= $producto['categoria_id'] == 4 ? 'selected' : '' ?>>
-                            Accesorios
-                        </option>
+                            <option value="<?= (int) $subcategoriaFila['id'] ?>"
+                                    data-categoria="<?= (int) $subcategoriaFila['categoria_id'] ?>"
+                                <?= (int) ($producto['subcategoria_id'] ?? 0) === (int) $subcategoriaFila['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($subcategoriaFila['nombre']) ?>
+                            </option>
+
+                        <?php endforeach; ?>
 
                     </select>
 
@@ -425,6 +507,21 @@ $imagenesProducto = mysqli_stmt_get_result($stmtImagenes);
                        name="imagenes[]"
                        accept="image/*"
                        multiple>
+
+            </div>
+
+            <div class="input-group">
+
+                <label class="admin-check">
+                    <input type="checkbox"
+                           name="activo"
+                           <?= (int) ($producto['activo'] ?? 1) === 1 ? 'checked' : '' ?>>
+                    Visible en tienda
+                </label>
+
+                <small>
+                    Si lo ocultás, no aparece en la tienda pero se conserva para pedidos anteriores.
+                </small>
 
             </div>
 
@@ -509,5 +606,35 @@ $imagenesProducto = mysqli_stmt_get_result($stmtImagenes);
 
 </div>
 <script src="../java/admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const categoriaSelect = document.getElementById('categoriaSelect');
+    const subcategoriaSelect = document.getElementById('subcategoriaSelect');
+
+    if(!categoriaSelect || !subcategoriaSelect){
+        return;
+    }
+
+    function filtrarSubcategorias(){
+        const categoriaId = categoriaSelect.value;
+
+        Array.from(subcategoriaSelect.options).forEach(function(option){
+            if(!option.value){
+                option.hidden = false;
+                return;
+            }
+
+            option.hidden = option.dataset.categoria !== categoriaId;
+        });
+
+        if(subcategoriaSelect.selectedOptions[0] && subcategoriaSelect.selectedOptions[0].hidden){
+            subcategoriaSelect.value = '';
+        }
+    }
+
+    categoriaSelect.addEventListener('change', filtrarSubcategorias);
+    filtrarSubcategorias();
+});
+</script>
 </body>
 </html>

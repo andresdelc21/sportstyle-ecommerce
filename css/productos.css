@@ -109,7 +109,42 @@
 .card-v2-info { padding: 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .card-v2-tags { display: flex; gap: 5px; flex-wrap: wrap; }
 
-.badge-categoria { display: inline-block; background: #e0f2fe; color: var(--verde-dark); font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; }
+.badge-categoria { display: inline-block; background: #fff7d6; color: var(--verde-dark); font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; }
+.badge-marca {
+    min-height: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8fafc;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 20px;
+    text-transform: uppercase;
+}
+
+.badge-marca .marca-logo-box {
+    width: 38px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 3px;
+}
+
+.badge-marca .marca-logo-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
 .badge-genero   { display: inline-block; background: #fff7ed; color: var(--naranja);    font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; }
 
 .card-v2-nombre { font-size: 15px; font-weight: 800; line-height: 1.3; color: var(--texto); }
@@ -172,7 +207,7 @@
     transition: 0.3s;
 }
 .btn-genero:hover { border-color: var(--naranja); color: var(--naranja); }
-.btn-genero.activo { background: var(--naranja); color: white; border-color: var(--naranja); }
+.btn-genero.activo { background: var(--naranja); color: #111111; border-color: var(--naranja); }
 
 .filtros { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 10px 40px 25px; }
 
@@ -197,7 +232,7 @@
 
 .productos-badge{
     display:inline-block;
-    background:#e0f2fe;
+    background:#fff7d6;
     color:var(--verde-dark);
     padding:8px 14px;
     border-radius:999px;
@@ -272,10 +307,14 @@
 
 .card-v2-img {
     height: 190px;
+    padding: 12px;
 }
 
 .card-v2-img img {
-    max-height: 158px;
+    width: 100%;
+    height: 100%;
+    max-height: 176px;
+    object-fit: contain;
     transform: none;
 }
 
@@ -359,10 +398,11 @@
 
     .card-v2-img {
         height: 160px;
+        padding: 10px;
     }
 
     .card-v2-img img {
-        max-height: 132px;
+        max-height: 146px;
     }
 
     .productos-header h1,

@@ -30,7 +30,7 @@ if(!isset($_SESSION['usuario_id'])){
 }
 
 /* TRAER PRODUCTOS */
-$sqlProductos = "SELECT * FROM productos";
+$sqlProductos = "SELECT * FROM productos WHERE activo = 1";
 $resultadoProductos = mysqli_query($conn, $sqlProductos);
 
 $productos = [];
@@ -39,12 +39,29 @@ while($fila = mysqli_fetch_assoc($resultadoProductos)){
     $productos[] = $fila;
 }
 
+$productosPorId = [];
+
+foreach($productos as $producto){
+    $productosPorId[(int) $producto['id']] = $producto;
+}
+
 $tallesPorId = [];
 $resultadoTallesCheckout = mysqli_query($conn, "SELECT * FROM producto_talles");
 
 if($resultadoTallesCheckout){
     while($talleCheckout = mysqli_fetch_assoc($resultadoTallesCheckout)){
         $tallesPorId[(int) $talleCheckout['id']] = $talleCheckout;
+    }
+}
+
+if(isset($_SESSION['carrito'])){
+    foreach($_SESSION['carrito'] as $key => $cantidad){
+        $productoIdCarrito = carritoProductoId($key);
+
+        if(!isset($productosPorId[$productoIdCarrito]) || (int) $cantidad <= 0){
+            unset($_SESSION['carrito'][$key]);
+            $_SESSION['carrito_msg'] = 'Quitamos productos no disponibles de tu carrito.';
+        }
     }
 }
 

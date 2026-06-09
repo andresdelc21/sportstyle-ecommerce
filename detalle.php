@@ -11,13 +11,18 @@ $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $sql = "SELECT
             productos.*,
             categorias.nombre AS categoria_nombre,
-            marcas.nombre AS marca_nombre
+            subcategorias.nombre AS subcategoria_nombre,
+            marcas.nombre AS marca_nombre,
+            marcas.logo AS marca_logo
         FROM productos
         LEFT JOIN categorias
         ON productos.categoria_id = categorias.id
+        LEFT JOIN subcategorias
+        ON productos.subcategoria_id = subcategorias.id
         LEFT JOIN marcas
         ON productos.marca_id = marcas.id
-        WHERE productos.id = ?";
+        WHERE productos.id = ?
+        AND productos.activo = 1";
 
 $stmt = mysqli_prepare($conn, $sql);
 
@@ -54,9 +59,15 @@ while($img = mysqli_fetch_assoc($resultadoImagenes)){
     $imagenes[] = $img['imagen'];
 }
 
-/* SI NO HAY IMÁGENES EXTRA, USA LA IMAGEN NORMAL DEL PRODUCTO */
+/* Incluye la imagen principal y evita duplicados para mostrar todos los ángulos cargados. */
+if(!empty($producto['imagen'])){
+    array_unshift($imagenes, $producto['imagen']);
+}
+
+$imagenes = array_values(array_unique(array_filter($imagenes)));
+
 if(empty($imagenes)){
-    $imagenes[] = $producto['imagen'];
+    $imagenes[] = 'img/banner.png';
 }
 
 $producto['imagenes'] = $imagenes;
@@ -88,7 +99,11 @@ if(!empty($tallesProducto)){
 }
 
 function tipoTalleProducto($producto){
-    $texto = strtolower(($producto['categoria_nombre'] ?? '') . ' ' . ($producto['nombre'] ?? ''));
+    $texto = strtolower(
+        ($producto['categoria_nombre'] ?? '') . ' ' .
+        ($producto['subcategoria_nombre'] ?? '') . ' ' .
+        ($producto['nombre'] ?? '')
+    );
 
     if(strpos($texto, 'zapat') !== false || strpos($texto, 'calzado') !== false){
         return 'calzado';
@@ -98,7 +113,16 @@ function tipoTalleProducto($producto){
         return 'medias';
     }
 
-    if(strpos($texto, 'remera') !== false || strpos($texto, 'buzo') !== false || strpos($texto, 'pantal') !== false || strpos($texto, 'short') !== false){
+    if(
+        strpos($texto, 'remera') !== false ||
+        strpos($texto, 'buzo') !== false ||
+        strpos($texto, 'campera') !== false ||
+        strpos($texto, 'conjunto') !== false ||
+        strpos($texto, 'pantal') !== false ||
+        strpos($texto, 'short') !== false ||
+        strpos($texto, 'camiseta') !== false ||
+        strpos($texto, 'calza') !== false
+    ){
         return 'indumentaria';
     }
 
@@ -179,41 +203,56 @@ $desc = descuento(
 
     <div class="detalle-img">
 
-    <img id="img-principal"
-         src="<?= $producto['imagenes'][0] ?>"
-         alt="<?= $producto['nombre'] ?>">
+        <div class="detalle-galeria-producto">
 
-    <?php if($producto['stock'] <= 0): ?>
+            <div class="miniaturas" aria-label="Imágenes del producto">
 
-        <span class="stock-overlay detalle-stock-overlay">
-            Sin stock
-        </span>
+                <?php foreach($producto['imagenes'] as $index => $img): ?>
 
-    <?php endif; ?>
+                    <button type="button"
+                            class="miniatura-producto <?= $index === 0 ? 'activa' : '' ?>"
+                            data-img="<?= htmlspecialchars($img) ?>"
+                            data-alt="<?= htmlspecialchars($producto['nombre']) ?>">
 
-    <?php if(count($producto['imagenes']) > 1): ?>
+                        <img src="<?= htmlspecialchars($img) ?>"
+                             alt="<?= htmlspecialchars($producto['nombre']) ?>">
 
-        <div class="miniaturas">
+                    </button>
 
-            <?php foreach($producto['imagenes'] as $img): ?>
+                <?php endforeach; ?>
 
-                <img src="<?= htmlspecialchars($img) ?>"
-     alt="<?= htmlspecialchars($producto['nombre']) ?>"
-     class="miniatura-producto"
-     data-img="<?= htmlspecialchars($img) ?>">
+            </div>
 
-            <?php endforeach; ?>
+            <button type="button"
+                    class="detalle-imagen-principal"
+                    aria-label="Ampliar imagen del producto">
+
+                <img id="img-principal"
+                     src="<?= htmlspecialchars($producto['imagenes'][0]) ?>"
+                     alt="<?= htmlspecialchars($producto['nombre']) ?>">
+
+                <span class="detalle-zoom-hint" aria-hidden="true">
+                    +
+                </span>
+
+                <?php if($producto['stock'] <= 0): ?>
+
+                    <span class="stock-overlay detalle-stock-overlay">
+                        Sin stock
+                    </span>
+
+                <?php endif; ?>
+
+            </button>
 
         </div>
 
-    <?php endif; ?>
-
-</div>
+    </div>
 
     <div class="detalle-info">
 
         <span class="detalle-categoria">
-            <?= $producto['categoria_nombre'] ?>
+            <?= htmlspecialchars($producto['subcategoria_nombre'] ?: $producto['categoria_nombre']) ?>
         </span>
 
         <h1>
@@ -224,10 +263,20 @@ $desc = descuento(
             Calificación <?= number_format($producto['rating'] ?? 5, 1, ',', '.') ?>/5
         </p>
 
-        <p>
-            <strong>Marca:</strong>
-            <?= $producto['marca_nombre'] ?? 'Sin marca' ?>
-        </p>
+        <div class="detalle-marca">
+            <span>Marca</span>
+
+            <strong>
+                <?php if(!empty($producto['marca_logo'])): ?>
+                    <span class="marca-logo-box">
+                        <img src="<?= htmlspecialchars($producto['marca_logo']) ?>"
+                             alt="<?= htmlspecialchars($producto['marca_nombre']) ?>">
+                    </span>
+                <?php endif; ?>
+
+                <?= htmlspecialchars($producto['marca_nombre'] ?? 'Sin marca') ?>
+            </strong>
+        </div>
 
         <div class="detalle-precio">
 
@@ -268,23 +317,29 @@ $desc = descuento(
             <?= $producto['genero'] ?>
         </p>
 
-        <section class="guia-talles">
+        <details class="guia-talles">
 
-            <div class="guia-talles-header">
+            <summary class="guia-talles-header">
 
-                <h3>Guía de talles</h3>
+                <span>
+                    Guía de talles
+                </span>
+
+                <strong>
+                    Ver tabla
+                </strong>
 
                 <?php if($tipoTalle === 'calzado'): ?>
                     <p>Referencia orientativa. Para calzado, medí tu pie desde el talón hasta la punta.</p>
                 <?php elseif($tipoTalle === 'indumentaria'): ?>
-                    <p>Referencia orientativa para remeras, buzos, pantalones y shorts.</p>
+                    <p>Referencia orientativa para remeras, buzos, camperas, conjuntos, pantalones y shorts.</p>
                 <?php elseif($tipoTalle === 'medias'): ?>
                     <p>Las medias suelen agruparse por rango de calzado. Revisá el rango indicado.</p>
                 <?php else: ?>
                     <p>Referencia orientativa. Verificá el talle disponible antes de agregar al carrito.</p>
                 <?php endif; ?>
 
-            </div>
+            </summary>
 
             <div class="guia-talles-tabla">
 
@@ -325,7 +380,7 @@ $desc = descuento(
                 Si estás entre dos talles, elegí el mayor para más comodidad.
             </p>
 
-        </section>
+        </details>
 
         <?php if(!empty($tallesProducto)): ?>
 
@@ -462,6 +517,8 @@ $desc = descuento(
         <form method="POST"
       action="agregar_review.php"
       class="review-form review-form-premium">
+
+    <?= csrfInput() ?>
 
     <input type="hidden"
            name="producto_id"
@@ -655,7 +712,8 @@ $desc = descuento(
     </div>
 
 <div class="zoom-overlay" id="zoomOverlay">
-    <img id="zoomImage" src="">
+    <button type="button" class="zoom-cerrar" id="zoomCerrar" aria-label="Cerrar zoom">Cerrar</button>
+    <img id="zoomImage" src="" alt="">
 </div>
 </section>
 <script src="java/detalle.js"></script>

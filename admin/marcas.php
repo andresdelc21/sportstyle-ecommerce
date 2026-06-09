@@ -1,16 +1,205 @@
 <?php
+
 session_start();
 
-require_once __DIR__ . "/includes/auth_admin.php"; require_once __DIR__ . "/includes/csrf.php"; require_once __DIR__ . "/../config/conexion.php";
-if(!isset($_SESSION['usuario_nombre'])){ header("Location: ../login.php"); exit; }
-$editando=null; $mensaje='';
-if(isset($_GET['editar'])){ $id=(int)$_GET['editar']; $stmt=mysqli_prepare($conn,"SELECT * FROM marcas WHERE id=?"); mysqli_stmt_bind_param($stmt,"i",$id); mysqli_stmt_execute($stmt); $res=mysqli_stmt_get_result($stmt); $editando=mysqli_fetch_assoc($res); }
-if($_SERVER['REQUEST_METHOD']==='POST'){ if(!validarCsrf()){ header("Location: marcas.php"); exit; } $accion=$_POST['accion']??'guardar'; $id=(int)($_POST['id']??0); if($accion==='eliminar' && $id>0){ $stmtUso=mysqli_prepare($conn,"SELECT COUNT(*) AS total FROM productos WHERE marca_id=?"); mysqli_stmt_bind_param($stmtUso,"i",$id); mysqli_stmt_execute($stmtUso); $uso=mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUso))['total']; if($uso==0){ $stmtDel=mysqli_prepare($conn,"DELETE FROM marcas WHERE id=?"); mysqli_stmt_bind_param($stmtDel,"i",$id); mysqli_stmt_execute($stmtDel); header("Location: marcas.php"); exit; } else { $mensaje='No se puede eliminar una marca con productos asociados.'; } } $nombre=trim($_POST['nombre']??''); $logo=trim($_POST['logo']??''); if($accion==='guardar' && $nombre){ if($id>0){$stmt=mysqli_prepare($conn,"UPDATE marcas SET nombre=?, logo=? WHERE id=?"); mysqli_stmt_bind_param($stmt,"ssi",$nombre,$logo,$id);}else{$stmt=mysqli_prepare($conn,"INSERT INTO marcas (nombre, logo) VALUES (?, ?)"); mysqli_stmt_bind_param($stmt,"ss",$nombre,$logo);} mysqli_stmt_execute($stmt); header("Location: marcas.php"); exit; } }
-$marcas=mysqli_query($conn,"SELECT m.*, COUNT(p.id) AS productos FROM marcas m LEFT JOIN productos p ON p.marca_id=m.id GROUP BY m.id ORDER BY m.nombre ASC");
+require_once __DIR__ . "/includes/auth_admin.php";
+require_once __DIR__ . "/includes/csrf.php";
+require_once __DIR__ . "/../config/conexion.php";
+require_once __DIR__ . "/includes/upload_helper.php";
+
+if(!isset($_SESSION['usuario_nombre'])){
+    header("Location: ../login.php");
+    exit;
+}
+
+$editando = null;
+$mensaje = "";
+
+if(isset($_GET['editar'])){
+    $id = (int) $_GET['editar'];
+    $stmt = mysqli_prepare($conn, "SELECT * FROM marcas WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    mysqli_stmt_execute($stmt);
+    $editando = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+}
+
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+
+    if(!validarCsrf()){
+        header("Location: marcas.php");
+        exit;
+    }
+
+    $accion = $_POST['accion'] ?? 'guardar';
+    $id = (int) ($_POST['id'] ?? 0);
+
+    if($accion === 'eliminar' && $id > 0){
+        $stmtUso = mysqli_prepare($conn, "SELECT COUNT(*) AS total FROM productos WHERE marca_id = ?");
+        mysqli_stmt_bind_param($stmtUso, "i", $id);
+        mysqli_stmt_execute($stmtUso);
+        $uso = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUso))['total'];
+
+        if($uso == 0){
+            $stmtDel = mysqli_prepare($conn, "DELETE FROM marcas WHERE id = ?");
+            mysqli_stmt_bind_param($stmtDel, "i", $id);
+            mysqli_stmt_execute($stmtDel);
+            header("Location: marcas.php");
+            exit;
+        }
+
+        $mensaje = "No se puede eliminar una marca con productos asociados.";
+    }
+
+    $nombre = trim($_POST['nombre'] ?? '');
+    $logo = trim($_POST['logo_actual'] ?? '');
+
+    if($accion === 'guardar' && isset($_FILES['logo']) && $_FILES['logo']['error'] !== UPLOAD_ERR_NO_FILE){
+        $logoSubido = guardarImagenSubida($_FILES['logo'], $mensaje);
+
+        if($logoSubido){
+            $logo = $logoSubido;
+        }
+    }
+
+    if($accion === 'guardar' && $nombre && !$mensaje){
+        if($id > 0){
+            $stmt = mysqli_prepare($conn, "UPDATE marcas SET nombre = ?, logo = ? WHERE id = ?");
+            mysqli_stmt_bind_param($stmt, "ssi", $nombre, $logo, $id);
+        } else {
+            $stmt = mysqli_prepare($conn, "INSERT INTO marcas (nombre, logo) VALUES (?, ?)");
+            mysqli_stmt_bind_param($stmt, "ss", $nombre, $logo);
+        }
+
+        mysqli_stmt_execute($stmt);
+        header("Location: marcas.php");
+        exit;
+    }
+}
+
+$marcas = mysqli_query(
+    $conn,
+    "SELECT m.*, COUNT(p.id) AS productos
+     FROM marcas m
+     LEFT JOIN productos p ON p.marca_id = m.id
+     GROUP BY m.id
+     ORDER BY m.nombre ASC"
+);
+
 ?>
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Marcas | Admin</title><link rel="stylesheet" href="../css/estilos.css"></head><body class="admin-body"><div class="admin-container"><?php include("includes/sidebar.php"); ?><main class="admin-content">
-<section class="admin-hero small-hero"><div><span class="admin-badge">Catálogo</span><h1>Marcas</h1><p>Gestioná las marcas disponibles en la tienda.</p></div></section>
-<?php if($mensaje): ?><div class="admin-alert error-msg"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?>
-<section class="pedido-panel"><form method="POST" class="form-admin-premium"><?= csrfInput() ?><input type="hidden" name="accion" value="guardar"><input type="hidden" name="id" value="<?= (int)($editando['id']??0) ?>"><div class="admin-grid"><div class="input-group"><label>Nombre</label><input name="nombre" value="<?= htmlspecialchars($editando['nombre']??'') ?>" required></div><div class="input-group"><label>Logo</label><input name="logo" value="<?= htmlspecialchars($editando['logo']??'') ?>"></div></div><button class="btn-admin-agregar"><?= $editando?'Guardar cambios':'Crear marca' ?></button> <?php if($editando): ?><a class="btn-admin-secundario" href="marcas.php">Cancelar</a><?php endif; ?></form></section>
-<div class="tabla-admin tabla-premium"><table><thead><tr><th>Marca</th><th>Logo</th><th>Productos</th><th>Acciones</th></tr></thead><tbody><?php while($m=mysqli_fetch_assoc($marcas)): ?><tr><td><strong><?= htmlspecialchars($m['nombre']) ?></strong></td><td><?= htmlspecialchars($m['logo']??'-') ?></td><td><?= (int)$m['productos'] ?></td><td class="acciones-tabla"><a class="btn-tabla editar" href="marcas.php?editar=<?= $m['id'] ?>">Editar</a><form method="POST" style="display:inline" onsubmit="return confirm('¿Eliminar marca?')"><?= csrfInput() ?><input type="hidden" name="accion" value="eliminar"><input type="hidden" name="id" value="<?= (int)$m['id'] ?>"><button class="btn-tabla eliminar" type="submit">Eliminar</button></form></td></tr><?php endwhile; ?></tbody></table></div>
-</main></div></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marcas | Admin</title>
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body class="admin-body">
+<div class="admin-container">
+    <?php include("includes/sidebar.php"); ?>
+
+    <main class="admin-content">
+        <section class="admin-hero small-hero">
+            <div>
+                <span class="admin-badge">Catálogo</span>
+                <h1>Marcas</h1>
+                <p>Gestioná las marcas disponibles en la tienda.</p>
+            </div>
+        </section>
+
+        <?php if($mensaje): ?>
+            <div class="admin-alert error-msg"><?= htmlspecialchars($mensaje) ?></div>
+        <?php endif; ?>
+
+        <section class="pedido-panel">
+            <form method="POST"
+                  enctype="multipart/form-data"
+                  class="form-admin-premium">
+                <?= csrfInput() ?>
+
+                <input type="hidden" name="accion" value="guardar">
+                <input type="hidden" name="id" value="<?= (int) ($editando['id'] ?? 0) ?>">
+                <input type="hidden" name="logo_actual" value="<?= htmlspecialchars($editando['logo'] ?? '') ?>">
+
+                <div class="admin-grid">
+                    <div class="input-group">
+                        <label>Nombre</label>
+                        <input name="nombre"
+                               value="<?= htmlspecialchars($editando['nombre'] ?? '') ?>"
+                               placeholder="Ej: Adidas"
+                               required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Logo de la marca</label>
+                        <input type="file"
+                               name="logo"
+                               accept="image/*">
+                        <small>Opcional. Subí el logo desde tu PC. Se guarda automáticamente en uploads.</small>
+
+                        <?php if(!empty($editando['logo'])): ?>
+                            <div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+                                <img src="../<?= htmlspecialchars($editando['logo']) ?>"
+                                     alt="<?= htmlspecialchars($editando['nombre'] ?? 'Logo') ?>"
+                                     style="max-width:90px; max-height:42px; object-fit:contain; background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:6px;">
+                                <small><?= htmlspecialchars($editando['logo']) ?></small>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <button class="btn-admin-agregar">
+                    <?= $editando ? 'Guardar cambios' : 'Crear marca' ?>
+                </button>
+
+                <?php if($editando): ?>
+                    <a class="btn-admin-secundario" href="marcas.php">Cancelar</a>
+                <?php endif; ?>
+            </form>
+        </section>
+
+        <div class="tabla-admin tabla-premium">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Marca</th>
+                        <th>Logo</th>
+                        <th>Productos</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while($m = mysqli_fetch_assoc($marcas)): ?>
+                        <tr>
+                            <td><strong><?= htmlspecialchars($m['nombre']) ?></strong></td>
+                            <td>
+                                <?php if(!empty($m['logo'])): ?>
+                                    <span style="display:inline-flex; align-items:center; gap:10px;">
+                                        <img src="../<?= htmlspecialchars($m['logo']) ?>"
+                                             alt="<?= htmlspecialchars($m['nombre']) ?>"
+                                             style="max-width:70px; max-height:34px; object-fit:contain;">
+                                        <small><?= htmlspecialchars($m['logo']) ?></small>
+                                    </span>
+                                <?php else: ?>
+                                    <span style="color:#94a3b8;">Sin logo</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= (int) $m['productos'] ?></td>
+                            <td class="acciones-tabla">
+                                <a class="btn-tabla editar" href="marcas.php?editar=<?= (int) $m['id'] ?>">Editar</a>
+                                <form method="POST" style="display:inline" onsubmit="return confirm('¿Eliminar marca?')">
+                                    <?= csrfInput() ?>
+                                    <input type="hidden" name="accion" value="eliminar">
+                                    <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
+                                    <button class="btn-tabla eliminar" type="submit">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -52,10 +52,14 @@ function pedidoPasoActivo(string $estado, string $paso): bool {
                 <article class="pedido-item">
 
                     <div class="pedido-item-main">
-                        <div>
+                        <div class="pedido-identidad">
                             <span class="pedido-numero">Pedido #<?= (int) $pedido['id'] ?></span>
-                            <h2>$<?= number_format((float) $pedido['total'], 0, ',', '.') ?></h2>
                             <p><?= date("d/m/Y", strtotime($pedido['fecha'])) ?></p>
+                        </div>
+
+                        <div class="pedido-total-mini">
+                            <span>Total</span>
+                            <strong>$<?= number_format((float) $pedido['total'], 0, ',', '.') ?></strong>
                         </div>
 
                         <span class="pedido-estado estado-<?= strtolower($pedido['estado']) ?>">
@@ -77,9 +81,41 @@ function pedidoPasoActivo(string $estado, string $paso): bool {
                         </p>
                     <?php endif; ?>
 
-                    <a href="pedido_detalle.php?id=<?= (int) $pedido['id'] ?>" class="pedido-link">
-                        Ver detalle →
-                    </a>
+                    <?php if(!empty($pedido['empresa_envio']) || !empty($pedido['numero_seguimiento'])): ?>
+                        <div class="pedido-seguimiento-mini">
+                            <div>
+                                <span>Seguimiento</span>
+                                <strong>
+                                    <?= htmlspecialchars($pedido['empresa_envio'] ?: 'Correo') ?>
+                                    <?php if(!empty($pedido['numero_seguimiento'])): ?>
+                                        · <?= htmlspecialchars($pedido['numero_seguimiento']) ?>
+                                    <?php endif; ?>
+                                </strong>
+                            </div>
+
+                            <?php if(!empty($pedido['link_seguimiento'])): ?>
+                                <a href="<?= htmlspecialchars($pedido['link_seguimiento']) ?>"
+                                   target="_blank"
+                                   rel="noopener"
+                                   class="pedido-link pedido-link-secundario">
+                                    Seguir envío
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="pedido-item-footer">
+
+                        <div>
+                            <span>Entrega</span>
+                            <strong><?= htmlspecialchars($pedido['zona_envio'] ?? 'A confirmar') ?></strong>
+                        </div>
+
+                        <a href="pedido_detalle.php?id=<?= (int) $pedido['id'] ?>" class="pedido-link">
+                            Ver detalle
+                        </a>
+
+                    </div>
 
                 </article>
 

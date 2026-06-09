@@ -62,6 +62,45 @@ if(isset($_POST['actualizar_estado'])){
     exit;
 }
 
+/* ACTUALIZAR SEGUIMIENTO */
+if(isset($_POST['actualizar_seguimiento'])){
+
+    if(!validarCsrf()){
+        header("Location: ver_pedido.php?id=" . $id);
+        exit;
+    }
+
+    $empresaEnvio = trim($_POST['empresa_envio'] ?? '');
+    $numeroSeguimiento = trim($_POST['numero_seguimiento'] ?? '');
+    $linkSeguimiento = trim($_POST['link_seguimiento'] ?? '');
+
+    if($linkSeguimiento !== '' && !preg_match('/^https?:\/\//i', $linkSeguimiento)){
+        $linkSeguimiento = '';
+    }
+
+    $sqlSeguimiento = "UPDATE pedidos
+                       SET empresa_envio = ?,
+                           numero_seguimiento = ?,
+                           link_seguimiento = ?
+                       WHERE id = ?";
+
+    $stmtSeguimiento = mysqli_prepare($conn, $sqlSeguimiento);
+
+    mysqli_stmt_bind_param(
+        $stmtSeguimiento,
+        "sssi",
+        $empresaEnvio,
+        $numeroSeguimiento,
+        $linkSeguimiento,
+        $id
+    );
+
+    mysqli_stmt_execute($stmtSeguimiento);
+
+    header("Location: ver_pedido.php?id=" . $id);
+    exit;
+}
+
 /* TRAER PEDIDO */
 $sqlPedido = "SELECT
                 pedidos.*,
@@ -226,6 +265,58 @@ if(!empty($pedido['telefono_cliente'])){
                         name="actualizar_estado"
                         class="btn-admin-agregar">
                     Guardar estado
+                </button>
+
+            </form>
+
+        </section>
+
+        <!-- SEGUIMIENTO -->
+        <section class="pedido-panel">
+
+            <div class="pedido-panel-header">
+
+                <div>
+                    <h2>Seguimiento del envío</h2>
+                    <p>Cargá la empresa de correo, número de guía y link para que el cliente pueda seguir el pedido.</p>
+                </div>
+
+            </div>
+
+            <form method="POST"
+                  class="form-admin-premium">
+
+                <?= csrfInput() ?>
+
+                <div class="admin-grid">
+
+                    <div class="input-group">
+                        <label>Empresa de correo</label>
+                        <input name="empresa_envio"
+                               value="<?= htmlspecialchars($pedido['empresa_envio'] ?? '') ?>"
+                               placeholder="Ej: Correo Argentino, Andreani, OCA">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Número de guía</label>
+                        <input name="numero_seguimiento"
+                               value="<?= htmlspecialchars($pedido['numero_seguimiento'] ?? '') ?>"
+                               placeholder="Ej: SP123456789AR">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Link de seguimiento</label>
+                        <input name="link_seguimiento"
+                               value="<?= htmlspecialchars($pedido['link_seguimiento'] ?? '') ?>"
+                               placeholder="https://...">
+                    </div>
+
+                </div>
+
+                <button type="submit"
+                        name="actualizar_seguimiento"
+                        class="btn-admin-agregar">
+                    Guardar seguimiento
                 </button>
 
             </form>

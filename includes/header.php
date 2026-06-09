@@ -7,9 +7,10 @@ if(session_status() === PHP_SESSION_NONE){
 include_once(__DIR__ . "/../config/conexion.php");
 include_once(__DIR__ . "/../config/config.php");
 include_once(__DIR__ . "/../data/carrito_helpers.php");
+include_once(__DIR__ . "/csrf.php");
 
 /* ===== PRODUCTOS MYSQL PARA CARRITO ===== */
-$sqlProductosHeader = "SELECT * FROM productos";
+$sqlProductosHeader = "SELECT * FROM productos WHERE activo = 1";
 
 $resultadoProductosHeader = mysqli_query(
     $conn,
@@ -61,9 +62,53 @@ if($resultadoCategoriasHeader){
 
 }
 
+$sqlSubcategoriasHeader = "SELECT id, categoria_id, nombre FROM subcategorias ORDER BY nombre ASC";
+$resultadoSubcategoriasHeader = mysqli_query($conn, $sqlSubcategoriasHeader);
+$subcategoriasHeader = [];
+$subcategoriasPorCategoriaHeader = [];
+
+if($resultadoSubcategoriasHeader){
+    while($subcategoriaHeader = mysqli_fetch_assoc($resultadoSubcategoriasHeader)){
+        $subcategoriasHeader[strtolower($subcategoriaHeader['nombre'])] = $subcategoriaHeader;
+        $subcategoriasPorCategoriaHeader[(int) $subcategoriaHeader['categoria_id']][] = $subcategoriaHeader;
+    }
+}
+
+function renderMenuCategoria(
+    array $categoriasHeader,
+    array $subcategoriasPorCategoriaHeader,
+    string $categoriaNombre,
+    string $genero
+): void {
+
+    $categoria = $categoriasHeader[strtolower($categoriaNombre)] ?? null;
+    $subcategorias = $categoria
+        ? ($subcategoriasPorCategoriaHeader[(int) $categoria['id']] ?? [])
+        : [];
+
+    echo '<div class="mega-col">';
+    echo '<h4>' . htmlspecialchars($categoriaNombre) . '</h4>';
+
+    if($categoria){
+        echo '<a class="mega-todos" href="' . htmlspecialchars(categoriaMenuUrl($categoriasHeader, $categoriaNombre, $genero)) . '">Ver todo</a>';
+    }
+
+    foreach($subcategorias as $subcategoria){
+        echo '<a href="' . htmlspecialchars(categoriaMenuUrl($categoriasHeader, $subcategoria['nombre'], $genero)) . '">';
+        echo htmlspecialchars($subcategoria['nombre']);
+        echo '</a>';
+    }
+
+    echo '</div>';
+
+}
+
 function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $genero = ''): string {
 
+    global $subcategoriasHeader;
+
     $categoria = $categoriasHeader[strtolower($nombre)] ?? null;
+    $subcategoria = $subcategoriasHeader[strtolower($nombre)] ?? null;
     $url = "/sportstyle/productos.php";
     $params = [];
 
@@ -73,6 +118,8 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 
     if($categoria){
         $params['categoria_id'] = $categoria['id'];
+    } elseif($subcategoria){
+        $params['subcategoria_id'] = $subcategoria['id'];
     } else {
         $params['buscar'] = $nombre;
     }
@@ -92,6 +139,9 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
+
+    <meta name="csrf-token"
+          content="<?= htmlspecialchars(csrfToken()) ?>">
 
     <title><?= htmlspecialchars($NOMBRE_TIENDA ?? 'SportStyle') ?></title>
 
@@ -114,9 +164,17 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 <header class="header">
 
     <!-- LOGO -->
-    <div class="logo">
-        <?= htmlspecialchars($NOMBRE_TIENDA ?? 'SportStyle') ?>
-    </div>
+    <?php
+        $nombreTiendaHeader = $NOMBRE_TIENDA ?? 'SportStyle';
+        $textoLogoHeader = stripos($nombreTiendaHeader, 'sportstyle') === 0
+            ? substr($nombreTiendaHeader, 1)
+            : $nombreTiendaHeader;
+    ?>
+
+    <a href="/sportstyle/index.php" class="logo" aria-label="Ir al inicio de SportStyle">
+        <span class="logo-mark">S</span>
+        <span class="logo-text"><?= htmlspecialchars($textoLogoHeader) ?></span>
+    </a>
 
     <button type="button"
             class="menu-toggle"
@@ -152,43 +210,10 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 
             <div class="mega-menu">
 
-                <div class="mega-col">
-
-                    <h4>Calzado</h4>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Zapatillas', 'Hombre') ?>">
-                        Zapatillas
-                    </a>
-
-                </div>
-
-                <div class="mega-col">
-
-                    <h4>Indumentaria</h4>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Remeras', 'Hombre') ?>">
-                        Remeras
-                    </a>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Pantalones', 'Hombre') ?>">
-                        Pantalones
-                    </a>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Buzos', 'Hombre') ?>">
-                        Buzos
-                    </a>
-
-                </div>
-
-                <div class="mega-col">
-
-                    <h4>Accesorios</h4>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Accesorios', 'Hombre') ?>">
-                        Ver accesorios
-                    </a>
-
-                </div>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Calzado', 'Hombre'); ?>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Ropa', 'Hombre'); ?>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Accesorios', 'Hombre'); ?>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Deportes', 'Hombre'); ?>
 
             </div>
 
@@ -206,43 +231,10 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 
             <div class="mega-menu">
 
-                <div class="mega-col">
-
-                    <h4>Calzado</h4>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Zapatillas', 'Mujer') ?>">
-                        Zapatillas
-                    </a>
-
-                </div>
-
-                <div class="mega-col">
-
-                    <h4>Indumentaria</h4>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Remeras', 'Mujer') ?>">
-                        Remeras
-                    </a>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Pantalones', 'Mujer') ?>">
-                        Pantalones
-                    </a>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Buzos', 'Mujer') ?>">
-                        Buzos
-                    </a>
-
-                </div>
-
-                <div class="mega-col">
-
-                    <h4>Accesorios</h4>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Accesorios', 'Mujer') ?>">
-                        Ver accesorios
-                    </a>
-
-                </div>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Calzado', 'Mujer'); ?>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Ropa', 'Mujer'); ?>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Accesorios', 'Mujer'); ?>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Deportes', 'Mujer'); ?>
 
             </div>
 
@@ -260,50 +252,17 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 
             <div class="mega-menu">
 
-                <div class="mega-col">
-
-                    <h4>Calzado</h4>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Zapatillas', 'Niños') ?>">
-                        Zapatillas
-                    </a>
-
-                </div>
-
-                <div class="mega-col">
-
-                    <h4>Indumentaria</h4>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Remeras', 'Niños') ?>">
-                        Remeras
-                    </a>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Pantalones', 'Niños') ?>">
-                        Pantalones
-                    </a>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Buzos', 'Niños') ?>">
-                        Buzos
-                    </a>
-
-                </div>
-
-                <div class="mega-col">
-
-                    <h4>Accesorios</h4>
-
-                    <a href="<?= categoriaMenuUrl($categoriasHeader, 'Accesorios', 'Niños') ?>">
-                        Ver accesorios
-                    </a>
-
-                </div>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Calzado', 'Niños'); ?>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Ropa', 'Niños'); ?>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Accesorios', 'Niños'); ?>
+                <?php renderMenuCategoria($categoriasHeader, $subcategoriasPorCategoriaHeader, 'Deportes', 'Niños'); ?>
 
             </div>
 
         </div>
 
         <!-- ===== MARCAS ===== -->
-        <div class="nav-item">
+        <div class="nav-item nav-marcas">
 
             <a href="#"
                class="nav-link">
@@ -320,7 +279,14 @@ function categoriaMenuUrl(array $categoriasHeader, string $nombre, string $gener
 
                         <a href="/sportstyle/productos.php?marca_id=<?= $marca['id'] ?>">
 
-                            <?= $marca['nombre'] ?>
+                            <?php if(!empty($marca['logo'])): ?>
+                                <span class="marca-logo-box">
+                                    <img src="/sportstyle/<?= htmlspecialchars($marca['logo']) ?>"
+                                         alt="<?= htmlspecialchars($marca['nombre']) ?>">
+                                </span>
+                            <?php endif; ?>
+
+                            <span><?= htmlspecialchars($marca['nombre']) ?></span>
 
                         </a>
 
