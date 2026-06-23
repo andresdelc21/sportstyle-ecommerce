@@ -2,11 +2,15 @@
 
 session_start();
 
-
-
 include_once __DIR__ . "/config/conexion.php";
 
 $error = "";
+$intentosLogin = $_SESSION['login_intentos'] ?? [];
+$intentosLogin = array_filter(
+    $intentosLogin,
+    fn($timestamp) => $timestamp > time() - 900
+);
+$_SESSION['login_intentos'] = $intentosLogin;
 
 /* LOGIN */
 if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -14,49 +18,56 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    $sql = "SELECT * FROM usuarios WHERE email = ? LIMIT 1";
+    if(count($intentosLogin) >= 5){
 
-    $stmt = mysqli_prepare($conn, $sql);
-
-    mysqli_stmt_bind_param(
-        $stmt,
-        "s",
-        $email
-    );
-
-    mysqli_stmt_execute($stmt);
-
-    $resultado = mysqli_stmt_get_result($stmt);
-
-    if(mysqli_num_rows($resultado) > 0){
-
-        $usuario = mysqli_fetch_assoc($resultado);
-
-        /* VERIFICAR PASSWORD */
-        if(password_verify($password, $usuario['password'])){
-
-            $_SESSION['usuario_id'] = $usuario['id'];
-            $_SESSION['usuario_nombre'] = $usuario['nombre'];
-            $_SESSION['usuario_rol'] = $usuario['rol'];
-            $_SESSION['usuario_email'] = $usuario['email'];
-
-            if(($usuario['rol'] ?? 'cliente') === 'admin'){
-                header("Location: admin/index.php");
-            } else {
-                header("Location: index.php");
-            }
-
-            exit;
-
-        } else {
-
-            $error = "Contraseña incorrecta";
-
-        }
+        $error = "Demasiados intentos. Esperá unos minutos y volvé a probar.";
 
     } else {
 
-        $error = "El correo no existe";
+        $sql = "SELECT * FROM usuarios WHERE email = ? LIMIT 1";
+
+        $stmt = mysqli_prepare($conn, $sql);
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "s",
+            $email
+        );
+
+        mysqli_stmt_execute($stmt);
+
+        $resultado = mysqli_stmt_get_result($stmt);
+
+        if(mysqli_num_rows($resultado) > 0){
+
+            $usuario = mysqli_fetch_assoc($resultado);
+
+            /* VERIFICAR PASSWORD */
+            if(password_verify($password, $usuario['password'])){
+
+                session_regenerate_id(true);
+
+                unset($_SESSION['login_intentos']);
+
+                $_SESSION['usuario_id'] = $usuario['id'];
+                $_SESSION['usuario_nombre'] = $usuario['nombre'];
+                $_SESSION['usuario_rol'] = $usuario['rol'];
+                $_SESSION['usuario_email'] = $usuario['email'];
+
+                if(($usuario['rol'] ?? 'cliente') === 'admin'){
+                    header("Location: admin/index.php");
+                } else {
+                    header("Location: index.php");
+                }
+
+                exit;
+
+            }
+
+        }
+
+        $_SESSION['login_intentos'][] = time();
+        $error = "Correo o contraseña incorrectos.";
 
     }
 }
