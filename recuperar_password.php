@@ -3,6 +3,7 @@
 session_start();
 
 include_once __DIR__ . "/config/conexion.php";
+include_once __DIR__ . "/config/config.php";
 
 $mensaje = "";
 $error = "";
@@ -92,7 +93,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Más adelante lo enviaremos por email real con SMTP.
                 */
 
-                $linkReset = "http://localhost/sportstyle/reset_password.php?token=" . $token;
+                $baseReset = rtrim($URL_TIENDA ?? "http://localhost/sportstyle", "/");
+                $linkReset = $baseReset . "/reset_password.php?token=" . $token;
 
                 $mensaje = "Generamos un enlace para restablecer tu contraseña.";
 

@@ -15,6 +15,7 @@ $claves = [
     'TITULAR_TIENDA' => 'Titular',
     'DIRECCION_TIENDA' => 'Dirección de tienda',
     'MAPS_TIENDA' => 'Link de Google Maps',
+    'URL_TIENDA' => 'URL pública de la tienda',
     'INSTAGRAM_TIENDA' => 'Instagram',
     'FACEBOOK_TIENDA' => 'Facebook',
     'MP_PUBLIC_KEY' => 'MercadoPago Public Key',

@@ -117,7 +117,7 @@ sportstyle/
 1. Clonar el repositorio:
 
 ```bash
-git clone https://github.com/progrmair21/sportstyle-ecommerce.git
+git clone https://github.com/andresdelc21/sportstyle-ecommerce.git
 ```
 
 2. Copiar o mantener el proyecto dentro de:
@@ -162,6 +162,7 @@ Desde el panel administrativo se pueden configurar datos generales:
 - email;
 - WhatsApp;
 - redes sociales;
+- URL pública de la tienda;
 - alias y CBU/CVU para transferencia;
 - credenciales de Mercado Pago.
 
@@ -205,6 +206,6 @@ En local funciona para desarrollo, pero Mercado Pago solo podrá llamar el webho
 
 **Andrés Del Carpio**
 
-Analista de Sistemas Informáticos.
+Analista en Sistemas de Computación.
 
 Proyecto desarrollado como práctica profesional y portfolio personal.

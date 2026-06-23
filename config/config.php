@@ -20,6 +20,8 @@ $DIRECCION_TIENDA = "SportStyle tienda";
 
 $MAPS_TIENDA = "https://www.google.com/maps/search/?api=1&query=SportStyle%20tienda";
 
+$URL_TIENDA = "http://localhost/sportstyle";
+
 
 /* =========================
    REDES SOCIALES
