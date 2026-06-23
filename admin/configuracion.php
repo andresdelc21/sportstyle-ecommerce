@@ -23,6 +23,8 @@ $claves = [
     'MP_WEBHOOK_TOKEN' => 'MercadoPago Webhook Token'
 ];
 
+$clavesSecretas = ['MP_ACCESS_TOKEN', 'MP_WEBHOOK_TOKEN'];
+
 if($_SERVER['REQUEST_METHOD']==='POST'){
     if(!validarCsrf()){
         header("Location: configuracion.php");
@@ -31,6 +33,11 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
 
     foreach($claves as $clave => $label){
         $valor = trim($_POST[$clave] ?? '');
+
+        if(in_array($clave, $clavesSecretas, true) && $valor === ''){
+            continue;
+        }
+
         $stmt = mysqli_prepare($conn, "INSERT INTO configuracion_tienda (clave, valor) VALUES (?, ?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)");
         mysqli_stmt_bind_param($stmt, "ss", $clave, $valor);
         mysqli_stmt_execute($stmt);
@@ -48,6 +55,16 @@ while($fila = mysqli_fetch_assoc($res)){ $valores[$fila['clave']] = $fila['valor
 <section class="admin-hero small-hero"><div><span class="admin-badge">Tienda</span><h1>Configuración</h1><p>Datos comerciales, redes y credenciales principales.</p></div></section>
 <?php if(isset($_GET['ok'])): ?><div class="admin-alert success-msg">Configuración guardada.</div><?php endif; ?>
 <section class="pedido-panel"><form method="POST" class="form-admin-premium"><?= csrfInput() ?><div class="admin-grid">
-<?php foreach($claves as $clave => $label): ?><div class="input-group"><label><?= htmlspecialchars($label) ?></label><input type="<?= in_array($clave, ['MP_ACCESS_TOKEN', 'MP_WEBHOOK_TOKEN'], true) ? 'password' : 'text' ?>" name="<?= $clave ?>" value="<?= htmlspecialchars($valores[$clave] ?? '') ?>" autocomplete="<?= in_array($clave, ['MP_ACCESS_TOKEN', 'MP_WEBHOOK_TOKEN'], true) ? 'new-password' : 'off' ?>"></div><?php endforeach; ?>
+<?php foreach($claves as $clave => $label): ?>
+<?php $esSecreta = in_array($clave, $clavesSecretas, true); ?>
+<div class="input-group">
+    <label><?= htmlspecialchars($label) ?></label>
+    <input type="<?= $esSecreta ? 'password' : 'text' ?>"
+           name="<?= $clave ?>"
+           value="<?= $esSecreta ? '' : htmlspecialchars($valores[$clave] ?? '') ?>"
+           placeholder="<?= $esSecreta && !empty($valores[$clave] ?? '') ? 'Credencial cargada. Escribí una nueva solo si querés cambiarla.' : '' ?>"
+           autocomplete="<?= $esSecreta ? 'new-password' : 'off' ?>">
+</div>
+<?php endforeach; ?>
 </div><button class="btn-admin-agregar" type="submit">Guardar configuración</button></form></section>
 </main></div></body></html>
