@@ -7,7 +7,6 @@ include_once __DIR__ . "/config/config.php";
 
 $mensaje = "";
 $error = "";
-$linkReset = "";
 
 /* PROCESAR FORMULARIO */
 if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -86,17 +85,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             if(mysqli_stmt_execute($stmtToken)){
 
-                /*
-                    POR AHORA, COMO ESTAMOS EN LOCALHOST,
-                    MOSTRAMOS EL LINK EN PANTALLA.
-
-                    Más adelante lo enviaremos por email real con SMTP.
-                */
-
                 $baseReset = rtrim($URL_TIENDA ?? "http://localhost/sportstyle", "/");
                 $linkReset = $baseReset . "/reset_password.php?token=" . $token;
 
-                $mensaje = "Generamos un enlace para restablecer tu contraseña.";
+                /*
+                    En hosting, este enlace debe enviarse por email con SMTP.
+                    No se muestra en pantalla para no exponer el token.
+                */
+
+                $mensaje = "Si el correo existe en nuestro sistema, recibirás instrucciones para restablecer tu contraseña.";
 
             } else {
 
@@ -167,24 +164,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             <?php endif; ?>
 
-            <?php if($linkReset): ?>
-
-                <div style="background:#f5f5f5; padding:15px; border-radius:12px; margin-bottom:20px; word-break:break-all;">
-
-                    <strong>
-                        Link temporal:
-                    </strong>
-
-                    <br><br>
-
-                    <a href="<?= $linkReset ?>">
-                        <?= $linkReset ?>
-                    </a>
-
-                </div>
-
-            <?php endif; ?>
-
             <form method="POST">
 
                 <div class="input-group">
@@ -203,7 +182,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <button type="submit"
                         class="btn-login">
 
-                    Generar enlace
+                    Enviar instrucciones
 
                 </button>
 
