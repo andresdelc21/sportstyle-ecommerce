@@ -163,8 +163,20 @@ Desde el panel administrativo se pueden configurar datos generales:
 - WhatsApp;
 - redes sociales;
 - URL pública de la tienda;
+- servidor SMTP para envío real de correos;
 - alias y CBU/CVU para transferencia;
 - credenciales de Mercado Pago.
+
+Para recuperación de contraseña en hosting se debe activar SMTP desde el admin:
+
+- `SMTP_ACTIVO`: usar `1`;
+- `SMTP_HOST`: servidor SMTP;
+- `SMTP_PORT`: normalmente `587` para TLS o `465` para SSL;
+- `SMTP_SECURE`: `tls`, `ssl` o `none`;
+- `SMTP_USER`: usuario del correo;
+- `SMTP_PASS`: contraseña o clave de aplicación;
+- `SMTP_FROM_EMAIL`: correo remitente;
+- `SMTP_FROM_NAME`: nombre visible del remitente.
 
 ## Mercado Pago
 

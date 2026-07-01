@@ -4,6 +4,7 @@ session_start();
 
 include_once __DIR__ . "/config/conexion.php";
 include_once __DIR__ . "/config/config.php";
+include_once __DIR__ . "/includes/email.php";
 
 $mensaje = "";
 $error = "";
@@ -19,7 +20,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     } else {
 
-        $sql = "SELECT * FROM usuarios WHERE email = ? LIMIT 1";
+        $sql = "SELECT nombre, email FROM usuarios WHERE email = ? LIMIT 1";
 
         $stmt = mysqli_prepare($conn, $sql);
 
@@ -88,10 +89,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 $baseReset = rtrim($URL_TIENDA ?? "http://localhost/sportstyle", "/");
                 $linkReset = $baseReset . "/reset_password.php?token=" . $token;
 
-                /*
-                    En hosting, este enlace debe enviarse por email con SMTP.
-                    No se muestra en pantalla para no exponer el token.
-                */
+                $usuario = mysqli_fetch_assoc($resultado);
+                $errorCorreo = "";
+                enviarEmailRecuperacionPassword(
+                    $email,
+                    $usuario['nombre'] ?? '',
+                    $linkReset,
+                    $errorCorreo
+                );
 
                 $mensaje = "Si el correo existe en nuestro sistema, recibirás instrucciones para restablecer tu contraseña.";
 

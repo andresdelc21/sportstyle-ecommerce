@@ -10,6 +10,14 @@ $claves = [
     'NOMBRE_TIENDA' => 'Nombre de tienda',
     'WHATSAPP_TIENDA' => 'WhatsApp',
     'EMAIL_TIENDA' => 'Email',
+    'SMTP_ACTIVO' => 'SMTP activo (1 sí / 0 no)',
+    'SMTP_HOST' => 'SMTP servidor',
+    'SMTP_PORT' => 'SMTP puerto',
+    'SMTP_SECURE' => 'SMTP seguridad (tls / ssl / none)',
+    'SMTP_USER' => 'SMTP usuario',
+    'SMTP_PASS' => 'SMTP contraseña',
+    'SMTP_FROM_EMAIL' => 'SMTP email remitente',
+    'SMTP_FROM_NAME' => 'SMTP nombre remitente',
     'ALIAS_TIENDA' => 'Alias de pago',
     'CBU_TIENDA' => 'CBU/CVU',
     'TITULAR_TIENDA' => 'Titular',
@@ -23,7 +31,7 @@ $claves = [
     'MP_WEBHOOK_TOKEN' => 'MercadoPago Webhook Token'
 ];
 
-$clavesSecretas = ['MP_ACCESS_TOKEN', 'MP_WEBHOOK_TOKEN'];
+$clavesSecretas = ['MP_ACCESS_TOKEN', 'MP_WEBHOOK_TOKEN', 'SMTP_PASS'];
 
 if($_SERVER['REQUEST_METHOD']==='POST'){
     if(!validarCsrf()){

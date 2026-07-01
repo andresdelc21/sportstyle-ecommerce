@@ -10,6 +10,22 @@ $WHATSAPP_TIENDA = "5491112345678";
 
 $EMAIL_TIENDA = "contacto@sportstyle.com";
 
+$SMTP_ACTIVO = "0";
+
+$SMTP_HOST = "";
+
+$SMTP_PORT = "587";
+
+$SMTP_SECURE = "tls";
+
+$SMTP_USER = "";
+
+$SMTP_PASS = "";
+
+$SMTP_FROM_EMAIL = "";
+
+$SMTP_FROM_NAME = "SportStyle";
+
 $ALIAS_TIENDA = "sportstyle.mp";
 
 $CBU_TIENDA = "0000000000000000000000";
