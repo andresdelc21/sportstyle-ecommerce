@@ -12,7 +12,16 @@ $categoriasHome = [];
 $sqlCategoriasHome = "SELECT
                         categorias.id,
                         categorias.nombre,
-                        productos.imagen
+                        COALESCE(
+                            (
+                                SELECT ip.imagen
+                                FROM imagenes_productos ip
+                                WHERE ip.producto_id = productos.id
+                                ORDER BY ip.principal DESC, ip.orden ASC, ip.id ASC
+                                LIMIT 1
+                            ),
+                            productos.imagen
+                        ) AS imagen
                       FROM categorias
                       INNER JOIN productos
                       ON productos.id = (
