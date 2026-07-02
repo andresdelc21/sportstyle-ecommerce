@@ -195,9 +195,21 @@ $desc = descuento(
 
 <?php include("includes/header.php"); ?>
 
-<a href="productos.php" class="btn-volver-detalle">
-    ← Volver a productos
-</a>
+<nav class="detalle-breadcrumb" aria-label="Ruta del producto">
+    <a href="index.php">Inicio</a>
+    <span>/</span>
+    <a href="productos.php">Productos</a>
+    <?php if(!empty($producto['categoria_nombre'])): ?>
+        <span>/</span>
+        <a href="productos.php?categoria=<?= (int) $producto['categoria_id'] ?>">
+            <?= htmlspecialchars($producto['categoria_nombre']) ?>
+        </a>
+    <?php endif; ?>
+    <?php if(!empty($producto['subcategoria_nombre'])): ?>
+        <span>/</span>
+        <span><?= htmlspecialchars($producto['subcategoria_nombre']) ?></span>
+    <?php endif; ?>
+</nav>
 
 <section class="detalle">
 
@@ -251,32 +263,64 @@ $desc = descuento(
 
     <div class="detalle-info">
 
-        <span class="detalle-categoria">
-            <?= htmlspecialchars($producto['subcategoria_nombre'] ?: $producto['categoria_nombre']) ?>
-        </span>
+        <div class="detalle-topline">
+            <span class="detalle-categoria">
+                <?= htmlspecialchars($producto['genero']) ?>
+                <?php if(!empty($producto['subcategoria_nombre'] ?: $producto['categoria_nombre'])): ?>
+                    / <?= htmlspecialchars($producto['subcategoria_nombre'] ?: $producto['categoria_nombre']) ?>
+                <?php endif; ?>
+            </span>
+
+            <a href="#"
+               class="btn-favorito-detalle btn-favorito-js <?= $esFavorito ? 'favorito-activo' : '' ?>"
+               data-producto="<?= $producto['id'] ?>"
+               title="<?= $esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos' ?>"
+               aria-label="Agregar o quitar favorito">
+                <span class="favorito-icono"><?= $esFavorito ? '♥' : '♡' ?></span>
+                <span class="favorito-texto"><?= $esFavorito ? 'Guardado' : 'Favorito' ?></span>
+            </a>
+        </div>
 
         <h1>
-            <?= $producto['nombre'] ?>
+            <?= htmlspecialchars($producto['nombre']) ?>
         </h1>
 
-        <p>
+        <p class="detalle-sku">
+            SKU: SPORT-<?= str_pad((string) $producto['id'], 5, '0', STR_PAD_LEFT) ?>
+        </p>
+
+        <p class="detalle-rating-line">
             Calificación <?= number_format($producto['rating'] ?? 5, 1, ',', '.') ?>/5
         </p>
 
-        <div class="detalle-marca">
-            <span>Marca</span>
+        <div class="detalle-meta-line">
+            <?php if(!empty($producto['marca_nombre'])): ?>
+                <span>
+                    Marca:
+                    <strong>
+                        <?= htmlspecialchars($producto['marca_nombre']) ?>
+                    </strong>
+                </span>
+            <?php endif; ?>
 
-            <strong>
+            <span>
+                Stock:
+                <strong>
+                    <?= $producto['stock'] > 0 ? (int) $producto['stock'] . ' disponibles' : 'Sin stock' ?>
+                </strong>
+            </span>
+        </div>
+
+        <?php if(!empty($producto['marca_logo'])): ?>
+            <div class="detalle-marca-logo">
                 <?php if(!empty($producto['marca_logo'])): ?>
                     <span class="marca-logo-box">
                         <img src="<?= htmlspecialchars($producto['marca_logo']) ?>"
                              alt="<?= htmlspecialchars($producto['marca_nombre']) ?>">
                     </span>
                 <?php endif; ?>
-
-                <?= htmlspecialchars($producto['marca_nombre'] ?? 'Sin marca') ?>
-            </strong>
-        </div>
+            </div>
+        <?php endif; ?>
 
         <div class="detalle-precio">
 
@@ -298,35 +342,16 @@ $desc = descuento(
 
         </div>
 
-        <p class="detalle-stock">
-
-            <?php if($producto['stock'] > 0): ?>
-
-                Stock disponible (<?= $producto['stock'] ?> unidades)
-
-            <?php else: ?>
-
-                Sin stock
-
-            <?php endif; ?>
-
-        </p>
-
-        <p>
-            <strong>Género:</strong>
-            <?= $producto['genero'] ?>
-        </p>
-
         <details class="guia-talles">
 
             <summary class="guia-talles-header">
 
                 <span>
-                    Guía de talles
+                    Ver guía de talles
                 </span>
 
                 <strong>
-                    Ver tabla
+                    Tabla
                 </strong>
 
                 <?php if($tipoTalle === 'calzado'): ?>
@@ -387,8 +412,8 @@ $desc = descuento(
             <section class="selector-talles-producto">
 
                 <div class="selector-talles-header">
-                    <h3>Seleccioná talle</h3>
-                    <span>Stock por variante</span>
+                    <h3>Seleccioná tu talle</h3>
+                    <span>Stock por talle</span>
                 </div>
 
                 <div class="talles-opciones">
@@ -440,7 +465,7 @@ $desc = descuento(
                 <a href="carrito.php?agregar=<?= $producto['id'] ?>"
                    class="btn-comprar btn-agregar-carrito-js"
                    data-producto="<?= $producto['id'] ?>">
-                    🛒 Agregar al carrito
+                    Agregar al carrito
                 </a>
 
             <?php else: ?>
@@ -450,22 +475,6 @@ $desc = descuento(
                 </span>
 
             <?php endif; ?>
-
-            <a href="#"
-               class="btn-favorito-detalle btn-favorito-js <?= $esFavorito ? 'favorito-activo' : '' ?>"
-               data-producto="<?= $producto['id'] ?>"
-               title="<?= $esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos' ?>"
-               aria-label="Agregar o quitar favorito">
-
-                <span class="favorito-icono">
-                    ❤️
-                </span>
-
-                <span class="favorito-texto">
-                    <?= $esFavorito ? 'En favoritos' : 'Guardar favorito' ?>
-                </span>
-
-            </a>
 
         </div>
 
@@ -481,9 +490,9 @@ $desc = descuento(
 
         <div class="detalle-extra">
 
-            <p>🚚 Envíos a todo el país</p>
-            <p>💳 Hasta 6 cuotas sin interés</p>
-            <p>🔒 Compra segura</p>
+            <p>Envíos a todo el país</p>
+            <p>Cuotas y promociones disponibles</p>
+            <p>Compra segura</p>
 
         </div>
 

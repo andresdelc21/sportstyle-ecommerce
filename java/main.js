@@ -95,6 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     : "Agregar a favoritos";
 
                 const texto = btn.querySelector(".favorito-texto");
+                const icono = btn.querySelector(".favorito-icono");
+
+                if (icono) {
+                    icono.textContent = data.favorito ? "♥" : "♡";
+                }
 
                 if (texto) {
                     texto.textContent = data.favorito
