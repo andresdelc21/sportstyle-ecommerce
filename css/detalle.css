@@ -903,8 +903,8 @@
 
 /* ===== DETALLE PRODUCTO TIENDA REAL ===== */
 .detalle-breadcrumb {
-    width: min(1600px, calc(100% - 72px));
-    margin: 104px auto 0;
+    width: min(1440px, calc(100% - 48px));
+    margin: 86px auto 0;
     display: flex;
     align-items: center;
     gap: 7px;
@@ -923,10 +923,10 @@
 }
 
 .detalle {
-    width: min(1600px, calc(100% - 72px));
+    width: min(1440px, calc(100% - 48px));
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(360px, 500px);
-    gap: 56px;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 430px);
+    gap: 34px;
     align-items: start;
     margin: 8px auto 0;
     padding: 0 0 34px;
@@ -946,22 +946,22 @@
 
 .detalle-galeria-producto {
     display: grid;
-    grid-template-columns: 150px minmax(0, 1fr);
-    gap: 34px;
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 18px;
     align-items: start;
 }
 
 .miniaturas {
     max-height: none;
-    gap: 20px;
+    gap: 14px;
     overflow: visible;
     padding: 0;
 }
 
 .miniatura-producto {
-    width: 150px;
-    height: 150px;
-    flex-basis: 150px;
+    width: 108px;
+    height: 108px;
+    flex-basis: 108px;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
     background: #f3f4f6;
@@ -980,9 +980,9 @@
 }
 
 .detalle-imagen-principal {
-    min-height: 720px;
-    height: calc(100vh - 190px);
-    max-height: 820px;
+    min-height: 560px;
+    height: calc(100vh - 250px);
+    max-height: 650px;
     background: #f4f4f6;
     border-radius: 4px;
     padding: 0;
@@ -990,10 +990,12 @@
 
 .detalle-imagen-principal img,
 .detalle-img .detalle-imagen-principal img {
-    width: 100%;
-    height: 100%;
-    max-height: none;
+    width: auto;
+    height: auto;
+    max-width: 88%;
+    max-height: 88%;
     object-fit: contain;
+    object-position: center;
 }
 
 .detalle-imagen-principal:hover img {
@@ -1006,7 +1008,7 @@
 
 .detalle-info {
     min-width: 0;
-    max-width: 500px;
+    max-width: 430px;
     padding-top: 8px;
     position: sticky;
     top: 96px;
