@@ -144,7 +144,11 @@ if($errorPago === ""){
         $preferencia
     );
 
-    if($respuesta['ok'] && !empty($respuesta['data']['init_point'])){
+    $checkoutUrl = $respuesta['ok'] && !empty($respuesta['data'])
+        ? mpCheckoutUrl($respuesta['data'], $MP_ACCESS_TOKEN)
+        : '';
+
+    if($checkoutUrl !== ''){
 
         $preferenceId = $respuesta['data']['id'] ?? null;
 
@@ -169,7 +173,7 @@ if($errorPago === ""){
 
         unset($_SESSION['carrito'], $_SESSION['mp_pedido_id']);
 
-        header("Location: " . $respuesta['data']['init_point']);
+        header("Location: " . $checkoutUrl);
         exit;
 
     }

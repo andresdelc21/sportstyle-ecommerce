@@ -2,6 +2,12 @@
 
 function mpBaseUrl(): string {
 
+    global $URL_TIENDA;
+
+    if(!empty($URL_TIENDA)){
+        return rtrim($URL_TIENDA, '/');
+    }
+
     $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
         ? 'https'
         : 'http';
@@ -10,6 +16,26 @@ function mpBaseUrl(): string {
     $carpeta = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
     return $protocolo . '://' . $host . ($carpeta === '' ? '' : $carpeta);
+
+}
+
+function mpEsCredencialDePrueba(string $accessToken): bool {
+
+    return strpos($accessToken, 'TEST-') === 0;
+
+}
+
+function mpCheckoutUrl(array $preferencia, string $accessToken): string {
+
+    if(
+        mpEsCredencialDePrueba($accessToken)
+        &&
+        !empty($preferencia['sandbox_init_point'])
+    ){
+        return $preferencia['sandbox_init_point'];
+    }
+
+    return $preferencia['init_point'] ?? '';
 
 }
 
